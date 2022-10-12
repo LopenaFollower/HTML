@@ -1,4 +1,4 @@
 {
-    value1: "return";
-    value1: "value";
+    "value1": "return";
+    "value2": "value";
 }
