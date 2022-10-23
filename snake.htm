@@ -311,6 +311,25 @@ var sp=spawn();var ap=apple();
 var head=[toNum(sp[0]),toNum(sp[1])];
 var food=[toNum(ap[0]),toNum(ap[1])];
 function getLoc(byId){var a=byId.split(",");return a;}
+document.addEventListener('keydown', e =>{
+	if(e.keyCode==37){
+		left();
+	}else if(e.keyCode==65){
+		left();
+	}else if(e.keyCode==38){
+		up();
+	}else if(e.keyCode==87){
+		up();
+	}else if(e.keyCode==40){
+		down();
+	}else if(e.keyCode==83){
+		down();
+	}else if(e.keyCode==39){
+		right();
+	}else if(e.keyCode==68){
+		right();
+	}
+});
 loop((function(){
 	head=head;food=food;
 	if(head[0]==15&&gstat==1){
