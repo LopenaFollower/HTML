@@ -17,7 +17,12 @@
 				user-select: none;
 			}
 			.black  {
-				border-radius: 3px;
+				border-radius: 4.5px;
+				box-shadow: 0px 0px 0px 1.05px rgb(20, 250, 250);;
+			}
+			li {
+				align: center;
+				color: rgba(0,0,0,0.5);
 			}
 		</style>
 	</head>
@@ -282,14 +287,28 @@
 				</tr>
 			</table>
 			<br id="why Id'd" data-value>
-			<button onclick='left();'>←</button>
-			<button onclick='up();'>↑</button>
-			<button onclick='down();'>↓</button>
-			<button onclick='right();'>→</button>
+			<button onclick='move("left");'>←</button>
+			<button onclick='move("up");'>↑</button>
+			<button onclick='move("down");'>↓</button>
+			<button onclick='move("right");'>→</button>
 			<br><p style='color: rgba(0,0,0,0.1)'>or WASD<br>or arrow keys</p>
+			<p style='text-align:left' style='color: rgba(0,0,0,0.3)'>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Bugs:
+			</p>
+			<ul align="left">
+				<li style='text-align:left'>Body segments disappearing due to <b><u>The Regulator</u></b>.</li>
+			</ul>
+			<p style='text-align:left' style='color: rgba(0,0,0,0.3)'>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Information:
+			</p>
+			<ul align="left">
+				<li style='text-align:left'><i>The Regulator</i> is the name of the module that makes sure the snake's length is appropriate to the score.</li>
+				<li style='text-align:left'>The maximun length of the snake that I have coded so far is 35, if more than that, the snake will keep growing</li>
+				<li style='text-align:left'>I made this game all on a phone.</li>
+			</ul>
 		</center>
 		<script>/*height setup*/;grid.style.width=screen.width-50+"px";grid.style.height=grid.style.width;
-var rgb;var mult=1;var speed=25;var r=0;var g=0;var b=0;var r_g=false;var g_g=false;var b_g=false;var r_l=false;var g_l=false;var b_l=false;function a(){r=255;g_g=true};a();setInterval(()=>{if(r>255){r_g=false;r=255};if(g>255){g_g=false;g=255};if(b>255){b_g=false;b=255}if(r<0){r_l=false;r=0};if(g<0){g_l=false;g=0};if(b<0){b_l=false;b=0};if(r_g==true){r=r+mult};if(g_g==true){g=g+mult};if(b_g==true){b=b+mult};if(r_l==true){r=r-mult};if(g_l==true){g=g-mult};if(b_l==true){b=b-mult};},speed||50);setInterval(()=>{if(r==255&&g==0&&b==0){g_g=true};if(r==255&&g==255&&b==0){r_l=true};if(r==0&&g==255&&b==0){b_g=true};if(r==0&&g==255&&b==255){g_l=true};if(r==0&&g==0&&b==255){r_g=true};if(r==255&&g==0&&b==255){b_l=true};rgb=r/1.25+","+g+","+b;},0.0001);
+var rgb,mult=1,speed=25;var r=0;var g=0;var b=0;var r_g=false;var g_g=false;var b_g=false;var r_l=false;var g_l=false;var b_l=false;function a(){r=255;g_g=true};a();setInterval(()=>{if(r>255){r_g=false;r=255};if(g>255){g_g=false;g=255};if(b>255){b_g=false;b=255}if(r<0){r_l=false;r=0};if(g<0){g_l=false;g=0};if(b<0){b_l=false;b=0};if(r_g==true){r=r+mult};if(g_g==true){g=g+mult};if(b_g==true){b=b+mult};if(r_l==true){r=r-mult};if(g_l==true){g=g-mult};if(b_l==true){b=b-mult};},speed||50);setInterval(()=>{if(r==255&&g==0&&b==0){g_g=true};if(r==255&&g==255&&b==0){r_l=true};if(r==0&&g==255&&b==0){b_g=true};if(r==0&&g==255&&b==255){g_l=true};if(r==0&&g==0&&b==255){r_g=true};if(r==255&&g==0&&b==255){b_l=true};rgb=r/1.25+","+g+","+b;},0.0001);
 /*shortcuts*/;
 function last(any){let string=any.toString();if(isNaN(any)==true){return string.substring(string.length-1)}else{return parseInt(string.substring(string.length-1))}};
 function floor(any){return Math.floor(toNum(any))};
@@ -313,27 +332,35 @@ var food=[toNum(ap[0]),toNum(ap[1])];
 function getLoc(byId){var a=byId.split(",");return a;}
 document.addEventListener('keydown', e =>{
 	if(e.keyCode==37){
-		left();
+		move("left");
 	}else if(e.keyCode==65){
-		left();
+		move("left");
 	}else if(e.keyCode==38){
-		up();
+		move("up");
 	}else if(e.keyCode==87){
-		up();
+		move("up");
 	}else if(e.keyCode==40){
-		down();
+		move("down");
 	}else if(e.keyCode==83){
-		down();
+		move("down");
 	}else if(e.keyCode==39){
-		right();
+		move("right");
 	}else if(e.keyCode==68){
-		right();
+		move("right");
 	}
 });
+function reset(){
+	for(let i=1;i<226;i++){
+		w(rev_index[i]).style.backgroundColor="rgb(20, 250, 250)";
+	}
+	ap=apple();
+	food=[toNum(ap[0]),toNum(ap[1])];
+}
 loop((function(){
 	head=head;food=food;
 	if(head[0]==15&&gstat==1){
 		gstat=0;
+		reset()
 		displayed_points="Game Over";
 		w("8,8").textContent=displayed_points;
 		ydir=0;
@@ -351,6 +378,7 @@ loop((function(){
 	}
 	if(head[1]==15&&gstat==1){
 		gstat=0;
+		reset()
 		displayed_points="Game Over";
 		w("8,8").textContent=displayed_points;
 		ydir=0;
@@ -368,6 +396,7 @@ loop((function(){
 	}
 	if(head[0]==-1&&gstat==1){
 		gstat=0;
+		reset()
 		displayed_points="Game Over";
 		w("8,8").textContent=displayed_points;
 		ydir=0;
@@ -385,6 +414,7 @@ loop((function(){
 	}
 	if(head[1]==-1&&gstat==1){
 		gstat=0;
+		reset()
 		displayed_points="Game Over";
 		w("8,8").textContent=displayed_points;
 		ydir=0;
@@ -405,35 +435,51 @@ var encoded=[".",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 //red: 1,black: 2,white: 0
 function h5(id){
 	try{
-	if(w(id).style.backgroundColor=="rgb(255, 17, 0)"){
-		encoded[index[id.toString()]]=1;
-	}else if(w(id).style.backgroundColor=="black"){
-		encoded[index[id.toString()]]=2;
-	}else if(w(id).style.backgroundColor=="rgb(20, 250, 250)"){
-		encoded[index[id.toString()]]=0;
-	}else if(w(id).style.backgroundColor==""){
-		encoded[index[id.toString()]]=0;
-	}
-	}catch(e){
-	}
+		if(w(id).style.backgroundColor=="rgb(255, 17, 0)"){
+			encoded[index[id.toString()]]=1;
+		}else if(w(id).style.backgroundColor=="black"){
+			encoded[index[id.toString()]]=2;
+		}else if(w(id).style.backgroundColor=="rgb(20, 250, 250)"){
+			encoded[index[id.toString()]]=0;
+		}else if(w(id).style.backgroundColor==""){
+			encoded[index[id.toString()]]=0;
+		}
+	}catch(e){}
 }
+var restric={
+	"up":false,
+	"down":false,
+	"left":false,
+	"right":false
+};
 var hesd=locate(2)
 setInterval(()=>{
-	h5(1+","+1);h5(2+","+1);h5(3+","+1);h5(4+","+1);h5(5+","+1);h5(6+","+1);h5(7+","+1);h5(8+","+1);h5(9+","+1);h5(10+","+1);h5(11+","+1);h5(12+","+1);h5(13+","+1);h5(14+","+1);h5(15+","+1);
-	h5(1+","+2);h5(2+","+2);h5(3+","+2);h5(4+","+2);h5(5+","+2);h5(6+","+2);h5(7+","+2);h5(8+","+1);h5(9+","+2);h5(10+","+2);h5(11+","+2);h5(12+","+2);h5(13+","+2);h5(14+","+2);h5(15+","+2);
-	h5(1+","+3);h5(2+","+3);h5(3+","+3);h5(4+","+3);h5(5+","+3);h5(6+","+3);h5(7+","+3);h5(8+","+3);h5(9+","+3);h5(10+","+3);h5(11+","+3);h5(12+","+3);h5(13+","+3);h5(14+","+3);h5(15+","+3);
-	h5(1+","+4);h5(2+","+4);h5(3+","+4);h5(4+","+4);h5(5+","+4);h5(6+","+4);h5(7+","+4);h5(8+","+4);h5(9+","+4);h5(10+","+4);h5(11+","+4);h5(12+","+4);h5(13+","+4);h5(14+","+4);h5(15+","+4);
-	h5(1+","+5);h5(2+","+5);h5(3+","+5);h5(4+","+5);h5(5+","+5);h5(6+","+5);h5(7+","+5);h5(8+","+5);h5(9+","+5);h5(10+","+5);h5(11+","+5);h5(12+","+5);h5(13+","+5);h5(14+","+5);h5(15+","+5);
-	h5(1+","+6);h5(2+","+6);h5(3+","+6);h5(4+","+6);h5(5+","+6);h5(6+","+6);h5(7+","+6);h5(8+","+6);h5(9+","+6);h5(10+","+6);h5(11+","+6);h5(12+","+6);h5(13+","+6);h5(14+","+6);h5(15+","+6);
-	h5(1+","+7);h5(2+","+7);h5(3+","+7);h5(4+","+7);h5(5+","+7);h5(6+","+7);h5(7+","+7);h5(8+","+7);h5(9+","+7);h5(10+","+7);h5(11+","+7);h5(12+","+7);h5(13+","+7);h5(14+","+7);h5(15+","+7);
-	h5(1+","+8);h5(2+","+8);h5(3+","+8);h5(4+","+8);h5(5+","+8);h5(6+","+8);h5(7+","+8);h5(8+","+8);h5(9+","+8);h5(10+","+8);h5(11+","+8);h5(12+","+8);h5(13+","+8);h5(14+","+8);h5(15+","+8);
-	h5(1+","+9);h5(2+","+9);h5(3+","+9);h5(4+","+9);h5(5+","+9);h5(6+","+9);h5(7+","+9);h5(8+","+9);h5(9+","+9);h5(10+","+9);h5(11+","+9);h5(12+","+9);h5(13+","+9);h5(14+","+9);h5(15+","+9);
-	h5(1+","+10);h5(2+","+10);h5(3+","+10);h5(4+","+10);h5(5+","+10);h5(6+","+10);h5(7+","+10);h5(8+","+10);h5(9+","+10);h5(10+","+10);h5(11+","+10);h5(12+","+10);h5(13+","+10);h5(14+","+10);h5(15+","+10);
-	h5(1+","+11);h5(2+","+11);h5(3+","+11);h5(4+","+11);h5(5+","+11);h5(6+","+11);h5(7+","+11);h5(8+","+11);h5(9+","+11);h5(10+","+11);h5(11+","+11);h5(12+","+11);h5(13+","+11);h5(14+","+11);h5(15+","+11);
-	h5(1+","+12);h5(2+","+12);h5(3+","+12);h5(4+","+12);h5(5+","+12);h5(6+","+12);h5(7+","+12);h5(8+","+12);h5(9+","+12);h5(10+","+12);h5(11+","+12);h5(12+","+12);h5(13+","+12);h5(14+","+12);h5(15+","+12);
-	h5(1+","+13);h5(2+","+13);h5(3+","+13);h5(4+","+13);h5(5+","+13);h5(6+","+13);h5(7+","+13);h5(8+","+13);h5(9+","+13);h5(10+","+13);h5(11+","+13);h5(12+","+13);h5(13+","+13);h5(14+","+13);h5(15+","+13);
-	h5(1+","+14);h5(2+","+14);h5(3+","+14);h5(4+","+14);h5(5+","+14);h5(6+","+14);h5(7+","+14);h5(8+","+14);h5(9+","+14);h5(10+","+14);h5(11+","+14);h5(12+","+14);h5(13+","+14);h5(14+","+14);h5(15+","+14);
-	h5(1+","+15);h5(2+","+15);h5(3+","+15);h5(4+","+15);h5(5+","+15);h5(6+","+15);h5(7+","+15);h5(8+","+15);h5(9+","+15);h5(10+","+15);h5(11+","+15);h5(12+","+15);h5(13+","+15);h5(14+","+15);h5(15+","+15);
+	h5(1+","+1);h5(2+","+1);h5(3+","+1);h5(4+","+1);h5(5+","+1);h5(6+","+1);h5(7+","+1);h5(8+","+1);h5(9+","+1);h5(10+","+1);h5(11+","+1);h5(12+","+1);h5(13+","+1);h5(14+","+1);h5(15+","+1);h5(1+","+2);h5(2+","+2);h5(3+","+2);h5(4+","+2);h5(5+","+2);h5(6+","+2);h5(7+","+2);h5(8+","+1);h5(9+","+2);h5(10+","+2);h5(11+","+2);h5(12+","+2);h5(13+","+2);h5(14+","+2);h5(15+","+2);h5(1+","+3);h5(2+","+3);h5(3+","+3);h5(4+","+3);h5(5+","+3);h5(6+","+3);h5(7+","+3);h5(8+","+3);h5(9+","+3);h5(10+","+3);h5(11+","+3);h5(12+","+3);h5(13+","+3);h5(14+","+3);h5(15+","+3);h5(1+","+4);h5(2+","+4);h5(3+","+4);h5(4+","+4);h5(5+","+4);h5(6+","+4);h5(7+","+4);h5(8+","+4);h5(9+","+4);h5(10+","+4);h5(11+","+4);h5(12+","+4);h5(13+","+4);h5(14+","+4);h5(15+","+4);h5(1+","+5);h5(2+","+5);h5(3+","+5);h5(4+","+5);h5(5+","+5);h5(6+","+5);h5(7+","+5);h5(8+","+5);h5(9+","+5);h5(10+","+5);h5(11+","+5);h5(12+","+5);h5(13+","+5);h5(14+","+5);h5(15+","+5);h5(1+","+6);h5(2+","+6);h5(3+","+6);h5(4+","+6);h5(5+","+6);h5(6+","+6);h5(7+","+6);h5(8+","+6);h5(9+","+6);h5(10+","+6);h5(11+","+6);h5(12+","+6);h5(13+","+6);h5(14+","+6);h5(15+","+6);h5(1+","+7);h5(2+","+7);h5(3+","+7);h5(4+","+7);h5(5+","+7);h5(6+","+7);h5(7+","+7);h5(8+","+7);h5(9+","+7);h5(10+","+7);h5(11+","+7);h5(12+","+7);h5(13+","+7);h5(14+","+7);h5(15+","+7);h5(1+","+8);h5(2+","+8);h5(3+","+8);h5(4+","+8);h5(5+","+8);h5(6+","+8);h5(7+","+8);h5(8+","+8);h5(9+","+8);h5(10+","+8);h5(11+","+8);h5(12+","+8);h5(13+","+8);h5(14+","+8);h5(15+","+8);h5(1+","+9);h5(2+","+9);h5(3+","+9);h5(4+","+9);h5(5+","+9);h5(6+","+9);h5(7+","+9);h5(8+","+9);h5(9+","+9);h5(10+","+9);h5(11+","+9);h5(12+","+9);h5(13+","+9);h5(14+","+9);h5(15+","+9);h5(1+","+10);h5(2+","+10);h5(3+","+10);h5(4+","+10);h5(5+","+10);h5(6+","+10);h5(7+","+10);h5(8+","+10);h5(9+","+10);h5(10+","+10);h5(11+","+10);h5(12+","+10);h5(13+","+10);h5(14+","+10);h5(15+","+10);h5(1+","+11);h5(2+","+11);h5(3+","+11);h5(4+","+11);h5(5+","+11);h5(6+","+11);h5(7+","+11);h5(8+","+11);h5(9+","+11);h5(10+","+11);h5(11+","+11);h5(12+","+11);h5(13+","+11);h5(14+","+11);h5(15+","+11);h5(1+","+12);h5(2+","+12);h5(3+","+12);h5(4+","+12);h5(5+","+12);h5(6+","+12);h5(7+","+12);h5(8+","+12);h5(9+","+12);h5(10+","+12);h5(11+","+12);h5(12+","+12);h5(13+","+12);h5(14+","+12);h5(15+","+12);h5(1+","+13);h5(2+","+13);h5(3+","+13);h5(4+","+13);h5(5+","+13);h5(6+","+13);h5(7+","+13);h5(8+","+13);h5(9+","+13);h5(10+","+13);h5(11+","+13);h5(12+","+13);h5(13+","+13);h5(14+","+13);h5(15+","+13);h5(1+","+14);h5(2+","+14);h5(3+","+14);h5(4+","+14);h5(5+","+14);h5(6+","+14);h5(7+","+14);h5(8+","+14);h5(9+","+14);h5(10+","+14);h5(11+","+14);h5(12+","+14);h5(13+","+14);h5(14+","+14);h5(15+","+14);h5(1+","+15);h5(2+","+15);h5(3+","+15);h5(4+","+15);h5(5+","+15);h5(6+","+15);h5(7+","+15);h5(8+","+15);h5(9+","+15);h5(10+","+15);h5(11+","+15);h5(12+","+15);h5(13+","+15);h5(14+","+15);h5(15+","+15);
+	if(ydir==1){
+		restric["up"]=true;
+		restric["down"]=false;
+		restric["left"]=false;
+		restric["right"]=false;
+	}
+	if(ydir==-1){
+		restric["down"]=true;
+		restric["up"]=false;
+		restric["left"]=false;
+		restric["right"]=false;
+	}
+	if(xdir==-1){
+		restric["right"]=true;
+		restric["up"]=false;
+		restric["down"]=false;
+		restric["left"]=false;
+	}
+	if(xdir==1){
+		restric["left"]=true;
+		restric["up"]=false;
+		restric["down"]=false;
+		restric["right"]=false;
+	}
+	hesd=locate(2);
 },1);
 function locate(bit_name){
 	var i;
@@ -443,28 +489,140 @@ function locate(bit_name){
 		}
 	}
 }
+function move(req){
+	if(pointz>=1){
+		switch(req){
+			case"left":
+			if(restric.left==false){
+				xdir=-1;ydir=0;
+			}
+			break;
+			case"up":
+			if(restric.up==false){
+				xdir=0;ydir=-1;
+			}
+			break;
+			case"down":
+			if(restric.down==false){
+				xdir=0;ydir=1;
+			}
+			break;
+			case"right":
+			if(restric.right==false){
+				xdir=1;ydir=0;
+			}
+			break;
+		}
+	}else{
+		switch(req){
+			case"left":
+			xdir=-1;ydir=0;
+			break;
+			case"up":
+			xdir=0;ydir=-1;
+			break;
+			case"down":
+			xdir=0;ydir=1;
+			break;
+			case"right":
+			xdir=1;ydir=0;
+			break;
+		}
+	}
+}
+var c9s="rgb(20, 250, 250)";
+var cur,pas,past,xcs,passt,pas1,pas2,pas3,vat,gary,mu1,mu2,mu3,tos,ciw,w00,w0m,uu,oa,yem,nrx,oqf,yxi,lwx,uue,ws3,ds0,
+d58,mek,r9f,k44,o2p,mce,aqx,cow,x92,x10,bEp,xP2,a4H,klJ,j0o,ABC,DEF,GHI,JKL,MNO,PQR,STU,VWX,YZ1,
+ab_,cd_,ef_,gh_,ij_,kl_,mn_,op_,qr_,st_,uv_,wx_,yz_,ab7,cd7,ef7,gh7,ij7,kl7,mn7,op7,qr7,st7,uv7,wx7,yz7;
+function padst(th){
+	yz7=wx7;
+	wx7=uv7;
+	uv7=st7;
+	st7=qr7;
+	qr7=op7;
+	op7=mn7;
+	mn7=kl7;
+	kl7=ij7;
+	ij7=gh7;
+	gh7=ef7;
+	ef7=cd7;
+	cd7=ab7;
+	ab7=yz_;
+	yz_=wx_;
+	wx_=uv_;
+	uv_=st_;
+	st_=qr_;
+	qr_=op_;
+	op_=mn_;
+	mn_=kl_;
+	kl_=ij_;
+	ij_=gh_;
+	gh_=ef_;
+	ef_=cd_;
+	cd_=ab_;
+	ab_=YZ1;
+	YZ1=VWX;
+	VWX=STU;
+	STU=PQR
+	PQR=MNO;
+	MNO=JKL;
+	JKL=GHI
+	GHI=DEF;
+	DEF=ABC;
+	ABC=j0o;
+	j0o=klJ;
+	klJ=a4H;
+	a4H=xP2;
+	xP2=bEp;
+	bEp=x10;
+	x10=x92;
+	x92=cow;
+	cow=aqx;
+	aqx=mce;
+	mce=o2p;
+	o2p=k44;
+	k44=r9f;
+	r9f=mek;
+	mek=d58;
+	d58=ds0;
+	ds0=ws3;ws3=uue;uue=lwx;lwx=yxi;yxi=oqf;oqf=nrx;nrx=yem;yem=oa;oa=uu;uu=w0m;w0m=w00;w00=ciw;ciw=tos;tos=mu3;mu3=mu2;mu2=mu1;mu1=gary;gary=vat;vat=pas3;pas3=pas2;pas2=pas1;pas1=passt;passt=past;past=pas;pas=cur;cur=th;
+	var a=[cur,pas,past,passt,pas1,pas2,pas3,vat,gary,mu1,mu2,mu3,tos,ciw,w00,w0m,uu,oa,yem,nrx,oqf,yxi,lwx,uue,ws3,ds0,d58,mek,r9f,k44,o2p,mce,aqx,cow,x92,x10,bEp,xP2,a4H,klJ,j0o,ABC,DEF,GHI,JKL,MNO,PQR,STU,VWX,YZ1,ab_,cd_,ef_,gh_,ij_,kl_,mn_,op_,qr_,st_,uv_,wx_,yz_,ab7,cd7,ef7,gh7,ij7,kl7,mn7,op7,qr7,st7,uv7,wx7,yz7];
+	return a;
+}
 setInterval(()=>{
 	hesd=locate(2)
 	if(gstat==1){
-	head[0]=head[0]+ydir;
-	head[1]=head[1]+xdir;
-	try{w("grid").children[0].children[head[0]-ydir].children[head[1]-xdir].style.backgroundColor="rgb(20, 250, 250)";}catch(e){};
-	try{w("grid").children[0].children[head[0]].children[head[1]].style.backgroundColor="black";}catch(e){};
-	try{w("grid").children[0].children[head[0]-ydir].children[head[1]-xdir].className="white";}catch(e){};
-	try{w("grid").children[0].children[head[0]].children[head[1]].className="black";}catch(e){};
-	
-	try{w("grid").children[0].children[head[0]-ydir].children[head[1]-xdir].style.backgroundColor="rgb(20, 250, 250)";}catch(e){};
-	try{w("grid").children[0].children[head[0]].children[head[1]].style.backgroundColor="black";}catch(e){};
-	try{w("grid").children[0].children[head[0]-ydir].children[head[1]-xdir].className="white";}catch(e){};
-	try{w("grid").children[0].children[head[0]].children[head[1]].className="black";}catch(e){};
+		head[0]=head[0]+ydir;
+		head[1]=head[1]+xdir;
+		if(pointz==0){
+			try{w("grid").children[0].children[head[0]-ydir].children[head[1]-xdir].style.backgroundColor=c9s;}catch(e){};
+			try{w("grid").children[0].children[head[0]-ydir].children[head[1]-xdir].className="white";}catch(e){};
+		}
+		try{w("grid").children[0].children[head[0]].children[head[1]].style.backgroundColor="black";}catch(e){};
+		try{w("grid").children[0].children[head[0]].children[head[1]].className="black";}catch(e){};
+		if(pointz>=1){
+			xcs=padst(index[((head[0]+1)-ydir).toString()+","+((head[1]+1)-xdir).toString()]);
+			try{w("grid").children[0].children[head[0]-ydir].children[head[1]-xdir].style.backgroundColor="rgb(0,55,0)";}catch(e){};
+		}
+	}
+	//eating
 	if(head[0]==food[0]&&head[1]==food[1]){
 		pointz++;
 		displayed_points="Eaten "+pointz;
 		ap=apple();
 		food=[toNum(ap[0]),toNum(ap[1])];
-	}}
-	w("points").innerHTML=displayed_points+"<br>"+hesd;
-},300);
+	}
+	w("points").innerHTML=displayed_points+"<br>"+toNum(food[0])+","+toNum(food[1]);
+},215);
+setInterval(()=>{
+try{
+	for(let i=1;i<225;i++){
+		if(pointz<=i&&w(rev_index[xcs[i]]).style.backgroundColor!="rgb(255, 17, 0)"&&w(rev_index[xcs[i]]).style.backgroundColor=="rgb(0, 55, 0)"){
+			try{w(rev_index[xcs[i]]).style.backgroundColor=c9s;}catch(e){};
+		}
+	}
+}catch(e){log(e.message)}
+},1);
 var index={
 "1,1": 1,"1,2": 2,"1,3": 3,"1,4": 4,"1,5": 5,"1,6": 6,"1,7": 7,"1,8": 8,"1,9": 9,"1,10": 10,"1,11": 11,"1,12": 12,"1,13": 13,
 "1,14": 14,
@@ -902,11 +1060,7 @@ var rev_index={
 219:"15,9",
 220:"15,10",
 221:"15,11",
-222:"15,12",
-223:"15,13",
-224:"15,14",
-225:"15,15"
-};
+222:"15,12",223:"15,13",224:"15,14",225:"15,15"};
 		</script>
 	</body>
 </html>
