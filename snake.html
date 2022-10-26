@@ -2,34 +2,47 @@
 <html>
 	<head>
 		<title>
-			an original title
+			snake
 		</title>
 		<style>
 			td {
-				border-color: rgba(0,0,0,0);
+				box-shadow: 0px 0px 0px 1.05px rgb(20, 250, 250);
 				background-color: rgb(20, 250, 250);
+				border-color: rgba(0,0,0,0);
+				border-collapse: collapse;
+				border-radius: 2.5px;
+				border: 0;
 			}
 			button {
-				width: 50px;
-				height: 50px;
-				font-size: 32px;
 				color: rgb(200,100,130);
 				user-select: none;
-			}
-			.black  {
-				border-radius: 4.5px;
-				box-shadow: 0px 0px 0px 1.05px rgb(20, 250, 250);;
+				font-size: 32px;
+				height: 50px;
+				width: 50px;
 			}
 			li {
+				text-align: left;
 				align: center;
-				color: rgba(0,0,0,0.5);
+				opacity: 0.5;
+			}
+			#grid, #back_grid {
+				background-color: rgb(20, 250, 250);
+				position: absolute;
+				left: 2.5px;
+				top: 40px;
+			}
+			#points {
+				text-align: left;
+				position: fixed;
+				left: 45%;
+				top: 5px;
 			}
 		</style>
 	</head>
 	<body onload=''>
 	<center>
 			<p id="points"></p>
-			<table border=2 style='border-collapse:collapse' style='' id="grid">
+			<table border="1px" id="grid">
 				<tr>
 					<td id="1,1"></td>
 					<td id="1,2"></td>
@@ -286,7 +299,13 @@
 					<td id="15,15"></td>
 				</tr>
 			</table>
-			<br id="why Id'd" data-value>
+			<div id="back_grid"></div>
+			<br id="why Id'd" data-value><br id="why Id'd" data-value><br id="why Id'd" data-value><br id="why Id'd" data-value><br id="why Id'd" data-value><br id="why Id'd" data-value>
+			<br id="why Id'd" data-value><br id="why Id'd" data-value><br id="why Id'd" data-value>
+			<br id="why Id'd" data-value><br id="why Id'd" data-value><br id="why Id'd" data-value>
+			<br id="why Id'd" data-value><br id="why Id'd" data-value><br id="why Id'd" data-value>
+			<br id="why Id'd" data-value><br id="why Id'd" data-value><br id="why Id'd" data-value>
+			<br id="why Id'd" data-value><br id="why Id'd" data-value><br id="why Id'd" data-value>
 			<button onclick='move("left");'>←</button>
 			<button onclick='move("up");'>↑</button>
 			<button onclick='move("down");'>↓</button>
@@ -296,40 +315,33 @@
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Bugs:
 			</p>
 			<ul align="left">
-				<li style='text-align:left'>Body segments disappearing due to <b><u>The Regulator</u></b>.</li>
+				<li>Food spawning in snake's body</li>
+				<li>Food becoming invisible</li>
 			</ul>
-			<p style='text-align:left' style='color: rgba(0,0,0,0.3)'>
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Information:
-			</p>
-			<ul align="left">
-				<li style='text-align:left'><i>The Regulator</i> is the name of the module that makes sure the snake's length is appropriate to the score.</li>
-				<li style='text-align:left'>The maximun length of the snake that I have coded so far is 35, if more than that, the snake will keep growing</li>
-				<li style='text-align:left'>I made this game all on a phone.</li>
-			</ul>
+		<p>Red / Green / Blue</p>
+			<input style='width:30%' id="redd" type="range" min="0" max="255" value="0">
+			<input style='width:30%' id="greenn" type="range" min="0" max="255" value="55">
+			<input style='width:30%' id="bluee" type="range" min="0" max="255" value="0">
+			<div style='width:95%;height:20px;' id="sample"></div>
 		</center>
-		<script>/*height setup*/;grid.style.width=screen.width-50+"px";grid.style.height=grid.style.width;
-var rgb,mult=1,speed=25;var r=0;var g=0;var b=0;var r_g=false;var g_g=false;var b_g=false;var r_l=false;var g_l=false;var b_l=false;function a(){r=255;g_g=true};a();setInterval(()=>{if(r>255){r_g=false;r=255};if(g>255){g_g=false;g=255};if(b>255){b_g=false;b=255}if(r<0){r_l=false;r=0};if(g<0){g_l=false;g=0};if(b<0){b_l=false;b=0};if(r_g==true){r=r+mult};if(g_g==true){g=g+mult};if(b_g==true){b=b+mult};if(r_l==true){r=r-mult};if(g_l==true){g=g-mult};if(b_l==true){b=b-mult};},speed||50);setInterval(()=>{if(r==255&&g==0&&b==0){g_g=true};if(r==255&&g==255&&b==0){r_l=true};if(r==0&&g==255&&b==0){b_g=true};if(r==0&&g==255&&b==255){g_l=true};if(r==0&&g==0&&b==255){r_g=true};if(r==255&&g==0&&b==255){b_l=true};rgb=r/1.25+","+g+","+b;},0.0001);
-/*shortcuts*/;
-function last(any){let string=any.toString();if(isNaN(any)==true){return string.substring(string.length-1)}else{return parseInt(string.substring(string.length-1))}};
+		<script>
+grid.style.width=screen.width-5+"px";grid.style.height=grid.style.width;
+back_grid.style.width=screen.width-5+"px";back_grid.style.height=grid.style.width;back_grid.style.zIndex="-1";
+setInterval(()=>{
+sample.style.backgroundColor="rgb("+redd.value+", "+greenn.value+", "+bluee.value+")";
+},1);
 function floor(any){return Math.floor(toNum(any))};
 function rand(){return Math.random()};
 function len(array){return array.length};
 function toNum(sao){return parseInt(sao)};
 function w(name){return document.getElementById(name);};
-function cssval(elem,what){return window.getComputedStyle(document.getElementById(elem)).getPropertyValue(what)};
 function log(text){return console.log((text||"").toString())}
 var xdir=0;var ydir=0;var displayed_points=0;var gstat;var pointz=0;
-function apple(){var col=floor(rand()*15).toString();var row=floor(rand()*15).toString();w("grid").children[0].children[col].children[row].style.backgroundColor="#FF1100";var a=[col,row];return a;}
-function left(){xdir=-1;ydir=0;}
-function up(){xdir=0;ydir=-1;}
-function down(){xdir=0;ydir=1;}
-function right(){xdir=1;ydir=0;}
-function loop(a,delay){var n=setInterval(()=>{a()},delay);}
+function apple(){var col=floor(rand()*15).toString();var row=floor(rand()*15).toString();try{if(w("grid").children[0].children[col].children[row].style.backgroundColor!="rgb("+redd.value+", "+greenn.value+", "+bluee.value+")"&&w("grid").children[0].children[col].children[row].style.backgroundColor!="black"){w("grid").children[0].children[col].children[row].style.backgroundColor="#FF1100";var a=[col,row];return a;}else{apple();log("food tried to spawn in body/head");}}catch(e){}};
 function spawn(){w("8,8").textContent="";gstat=1;var col=floor(rand()*(12-3)+3).toString();var row=floor(rand()*(12-3)+3).toString();w("grid").children[0].children[col].children[row].style.backgroundColor="black";w("grid").children[0].children[col].children[row].className="black";var a=[col,row];return a;}
 var sp=spawn();var ap=apple();
 var head=[toNum(sp[0]),toNum(sp[1])];
 var food=[toNum(ap[0]),toNum(ap[1])];
-function getLoc(byId){var a=byId.split(",");return a;}
 document.addEventListener('keydown', e =>{
 	if(e.keyCode==37){
 		move("left");
@@ -350,111 +362,51 @@ document.addEventListener('keydown', e =>{
 	}
 });
 function reset(){
+	gstat=0;
 	for(let i=1;i<226;i++){
 		w(rev_index[i]).style.backgroundColor="rgb(20, 250, 250)";
 	}
-	ap=apple();
-	food=[toNum(ap[0]),toNum(ap[1])];
+	displayed_points="Game Over";
+	w("8,8").textContent=displayed_points;
+	ydir=0;
+	xdir=0;
+	setTimeout(()=>{
+		for(let i=1;i<226;i++){
+			w(rev_index[i]).style.backgroundColor="rgb(20, 250, 250)";
+		}
+		ydir=0;
+		xdir=0;
+		sp=spawn();
+		displayed_points=0;
+		pointz=0;
+		ap=apple();
+		food=[toNum(ap[0]),toNum(ap[1])];
+		head=[toNum(sp[0]),toNum(sp[1])];
+	},1000);
 }
-loop((function(){
+setInterval(()=>{
 	head=head;food=food;
 	if(head[0]==15&&gstat==1){
-		gstat=0;
-		reset()
-		displayed_points="Game Over";
-		w("8,8").textContent=displayed_points;
-		ydir=0;
-		xdir=0;
-		try{w("grid").children[0].children[head[0]-1].children[head[1]].style.backgroundColor="rgb(20, 250, 250)";}catch(e){};
-		try{w("grid").children[0].children[head[0]+1].children[head[1]].style.backgroundColor="rgb(20, 250, 250)";}catch(e){};
-		setTimeout(()=>{
-			ydir=0;
-			xdir=0;
-			sp=spawn();
-			displayed_points=0;
-			pointz=0;
-			head=[toNum(sp[0]),toNum(sp[1])];
-		},1000);
+		reset();
 	}
 	if(head[1]==15&&gstat==1){
-		gstat=0;
-		reset()
-		displayed_points="Game Over";
-		w("8,8").textContent=displayed_points;
-		ydir=0;
-		xdir=0;
-		try{w("grid").children[0].children[head[0]-1].children[head[1]].style.backgroundColor="rgb(20, 250, 250)";}catch(e){};
-		try{w("grid").children[0].children[head[0]].children[head[1]].style.backgroundColor="rgb(20, 250, 250)";}catch(e){};
-		setTimeout(()=>{
-			ydir=0;
-			xdir=0;
-			sp=spawn();
-			displayed_points=0;
-			pointz=0;
-			head=[toNum(sp[0]),toNum(sp[1])];
-		},1000);
+		reset();
 	}
 	if(head[0]==-1&&gstat==1){
-		gstat=0;
-		reset()
-		displayed_points="Game Over";
-		w("8,8").textContent=displayed_points;
-		ydir=0;
-		xdir=0;
-		try{w("grid").children[0].children[head[0]+1].children[head[1]].style.backgroundColor="rgb(20, 250, 250)";}catch(e){};
-		try{w("grid").children[0].children[head[0]-1].children[head[1]].style.backgroundColor="rgb(20, 250, 250)";}catch(e){};
-		setTimeout(()=>{
-			ydir=0;
-			xdir=0;
-			sp=spawn();
-			displayed_points=0;
-			pointz=0;
-			head=[toNum(sp[0]),toNum(sp[1])];
-		},1000);
+		reset();
 	}
 	if(head[1]==-1&&gstat==1){
-		gstat=0;
-		reset()
-		displayed_points="Game Over";
-		w("8,8").textContent=displayed_points;
-		ydir=0;
-		xdir=0;
-		try{w("grid").children[0].children[head[0]+1].children[head[1]].style.backgroundColor="rgb(20, 250, 250)";}catch(e){};
-		try{w("grid").children[0].children[head[0]-1].children[head[1]].style.backgroundColor="rgb(20, 250, 250)";}catch(e){};
-		setTimeout(()=>{
-			ydir=0;
-			xdir=0;
-			sp=spawn();
-			displayed_points=0;
-			pointz=0;
-			head=[toNum(sp[0]),toNum(sp[1])];
-		},1000);
+		reset();
 	}
-}),1)
-var encoded=[".",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-//red: 1,black: 2,white: 0
-function h5(id){
-	try{
-		if(w(id).style.backgroundColor=="rgb(255, 17, 0)"){
-			encoded[index[id.toString()]]=1;
-		}else if(w(id).style.backgroundColor=="black"){
-			encoded[index[id.toString()]]=2;
-		}else if(w(id).style.backgroundColor=="rgb(20, 250, 250)"){
-			encoded[index[id.toString()]]=0;
-		}else if(w(id).style.backgroundColor==""){
-			encoded[index[id.toString()]]=0;
-		}
-	}catch(e){}
-}
+},1)
+
 var restric={
 	"up":false,
 	"down":false,
 	"left":false,
 	"right":false
 };
-var hesd=locate(2)
 setInterval(()=>{
-	h5(1+","+1);h5(2+","+1);h5(3+","+1);h5(4+","+1);h5(5+","+1);h5(6+","+1);h5(7+","+1);h5(8+","+1);h5(9+","+1);h5(10+","+1);h5(11+","+1);h5(12+","+1);h5(13+","+1);h5(14+","+1);h5(15+","+1);h5(1+","+2);h5(2+","+2);h5(3+","+2);h5(4+","+2);h5(5+","+2);h5(6+","+2);h5(7+","+2);h5(8+","+1);h5(9+","+2);h5(10+","+2);h5(11+","+2);h5(12+","+2);h5(13+","+2);h5(14+","+2);h5(15+","+2);h5(1+","+3);h5(2+","+3);h5(3+","+3);h5(4+","+3);h5(5+","+3);h5(6+","+3);h5(7+","+3);h5(8+","+3);h5(9+","+3);h5(10+","+3);h5(11+","+3);h5(12+","+3);h5(13+","+3);h5(14+","+3);h5(15+","+3);h5(1+","+4);h5(2+","+4);h5(3+","+4);h5(4+","+4);h5(5+","+4);h5(6+","+4);h5(7+","+4);h5(8+","+4);h5(9+","+4);h5(10+","+4);h5(11+","+4);h5(12+","+4);h5(13+","+4);h5(14+","+4);h5(15+","+4);h5(1+","+5);h5(2+","+5);h5(3+","+5);h5(4+","+5);h5(5+","+5);h5(6+","+5);h5(7+","+5);h5(8+","+5);h5(9+","+5);h5(10+","+5);h5(11+","+5);h5(12+","+5);h5(13+","+5);h5(14+","+5);h5(15+","+5);h5(1+","+6);h5(2+","+6);h5(3+","+6);h5(4+","+6);h5(5+","+6);h5(6+","+6);h5(7+","+6);h5(8+","+6);h5(9+","+6);h5(10+","+6);h5(11+","+6);h5(12+","+6);h5(13+","+6);h5(14+","+6);h5(15+","+6);h5(1+","+7);h5(2+","+7);h5(3+","+7);h5(4+","+7);h5(5+","+7);h5(6+","+7);h5(7+","+7);h5(8+","+7);h5(9+","+7);h5(10+","+7);h5(11+","+7);h5(12+","+7);h5(13+","+7);h5(14+","+7);h5(15+","+7);h5(1+","+8);h5(2+","+8);h5(3+","+8);h5(4+","+8);h5(5+","+8);h5(6+","+8);h5(7+","+8);h5(8+","+8);h5(9+","+8);h5(10+","+8);h5(11+","+8);h5(12+","+8);h5(13+","+8);h5(14+","+8);h5(15+","+8);h5(1+","+9);h5(2+","+9);h5(3+","+9);h5(4+","+9);h5(5+","+9);h5(6+","+9);h5(7+","+9);h5(8+","+9);h5(9+","+9);h5(10+","+9);h5(11+","+9);h5(12+","+9);h5(13+","+9);h5(14+","+9);h5(15+","+9);h5(1+","+10);h5(2+","+10);h5(3+","+10);h5(4+","+10);h5(5+","+10);h5(6+","+10);h5(7+","+10);h5(8+","+10);h5(9+","+10);h5(10+","+10);h5(11+","+10);h5(12+","+10);h5(13+","+10);h5(14+","+10);h5(15+","+10);h5(1+","+11);h5(2+","+11);h5(3+","+11);h5(4+","+11);h5(5+","+11);h5(6+","+11);h5(7+","+11);h5(8+","+11);h5(9+","+11);h5(10+","+11);h5(11+","+11);h5(12+","+11);h5(13+","+11);h5(14+","+11);h5(15+","+11);h5(1+","+12);h5(2+","+12);h5(3+","+12);h5(4+","+12);h5(5+","+12);h5(6+","+12);h5(7+","+12);h5(8+","+12);h5(9+","+12);h5(10+","+12);h5(11+","+12);h5(12+","+12);h5(13+","+12);h5(14+","+12);h5(15+","+12);h5(1+","+13);h5(2+","+13);h5(3+","+13);h5(4+","+13);h5(5+","+13);h5(6+","+13);h5(7+","+13);h5(8+","+13);h5(9+","+13);h5(10+","+13);h5(11+","+13);h5(12+","+13);h5(13+","+13);h5(14+","+13);h5(15+","+13);h5(1+","+14);h5(2+","+14);h5(3+","+14);h5(4+","+14);h5(5+","+14);h5(6+","+14);h5(7+","+14);h5(8+","+14);h5(9+","+14);h5(10+","+14);h5(11+","+14);h5(12+","+14);h5(13+","+14);h5(14+","+14);h5(15+","+14);h5(1+","+15);h5(2+","+15);h5(3+","+15);h5(4+","+15);h5(5+","+15);h5(6+","+15);h5(7+","+15);h5(8+","+15);h5(9+","+15);h5(10+","+15);h5(11+","+15);h5(12+","+15);h5(13+","+15);h5(14+","+15);h5(15+","+15);
 	if(ydir==1){
 		restric["up"]=true;
 		restric["down"]=false;
@@ -479,16 +431,7 @@ setInterval(()=>{
 		restric["down"]=false;
 		restric["right"]=false;
 	}
-	hesd=locate(2);
 },1);
-function locate(bit_name){
-	var i;
-	for(i=0;i<encoded.length;i++){
-		if(encoded[i]==bit_name){
-			return i;
-		}
-	}
-}
 function move(req){
 	if(pointz>=1){
 		switch(req){
@@ -516,16 +459,16 @@ function move(req){
 	}else{
 		switch(req){
 			case"left":
-			xdir=-1;ydir=0;
+				xdir=-1;ydir=0;
 			break;
 			case"up":
-			xdir=0;ydir=-1;
+				xdir=0;ydir=-1;
 			break;
 			case"down":
-			xdir=0;ydir=1;
+				xdir=0;ydir=1;
 			break;
 			case"right":
-			xdir=1;ydir=0;
+				xdir=1;ydir=0;
 			break;
 		}
 	}
@@ -590,8 +533,12 @@ function padst(th){
 	return a;
 }
 setInterval(()=>{
-	hesd=locate(2)
 	if(gstat==1){
+		try{
+			if(w("grid").children[0].children[head[0]+ydir].children[head[1]+xdir].style.backgroundColor=="rgb("+redd.value+", "+greenn.value+", "+bluee.value+")"){
+				reset();
+			}
+		}catch(e){}
 		head[0]=head[0]+ydir;
 		head[1]=head[1]+xdir;
 		if(pointz==0){
@@ -602,7 +549,7 @@ setInterval(()=>{
 		try{w("grid").children[0].children[head[0]].children[head[1]].className="black";}catch(e){};
 		if(pointz>=1){
 			xcs=padst(index[((head[0]+1)-ydir).toString()+","+((head[1]+1)-xdir).toString()]);
-			try{w("grid").children[0].children[head[0]-ydir].children[head[1]-xdir].style.backgroundColor="rgb(0,55,0)";}catch(e){};
+			try{w("grid").children[0].children[head[0]-ydir].children[head[1]-xdir].style.backgroundColor="rgb("+redd.value+", "+greenn.value+", "+bluee.value+")";}catch(e){};
 		}
 	}
 	//eating
@@ -613,15 +560,15 @@ setInterval(()=>{
 		food=[toNum(ap[0]),toNum(ap[1])];
 	}
 	w("points").innerHTML=displayed_points+"<br>"+toNum(food[0])+","+toNum(food[1]);
-},215);
+},250);
 setInterval(()=>{
 try{
 	for(let i=1;i<225;i++){
-		if(pointz<=i&&w(rev_index[xcs[i]]).style.backgroundColor!="rgb(255, 17, 0)"&&w(rev_index[xcs[i]]).style.backgroundColor=="rgb(0, 55, 0)"){
+		if(pointz<=i&&pointz>=i&&w(rev_index[xcs[i]]).style.backgroundColor!="rgb(255, 17, 0)"){
 			try{w(rev_index[xcs[i]]).style.backgroundColor=c9s;}catch(e){};
 		}
 	}
-}catch(e){log(e.message)}
+}catch(e){}
 },1);
 var index={
 "1,1": 1,"1,2": 2,"1,3": 3,"1,4": 4,"1,5": 5,"1,6": 6,"1,7": 7,"1,8": 8,"1,9": 9,"1,10": 10,"1,11": 11,"1,12": 12,"1,13": 13,
@@ -1047,20 +994,7 @@ var rev_index={
 206:"14,11",
 207:"14,12",
 208:"14,13",
-209:"14,14",
-210:"14,15",
-211:"15,1",
-212:"15,2",
-213:"15,3",
-214:"15,4",
-215:"15,5",
-216:"15,6",
-217:"15,7",
-218:"15,8",
-219:"15,9",
-220:"15,10",
-221:"15,11",
-222:"15,12",223:"15,13",224:"15,14",225:"15,15"};
+209:"14,14",210:"14,15",211:"15,1",212:"15,2",213:"15,3",214:"15,4",215:"15,5",216:"15,6",217:"15,7",218:"15,8",219:"15,9",220:"15,10",221:"15,11",222:"15,12",223:"15,13",224:"15,14",225:"15,15"};
 		</script>
 	</body>
 </html>
