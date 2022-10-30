@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>
+			game
+		</title>
+		<style>
+			.base{
+				border-radius:10px;
+				width:max(275px);
+				height:max(385px);
+				border-collapse:collapse;
+				position:relative;
+				top:70px;
+				border-color:white;
+			}
+			td{
+				align-items:center;
+				text-align:center;
+				word-wrap:auto;
+				width:max(55px);
+				height:max(55px);
+			}
+			#next{
+				border-style:solid;
+				border-color:white;
+				width:max(55px);
+				height:max(55px);
+			}
+		</style>
+	</head>
+	<body bgcolor="#373737">
+		<center>
+			<p>Next:</p>
+			<div id="next"></div>
+			<table border="3" class="base">
+				<tr id="row1">
+					<td onclick="p(this.id)" id="1,1"></td>
+					<td onclick="p(this.id)" id="1,2"></td>
+					<td onclick="p(this.id)" id="1,3"></td>
+					<td onclick="p(this.id)" id="1,4"></td>
+					<td onclick="p(this.id)" id="1,5"></td>
+				</tr>
+				<tr id="row2">
+					<td onclick="p(this.id)" id="2,1"></td>
+					<td onclick="p(this.id)" id="2,2"></td>
+					<td onclick="p(this.id)" id="2,3"></td>
+					<td onclick="p(this.id)" id="2,4"></td>
+					<td onclick="p(this.id)" id="2,5"></td>
+				</tr>
+				<tr id="row3">
+					<td onclick="p(this.id)" id="3,1"></td>
+					<td onclick="p(this.id)" id="3,2"></td>
+					<td onclick="p(this.id)" id="3,3"></td>
+					<td onclick="p(this.id)" id="3,4"></td>
+					<td onclick="p(this.id)" id="3,5"></td>
+				</tr>
+				<tr id="row4">
+					<td onclick="p(this.id)" id="4,1"></td>
+					<td onclick="p(this.id)" id="4,2"></td>
+					<td onclick="p(this.id)" id="4,3"></td>
+					<td onclick="p(this.id)" id="4,4"></td>
+					<td onclick="p(this.id)" id="4,5"></td>
+				</tr>
+				<tr id="row5">
+					<td onclick="p(this.id)" id="5,1"></td>
+					<td onclick="p(this.id)" id="5,2"></td>
+					<td onclick="p(this.id)" id="5,3"></td>
+					<td onclick="p(this.id)" id="5,4"></td>
+					<td onclick="p(this.id)" id="5,5"></td>
+				</tr>
+				<tr id="row6">
+					<td onclick="p(this.id)" id="6,1"></td>
+					<td onclick="p(this.id)" id="6,2"></td>
+					<td onclick="p(this.id)" id="6,3"></td>
+					<td onclick="p(this.id)" id="6,4"></td>
+					<td onclick="p(this.id)" id="6,5"></td>
+				</tr>
+				<tr id="row7">
+					<td onclick="p(this.id)" id="7,1"></td>
+					<td onclick="p(this.id)" id="7,2"></td>
+					<td onclick="p(this.id)" id="7,3"></td>
+					<td onclick="p(this.id)" id="7,4"></td>
+					<td onclick="p(this.id)" id="7,5"></td>
+				</tr>
+			</table>
+		</center>
+		<script>
+function last(any){let string=any.toString();if(isNaN(any)==true){return string.substring(string.length-1)}else{return parseInt(string.substring(string.length-1))}};
+function first(any){let string=any.toString();if(isNaN(any)==true){return string.substring(0,1)}else{return parseInt(string.substring(0,1))}};
+function floor(any){return Math.floor(toNum(any))};
+function rand(){return Math.random()};
+function len(array){return array.length};
+function toNum(sao){return parseInt(sao)};
+function w(name){return document.getElementById(name);};
+function cssval(elem,what){return window.getComputedStyle(document.getElementById(elem)).getPropertyValue(what)};
+function log(text){return console.log((text||"").toString())}
+var col1={"1,1":true,"2,1":true,"3,1":true,"4,1":true,"5,1":true,"6,1":true,"7,1":true},
+	col2={"1,2":true,"2,2":true,"3,2":true,"4,2":true,"5,2":true,"6,2":true,"7,2":true},
+	col3={"1,3":true,"2,3":true,"3,3":true,"4,3":true,"5,3":true,"6,3":true,"7,3":true},
+	col4={"1,4":true,"2,4":true,"3,4":true,"4,4":true,"5,4":true,"6,4":true,"7,4":true},
+	col5={"1,5":true,"2,5":true,"3,5":true,"4,5":true,"5,5":true,"6,5":true,"7,5":true},
+	col_1=0,
+	col_2=0,
+	col_3=0,
+	col_4=0,
+	col_5=0;
+function check(col){
+	
+}
+function p(id){
+	if(col1[id]){
+		col_1++
+	}else if(col2[id]){
+		col_2++
+	}else if(col3[id]){
+		col_3++
+	}else if(col4[id]){
+		col_4++
+	}else if(col5[id]){
+		col_5++
+	}
+	if(col_1>=8&&col_2>=8&&col_3>=8&&col_4>=8&&col_5>=8){reset();}
+}
+function reset(){
+	
+}
+		</script>
+	</body>
+</html>
