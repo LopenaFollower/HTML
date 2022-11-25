@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            an original title
+        </title>
+        <style>
+            input{width:50px;background-color:#d4efd8;}p{font-size:20px;letter-spacing:1.4px;font-weight:bold;font-family:Ariel,monospace;}
+        </style>
+    </head>
+    
+    <body bgcolor="#d4efd8">
+        <center>
+        	<span><u>a</u>xÂ² + <u>b</u>x + <u>c</u></span><br><span>where <b><u>a</u></b> must be a real number</span><br>
+            <br>
+            a=<input type="text"id="aÏ€"maxlength="9"/>, 
+            b=<input type="text"id="bÏ€"maxlength="9"/>, 
+            c=<input type="text"id="cÏ€"maxlength="9"/>
+            <button onclick='A_(o1(n0[o0](g1)[p0]||g0),o1(n0[o0](k0)[p0]||g0),o1(n0[o0](b0)[p0]||g0),k1,k1,[],h0(u0)+v0,h0(u0))'>solve</button><br><br>
+            <p id="dÏ€"></p><br>
+            <p id="eÏ€"></p>
+        </center>
+        <script>
+var a0=Math,
+    b0="cÏ€",
+    c0="Â²",
+    d0="Standard Form:\n",
+    e0="x",
+    f0="pow",
+    g0=(-0x2*-0x211+0x30+-0x31d)*(-0x1ff8+-0x1*-0x204+0x1df9*0x1)+-(-0x2*0xbce+0x1c1d+0x9e*0x19)+-(-0xf0c+0x263b+-0x172e)*-(-0x520+-0x2366+-0x6c*-0x81),
+    h0=parseInt,
+    i0="toString"
+    j0="log",
+    k0="bÏ€",
+    l0=console
+    m0="replace"
+    n0=document,
+    o0="getElementById",
+    p0="value",
+    q0="Vertex",
+    r0="(h,k)",
+    s0=" = ",
+    t0="dÏ€",
+    u0="1",
+    v0=-(0x1*0x2e39+0x3cd*-0xc+0x4f*0x5e+-(0x4*-0x17+-0x2a*0x56+0x5*0x329)*-(0x2*-0xd7f+0x1*-0x5ad+0x1057*0x2)+-(-0x29d2+-0x1115*-0x1+0x3a5a)),
+    w0=(0x21d1+0x1fb*-0xb+-0xc06),
+    x0="indexOf",
+    y0="\.",
+    z0="\/",
+    a1="innerText",
+    b1="eÏ€",
+    c1=-((0x42a*-0x4+0x4e0+-0x1fed*-0x1)*-(0xa3*0x34+0x1f89+-0x40a4)+-(0xdc4+0x13bb+0x1*-0x1aef)+-(0x222b*-0x1+-0x1427+-0xff*-0x37)*-(0xa*0x3d+-0x5*0x181+-0xc9*-0x7))*((-0x1*-0x614+-0xe*0x16e+0x199*0x9)*-(0x1134+0x168a+-0x27b7)+-(0xdfa+-0x2263*0x1+-0x4*-0x52c)*-(-0x128d+-0xc34*0x1+0x1ee4)+-(-0x2467+-0x317*0x4+0xf*0x3b1)*(0x155b+0x14f7+0xe1b*-0x3))+-(-(0x12*0x185+-0x1*-0x6b1+-0x2208)*(-0x1*-0xe17+0x17db+0xd*-0x2a1)+(0x14af+-0x1b5e+0x1397)+-(0x5*0xa2+0x116b+-0x1492)*-(-0x22b5+0x97d+0x1ba6))+(0x572*0x5+0x10cc+-0x1ab*0xa+-(-0xe65+0x2*-0x112b+0x30bc)*(-0x1*0x1571+0x89c+0x2*0x71e)+(-0x9*-0x1df+-0x23ab+0x21e7)),
+    d1=0x24d4+-0x39f*0x9+0x43d*-0x1,
+    e1="\+",
+    f1="\=",
+    g1="aÏ€",
+    h1="length",
+    i1="toLowerCase",
+    j1="",
+    k1=undefined,
+    l1=["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
+    m1=0x10,
+    n1=(g0[i0]+(e0?e0:"look at this skidðŸ’€")),
+    o1=eval,
+    p1="not a valid equation"
+function A_(a,b,c,h,k,v,m,n){
+    h=(v0*h0(b))/(w0*h0(a))[i0]()
+    v[m]=((h[i0]()[x0](y0)<=v0&&j0)?h:B_((v0*h0(b)),(w0*h0(a))))
+    k=(((a0[f0](w0,w0)*h0(a)*h0(c))-a0[f0](h0(b),w0))/(a0[f0](w0,w0)*h0(a)))[i0]()
+    v[n]=((k[i0]()[x0](y0)<=v0)?h0(k):B_(((a0[f0](w0,w0)*h0(a)*h0(c))-a0[f0](h0(b),w0)),(a0[f0](w0,w0)*h0(a))))
+    n0[o0](b1)[a1]=(a?(d0+h0(a)+e0+c0+(b?(b>=g0?e1+h0(b):h0(b)):j1)+(b?e0:j1)+(c?(c>=g0?e1+h0(c):h0(c)):j1)+f1+g0):p1)[i0]()[m0]((u0+e0),e0)
+    n0[o0](t0)[a1]=(q0+r0)+s0+v
+    D_(function(m){n0[o0](b1)[a1]=n0[o0](b1)[a1][m0]((u0+e0)[i0](),e0)})
+}
+function B_(a,b,C_=function C_(c,d){return(d?C_(d,c%d):c)}){
+	C_=C_(a,b);
+	return(b/C_<=g0&&a/C_<=g0)?(v0*(a/C_)+z0+v0*(b/C_)):(b/C_<=g0?(v0*(a/C_)+z0+v0*(b/C_)):(a/C_)+z0+(b/C_))
+}
+function D_(a,b){
+	setTimeout(a(),(b?b:g0));
+}
+setInterval(function(_FILTER_=m0,_NON_=j1,_NUMERAL_=g0,_CHARACTERS_=l1){
+	for(_NUMERAL_;_NUMERAL_<_CHARACTERS_[h1];_NUMERAL_++){
+		n0[o0](g1)[p0]=n0[o0](g1)[p0][i1]()[_FILTER_](_CHARACTERS_[_NUMERAL_],_NON_)
+		n0[o0](k0)[p0]=n0[o0](k0)[p0][i1]()[_FILTER_](_CHARACTERS_[_NUMERAL_],_NON_)
+		n0[o0](b0)[p0]=n0[o0](b0)[p0][i1]()[_FILTER_](_CHARACTERS_[_NUMERAL_],_NON_)
+	}
+},-(n1+m1[i0](m1)));
+        </script>
+    </body>
+</html>
