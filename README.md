@@ -1,5 +1,1 @@
-- 👋 Hi, I’m @LopenaFollower
-- 👀 I’m interested in ... coding, duh
-- 🌱 I’m currently learning ... CSS, json, mastering JavaScript
-- 💞️ I’m looking to collaborate on ... nothing
-- 📫 How to reach me ... don't.
+woohoo debugging
