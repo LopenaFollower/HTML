@@ -1,6 +1,1 @@
-[
-    {
-        "value1": "return",
-        "value2": "value"
-    }
-]
+{web:["data1", "data2"]}
