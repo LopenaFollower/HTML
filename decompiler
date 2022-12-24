@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>
+			decompiler v1.1
+		</title>
+		<style>
+			html,body,center{height:100%;width:100%;margin:0 auto;}
+			#errors{user-select:none;}
+			#main{width:98.5%;height:80%;padding:10px;background-color:#444;color:white;font-size:14px;font-family:monospace;caret-color:orange;border-radius:5px}
+			button{width:85px;font-family:Arial;}
+		</style>
+	</head>
+	<body bgcolor=#d4efd8>
+		<textarea id=main spellcheck=false contenteditable=true>alert("Hello World")</textarea><br>
+		<table>
+			<tr>
+				<td>
+					<input id=replace_text placeholder='replace text...'/>
+				</td>
+				<td>
+					<button onclick='run(document.getElementById("main").value)'>Run</button>
+				</td>
+				<td>
+					<button onclick='document.getElementById("main").value=""'>Clear</button>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<input id=replace_with placeholder='replace with...'/>
+				</td>
+				<td>
+					<button onclick='for(let i=0;i<1000;i++){document.getElementById("main").value=document.getElementById("main").value.replace(document.getElementById("replace_text").value,document.getElementById("replace_with").value)}'>Replace All</button>
+				</td>
+				<td>
+				</td>
+			</tr>
+		</table>
+		<p id=errors></p>
+		<p id="script"></p>
+		<div id=here></div>
+		<script>
+var mult=1,r=255,g=0,b=0,r_g=false,g_g=true,b_g=false,r_l=false,g_l=false,b_l=false,m=255,f=![],t=!![];setInterval(()=>{if(r>m){r_g=false;r=m};if(g>m){g_g=f;g=m};if(b>m){b_g=f;b=m};if(r<0){r_l=f;r=0};if(g<0){g_l=f;g=0};if(b<0){b_l=f;b=0};if(r_g){r+=mult};if(g_g){g+=mult};if(b_g){b+=mult};if(r_l){r-=mult};if(g_l){g-=mult};if(b_l){b-=mult};},25);setInterval(()=>{if(r==m&&g==0&&b==0){g_g=t};if(r==m&&g==m&&b==0){r_l=t};if(r==0&&g==m&&b==0){b_g=t};if(r==0&&g==m&&b==m){g_l=t};if(r==0&&g==0&&b==m){r_g=t};if(r==m&&g==0&&b==m){b_l=t};document.getElementById("main").style.caretColor="rgb("+r+","+g+","+b+")";},1);
+function run(code){
+	if(code.includes('run_snake()')){
+		var xhttp = new XMLHttpRequest();var resp="";xhttp.onreadystatechange=function(){if(this.readyState==4&&this.status==200){resp=this.responseText;}};xhttp.open("GET", "https://raw.githubusercontent.com/LopenaFollower/JavaScript/main/snake_ext.js",true);xhttp.send()
+		setTimeout(()=>{
+			document.getElementById("script").remove()
+			var handler=document.createElement("script")
+			handler.type='text/javascript';
+			handler.id="script";
+			handler.text=`
+				try{`+
+					resp+`;
+				}catch(error){
+					document.getElementById('errors').innerText=error;
+					document.getElementById('errors').style.opacity=1.1;
+					setTimeout(()=>{
+						var a_interval_for_fading_text=setInterval(()=>{
+							if(document.getElementById('errors').style.opacity<0){
+								clearInterval(a_interval_for_fading_text)
+							}else{
+								document.getElementById('errors').style.opacity-=0.05;
+							}
+						},100);
+					},1000);
+				}`;
+			document.getElementById("here").appendChild(handler);
+		},1000);
+	}else if(code.includes('run_vertex()')){
+		var xhttp = new XMLHttpRequest();var resp="";xhttp.onreadystatechange=function(){if(this.readyState==4&&this.status==200){resp=this.responseText;}};xhttp.open("GET", "https://raw.githubusercontent.com/LopenaFollower/JavaScript/main/vertex_ext.js",true);xhttp.send()
+		setTimeout(()=>{
+			document.getElementById("script").remove()
+			var handler=document.createElement("script")
+			handler.type='text/javascript';
+			handler.id="script";
+			handler.text=`
+				try{`+
+					resp+`;
+				}catch(error){
+					document.getElementById('errors').innerText=error;
+					document.getElementById('errors').style.opacity=1.1;
+					setTimeout(()=>{
+						var a_interval_for_fading_text=setInterval(()=>{
+							if(document.getElementById('errors').style.opacity<0){
+								clearInterval(a_interval_for_fading_text)
+							}else{
+								document.getElementById('errors').style.opacity-=0.05;
+							}
+						},100);
+					},1000);
+				}`;
+			document.getElementById("here").appendChild(handler);
+		},1000);
+	}else{
+		document.getElementById("script").remove()
+		var handler=document.createElement("script")
+		handler.type='text/javascript';
+		handler.id="script";
+		handler.text=`
+			try{\n`+
+				code+`;
+			}catch(error){
+				document.getElementById('errors').innerText=error;
+				document.getElementById('errors').style.opacity=1.1;
+				setTimeout(()=>{
+					var a_interval_for_fading_text=setInterval(()=>{
+						if(document.getElementById('errors').style.opacity<0){
+							clearInterval(a_interval_for_fading_text)
+						}else{
+							document.getElementById('errors').style.opacity-=0.05;
+						}
+					},100);
+				},1000);
+			}`;
+		document.getElementById("here").appendChild(handler);
+	}
+}
+		</script>
+	</body>
+</html>
