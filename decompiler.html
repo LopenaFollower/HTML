@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<title>
-			decompiler v1.1
+			decompiler v1.2
 		</title>
 		<style>
 			html,body,center{height:100%;width:100%;margin:0 auto;}
@@ -37,7 +37,7 @@
 			</tr>
 		</table>
 		<p id=errors></p>
-		<p id="script"></p>
+		<p id=script></p>
 		<div id=here></div>
 		<script>
 var mult=1,r=255,g=0,b=0,r_g=false,g_g=true,b_g=false,r_l=false,g_l=false,b_l=false,m=255,f=![],t=!![];setInterval(()=>{if(r>m){r_g=false;r=m};if(g>m){g_g=f;g=m};if(b>m){b_g=f;b=m};if(r<0){r_l=f;r=0};if(g<0){g_l=f;g=0};if(b<0){b_l=f;b=0};if(r_g){r+=mult};if(g_g){g+=mult};if(b_g){b+=mult};if(r_l){r-=mult};if(g_l){g-=mult};if(b_l){b-=mult};},25);setInterval(()=>{if(r==m&&g==0&&b==0){g_g=t};if(r==m&&g==m&&b==0){r_l=t};if(r==0&&g==m&&b==0){b_g=t};if(r==0&&g==m&&b==m){g_l=t};if(r==0&&g==0&&b==m){r_g=t};if(r==m&&g==0&&b==m){b_l=t};document.getElementById("main").style.caretColor="rgb("+r+","+g+","+b+")";},1);
@@ -56,9 +56,9 @@ function run(code){
 					document.getElementById('errors').innerText=error;
 					document.getElementById('errors').style.opacity=1.1;
 					setTimeout(()=>{
-						var a_interval_for_fading_text=setInterval(()=>{
+						var an_interval_for_fading_text=setInterval(()=>{
 							if(document.getElementById('errors').style.opacity<0){
-								clearInterval(a_interval_for_fading_text)
+								clearInterval(an_interval_for_fading_text)
 							}else{
 								document.getElementById('errors').style.opacity-=0.05;
 							}
@@ -81,9 +81,9 @@ function run(code){
 					document.getElementById('errors').innerText=error;
 					document.getElementById('errors').style.opacity=1.1;
 					setTimeout(()=>{
-						var a_interval_for_fading_text=setInterval(()=>{
+						var an_interval_for_fading_text=setInterval(()=>{
 							if(document.getElementById('errors').style.opacity<0){
-								clearInterval(a_interval_for_fading_text)
+								clearInterval(an_interval_for_fading_text)
 							}else{
 								document.getElementById('errors').style.opacity-=0.05;
 							}
@@ -104,9 +104,9 @@ function run(code){
 				document.getElementById('errors').innerText=error;
 				document.getElementById('errors').style.opacity=1.1;
 				setTimeout(()=>{
-					var a_interval_for_fading_text=setInterval(()=>{
+					var an_interval_for_fading_text=setInterval(()=>{
 						if(document.getElementById('errors').style.opacity<0){
-							clearInterval(a_interval_for_fading_text)
+							clearInterval(an_interval_for_fading_text)
 						}else{
 							document.getElementById('errors').style.opacity-=0.05;
 						}
