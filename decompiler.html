@@ -49,9 +49,9 @@ const result = text.replace(/O/g, match => ++sdad === 3 ? 'Z' : match)
 
 
 main.addEventListener("keydown",e=>{if(e.keyCode==9){e.preventDefault();main.setRangeText("\t",main.selectionStart,main.selectionEnd,"end")}})
-function run(code){
+function run(code,xhttp=new XMLHttpRequest(),resp=""){
 	if(code.includes('run_snake()')){
-		var xhttp = new XMLHttpRequest();var resp="";xhttp.onreadystatechange=function(){if(this.readyState==4&&this.status==200){resp=this.responseText;}};xhttp.open("GET", "https://raw.githubusercontent.com/LopenaFollower/JavaScript/main/snake_ext.js",true);xhttp.send()
+		xhttp.onreadystatechange=function(){if(this.readyState==4&&this.status==200){resp=this.responseText;}};xhttp.open("GET", "https://raw.githubusercontent.com/LopenaFollower/JavaScript/main/snake_ext.js",true);xhttp.send()
 		setTimeout(()=>{
 			document.getElementById("script").remove()
 			var handler=document.createElement("script")
@@ -76,7 +76,7 @@ function run(code){
 			document.getElementById("here").appendChild(handler);
 		},1000);
 	}else if(code.includes('run_vertex()')){
-		var xhttp = new XMLHttpRequest();var resp="";xhttp.onreadystatechange=function(){if(this.readyState==4&&this.status==200){resp=this.responseText;}};xhttp.open("GET", "https://raw.githubusercontent.com/LopenaFollower/JavaScript/main/vertex_ext.js",true);xhttp.send()
+		xhttp.onreadystatechange=function(){if(this.readyState==4&&this.status==200){resp=this.responseText;}};xhttp.open("GET", "https://raw.githubusercontent.com/LopenaFollower/JavaScript/main/vertex_ext.js",true);xhttp.send()
 		setTimeout(()=>{
 			document.getElementById("script").remove()
 			var handler=document.createElement("script")
