@@ -41,70 +41,22 @@
 		<p id=script></p>
 		<div id=here></div>
 		<script>
-var main=document.getElementById("main"),mult=1,r=255,g=0,b=0,r_g=false,g_g=true,b_g=false,r_l=false,g_l=false,b_l=false,m=255,f=![],t=!![];setInterval(()=>{if(r>m){r_g=false;r=m};if(g>m){g_g=f;g=m};if(b>m){b_g=f;b=m};if(r<0){r_l=f;r=0};if(g<0){g_l=f;g=0};if(b<0){b_l=f;b=0};if(r_g){r+=mult};if(g_g){g+=mult};if(b_g){b+=mult};if(r_l){r-=mult};if(g_l){g-=mult};if(b_l){b-=mult};},25);setInterval(()=>{if(r==m&&g==0&&b==0){g_g=t};if(r==m&&g==m&&b==0){r_l=t};if(r==0&&g==m&&b==0){b_g=t};if(r==0&&g==m&&b==m){g_l=t};if(r==0&&g==0&&b==m){r_g=t};if(r==m&&g==0&&b==m){b_l=t};main.style.caretColor="rgb("+r+","+g+","+b+")";main.style.textShadow="0px 0px 3px rgb("+b+","+r+","+g+")";},1);
+var main=document.getElementById("main"),xhttp=new XMLHttpRequest(),package=[],mult=1,r=255,g=0,b=0,r_g=false,g_g=true,b_g=false,r_l=false,g_l=false,b_l=false,m=255,f=![],t=!![];setInterval(()=>{if(r>m){r_g=false;r=m};if(g>m){g_g=f;g=m};if(b>m){b_g=f;b=m};if(r<0){r_l=f;r=0};if(g<0){g_l=f;g=0};if(b<0){b_l=f;b=0};if(r_g){r+=mult};if(g_g){g+=mult};if(b_g){b+=mult};if(r_l){r-=mult};if(g_l){g-=mult};if(b_l){b-=mult};},25);setInterval(()=>{if(r==m&&g==0&&b==0){g_g=t};if(r==m&&g==m&&b==0){r_l=t};if(r==0&&g==m&&b==0){b_g=t};if(r==0&&g==m&&b==m){g_l=t};if(r==0&&g==0&&b==m){r_g=t};if(r==m&&g==0&&b==m){b_l=t};main.style.caretColor="rgb("+r+","+g+","+b+")";main.style.textShadow="0px 0px 3px rgb("+b+","+r+","+g+")";},1);
 main.addEventListener("keydown",e=>{if(e.keyCode==9){e.preventDefault();main.setRangeText("\t",main.selectionStart,main.selectionEnd,"end")}})
-function run(code,xhttp=new XMLHttpRequest(),resp=""){
-	if(code.includes('run_snake()')){
-		xhttp.onreadystatechange=function(){if(this.readyState==4&&this.status==200){resp=this.responseText;}};xhttp.open("GET", "https://raw.githubusercontent.com/LopenaFollower/JavaScript/main/snake_ext.js",true);xhttp.send()
-		setTimeout(()=>{
-			document.getElementById("script").remove()
-			var handler=document.createElement("script")
-			handler.type='text/javascript';
-			handler.id="script";
-			handler.text=`
-				try{`+
-					resp+`;
-				}catch(error){
-					document.getElementById('errors').innerText=error;
-					document.getElementById('errors').style.opacity=1.1;
-					setTimeout(()=>{
-						var an_interval_for_fading_text=setInterval(()=>{
-							if(document.getElementById('errors').style.opacity<0){
-								clearInterval(an_interval_for_fading_text)
-							}else{
-								document.getElementById('errors').style.opacity-=0.05;
-							}
-						},100);
-					},1000);
-				}`;
-			document.getElementById("here").appendChild(handler);
-		},1000);
-	}else if(code.includes('run_vertex()')){
-		xhttp.onreadystatechange=function(){if(this.readyState==4&&this.status==200){resp=this.responseText;}};xhttp.open("GET", "https://raw.githubusercontent.com/LopenaFollower/JavaScript/main/vertex_ext.js",true);xhttp.send()
-		setTimeout(()=>{
-			document.getElementById("script").remove()
-			var handler=document.createElement("script")
-			handler.type='text/javascript';
-			handler.id="script";
-			handler.text=`
-				try{`+
-					resp+`;
-				}catch(error){
-					document.getElementById('errors').innerText=error;
-					document.getElementById('errors').style.opacity=1.1;
-					setTimeout(()=>{
-						var an_interval_for_fading_text=setInterval(()=>{
-							if(document.getElementById('errors').style.opacity<0){
-								clearInterval(an_interval_for_fading_text)
-							}else{
-								document.getElementById('errors').style.opacity-=0.05;
-							}
-						},100);
-					},1000);
-				}`;
-			document.getElementById("here").appendChild(handler);
-		},1000);
-	}else{
+xhttp.onreadystatechange=function(){if(this.readyState==4&&this.status==200){package[0]=this.responseText;}};xhttp.open("GET","https://raw.githubusercontent.com/LopenaFollower/JavaScript/main/snake_ext.js",true);xhttp.send()
+xhttp.onreadystatechange=function(){if(this.readyState==4&&this.status==200){package[1]=this.responseText;}};xhttp.open("GET","https://raw.githubusercontent.com/LopenaFollower/JavaScript/main/vertex_ext.js",true);xhttp.send()
+function run(code){
+	if(code.length>0){
 		document.getElementById("script").remove()
 		var handler=document.createElement("script")
 		handler.type='text/javascript';
 		handler.id="script";
 		handler.text=`
 			try{\n`+
-				code.replace("\t","    ")+`;
+				(code.includes('run_snake()')?package[0]:(code.includes('run_vertex()')?package[1]:code.replace("\t","    ")))+`;
 			}catch(error){
 				document.getElementById('errors').innerText=error;
-				document.getElementById('errors').style.opacity=1.1;
+				document.getElementById('errors').style.opacity=1.05;
 				setTimeout(()=>{
 					var an_interval_for_fading_text=setInterval(()=>{
 						if(document.getElementById('errors').style.opacity<0){
