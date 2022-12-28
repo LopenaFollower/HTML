@@ -88,8 +88,7 @@
 			</table>
 		</center>
 		<script>
-var settings={step:1,speed:1},
-	r=255,g=0,b=0,r_g=![],g_g=true,b_g=![],r_l=![],g_l=![],b_l=![],m=255,f=![],t=!![];setInterval(()=>{if(r>m){r_g=![];r=m};if(g>m){g_g=f;g=m};if(b>m){b_g=f;b=m};if(r<0){r_l=f;r=0};if(g<0){g_l=f;g=0};if(b<0){b_l=f;b=0};if(r_g){r+=settings.step};if(g_g){g+=settings.step};if(b_g){b+=settings.step};if(r_l){r-=settings.step};if(g_l){g-=settings.step};if(b_l){b-=settings.step};},settings.speed);setInterval(()=>{if(r==m&&g==0&&b==0){g_g=t};if(r==m&&g==m&&b==0){r_l=t};if(r==0&&g==m&&b==0){b_g=t};if(r==0&&g==m&&b==m){g_l=t};if(r==0&&g==0&&b==m){r_g=t};if(r==m&&g==0&&b==m){b_l=t}},1);
+var settings={step:1,speed:1},r=255,g=0,b=0,r_g=![],g_g=true,b_g=![],r_l=![],g_l=![],b_l=![],m=255,f=![],t=!![];setInterval(()=>{if(r>m){r_g=![];r=m};if(g>m){g_g=f;g=m};if(b>m){b_g=f;b=m};if(r<0){r_l=f;r=0};if(g<0){g_l=f;g=0};if(b<0){b_l=f;b=0};if(r_g){r+=settings.step};if(g_g){g+=settings.step};if(b_g){b+=settings.step};if(r_l){r-=settings.step};if(g_l){g-=settings.step};if(b_l){b-=settings.step};},settings.speed);setInterval(()=>{if(r==m&&g==0&&b==0){g_g=t};if(r==m&&g==m&&b==0){r_l=t};if(r==0&&g==m&&b==0){b_g=t};if(r==0&&g==m&&b==m){g_l=t};if(r==0&&g==0&&b==m){r_g=t};if(r==m&&g==0&&b==m){b_l=t}},1);
 function rgb_el(el,type,format){el.style[type]=fetch_rgb(format)};function fetch_rgb(format){switch(format){case"rgb":return"rgb("+r+","+g+","+b+")";break;case"rbg":return"rgb("+r+","+b+","+g+")";break;case"grb":return"rgb("+g+","+r+","+b+")";break;case"gbr":return"rgb("+g+","+b+","+r+")";break;case"bgr":return"rgb("+b+","+g+","+r+")";break;case"brg":return"rgb("+b+","+r+","+g+")";break}};Math.rand=()=>{return Math.random()};
 var col1={"1,1":true,"2,1":true,"3,1":true,"4,1":true,"5,1":true,"6,1":true,"7,1":true},col2={"1,2":true,"2,2":true,"3,2":true,"4,2":true,"5,2":true,"6,2":true,"7,2":true},col3={"1,3":true,"2,3":true,"3,3":true,"4,3":true,"5,3":true,"6,3":true,"7,3":true},col4={"1,4":true,"2,4":true,"3,4":true,"4,4":true,"5,4":true,"6,4":true,"7,4":true},col5={"1,5":true,"2,5":true,"3,5":true,"4,5":true,"5,5":true,"6,5":true,"7,5":true},
 	col_1,col_2,col_3,col_4,col_5,cool=true;
@@ -145,7 +144,7 @@ const {floor}=Math,{rand}=Math,toNum=(sao)=>{return parseInt(sao)},w=(name)=>{re
 "1125899906842624":"#6b6b6b",
 "2251799813685248":"#6b6b6b",
 "4503599627370496":"#41C2AF"
-},fal_g=1,last=(any)=>{let string=any.toString();if(isNaN(any)==true){return string.substring(string.length-1)}else{return parseInt(string.substring(string.length-1))}},first=(any)=>{let string=any.toString();if(isNaN(any)==true){return string.substring(0,1)}else{return parseInt(string.substring(0,1))}};
+},fal_g=cd/14,last=(any)=>{let string=any.toString();if(isNaN(any)==true){return string.substring(string.length-1)}else{return parseInt(string.substring(string.length-1))}},first=(any)=>{let string=any.toString();if(isNaN(any)==true){return string.substring(0,1)}else{return parseInt(string.substring(0,1))}};
 setInterval(()=>{
 	scheme["9007199254740992"]=fetch_rgb("grb")
 	scheme["18014398509481984"]=fetch_rgb("bgr")
@@ -195,7 +194,7 @@ function p(id){
 		setTimeout(w("next")[IT]="",cd/2);
 		setTimeout(next_p,cd);
 	}
-	setTimeout(combine(row),50);
+	setTimeout(combine(row),0);
 	if(col_1<=0||col_2<=0||col_3<=0||col_4<=0||col_5<=0){reset();}
 }
 function fall(col,row){
@@ -360,7 +359,7 @@ try{
 				fall(6,3)
 				col_2++
 				fall(7,2)
-				w("6,2")[IT]=toNum(w("6,2")[IT])*16;
+				w("6,2")[IT]=toNum(w("6,2")[IT])*8;
 			}
 			if(are(w("6,2")[IT],w("7,3")[IT],w("6,4")[IT])&&is(w("6,4")[IT],w("6,3")[IT])&&w("7,3")[IT]!=""){
 				w("6,2")[IT]="";
@@ -371,7 +370,7 @@ try{
 				fall(6,4)
 				col_3++
 				fall(7,3)
-				w("6,3")[IT]=toNum(w("6,3")[IT])*16;
+				w("6,3")[IT]=toNum(w("6,3")[IT])*8;
 			}
 			if(are(w("6,3")[IT],w("7,4")[IT],w("6,5")[IT])&&is(w("6,5")[IT],w("6,4")[IT])&&w("7,4")[IT]!=""){
 				w("6,3")[IT]="";
@@ -382,7 +381,7 @@ try{
 				fall(6,5)
 				col_4++
 				fall(7,4)
-				w("6,4")[IT]=toNum(w("6,4")[IT])*16;
+				w("6,4")[IT]=toNum(w("6,4")[IT])*8;
 			}
 			if(are(w("5,1")[IT],w("6,2")[IT],w("5,3")[IT])&&is(w("5,3")[IT],w("5,2")[IT])&&w("6,2")[IT]!=""){
 				w("5,1")[IT]="";
@@ -393,7 +392,7 @@ try{
 				fall(5,3)
 				col_2++
 				fall(6,2)
-				w("5,2")[IT]=toNum(w("5,2")[IT])*16;
+				w("5,2")[IT]=toNum(w("5,2")[IT])*8;
 			}
 			if(are(w("5,2")[IT],w("6,3")[IT],w("5,4")[IT])&&is(w("5,4")[IT],w("5,3")[IT])&&w("6,3")[IT]!=""){
 				w("5,2")[IT]="";
@@ -404,7 +403,7 @@ try{
 				fall(5,4)
 				col_3++
 				fall(6,3)
-				w("5,3")[IT]=toNum(w("5,3")[IT])*16;
+				w("5,3")[IT]=toNum(w("5,3")[IT])*8;
 			}
 			if(are(w("5,3")[IT],w("6,4")[IT],w("5,5")[IT])&&is(w("5,5")[IT],w("5,4")[IT])&&w("6,4")[IT]!=""){
 				w("5,3")[IT]="";
@@ -415,7 +414,7 @@ try{
 				fall(5,5)
 				col_4++
 				fall(6,4)
-				w("5,4")[IT]=toNum(w("5,4")[IT])*16;
+				w("5,4")[IT]=toNum(w("5,4")[IT])*8;
 			}
 			if(are(w("4,1")[IT],w("5,2")[IT],w("4,3")[IT])&&is(w("4,3")[IT],w("4,2")[IT])&&w("5,2")[IT]!=""){
 				w("4,1")[IT]="";
@@ -426,7 +425,7 @@ try{
 				fall(4,3)
 				col_2++
 				fall(5,2)
-				w("4,2")[IT]=toNum(w("4,2")[IT])*16;
+				w("4,2")[IT]=toNum(w("4,2")[IT])*8;
 			}
 			if(are(w("4,2")[IT],w("5,3")[IT],w("4,4")[IT])&&is(w("4,4")[IT],w("4,3")[IT])&&w("5,3")[IT]!=""){
 				w("4,2")[IT]="";
@@ -437,7 +436,7 @@ try{
 				fall(4,4)
 				col_3++
 				fall(5,3)
-				w("4,3")[IT]=toNum(w("4,3")[IT])*16;
+				w("4,3")[IT]=toNum(w("4,3")[IT])*8;
 			}
 			if(are(w("4,3")[IT],w("5,4")[IT],w("4,5")[IT])&&is(w("4,5")[IT],w("4,4")[IT])&&w("5,4")[IT]!=""){
 				w("4,3")[IT]="";
@@ -448,7 +447,7 @@ try{
 				fall(4,5)
 				col_4++
 				fall(5,4)
-				w("4,4")[IT]=toNum(w("4,4")[IT])*16;
+				w("4,4")[IT]=toNum(w("4,4")[IT])*8;
 			}
 			if(are(w("3,1")[IT],w("4,2")[IT],w("3,3")[IT])&&is(w("3,3")[IT],w("3,2")[IT])&&w("4,2")[IT]!=""){
 				w("3,1")[IT]="";
@@ -459,7 +458,7 @@ try{
 				fall(3,3)
 				col_2++
 				fall(4,2)
-				w("3,2")[IT]=toNum(w("3,2")[IT])*16;
+				w("3,2")[IT]=toNum(w("3,2")[IT])*8;
 			}
 			if(are(w("3,2")[IT],w("4,3")[IT],w("3,4")[IT])&&is(w("3,4")[IT],w("3,3")[IT])&&w("4,3")[IT]!=""){
 				w("3,2")[IT]="";
@@ -470,7 +469,7 @@ try{
 				fall(3,4)
 				col_3++
 				fall(4,3)
-				w("3,3")[IT]=toNum(w("3,3")[IT])*16;
+				w("3,3")[IT]=toNum(w("3,3")[IT])*8;
 			}
 			if(are(w("3,3")[IT],w("4,4")[IT],w("3,5")[IT])&&is(w("3,5")[IT],w("3,4")[IT])&&w("4,4")[IT]!=""){
 				w("3,3")[IT]="";
@@ -481,7 +480,7 @@ try{
 				fall(3,5)
 				col_4++
 				fall(4,4)
-				w("3,4")[IT]=toNum(w("3,4")[IT])*16;
+				w("3,4")[IT]=toNum(w("3,4")[IT])*8;
 			}
 			if(are(w("2,1")[IT],w("3,2")[IT],w("2,3")[IT])&&is(w("2,3")[IT],w("2,2")[IT])&&w("3,2")[IT]!=""){
 				w("2,1")[IT]="";
@@ -492,7 +491,7 @@ try{
 				fall(2,3)
 				col_2++
 				fall(3,2)
-				w("2,2")[IT]=toNum(w("2,2")[IT])*16;
+				w("2,2")[IT]=toNum(w("2,2")[IT])*8;
 			}
 			if(are(w("2,2")[IT],w("3,3")[IT],w("2,4")[IT])&&is(w("2,4")[IT],w("2,3")[IT])&&w("3,3")[IT]!=""){
 				w("2,2")[IT]="";
@@ -503,7 +502,7 @@ try{
 				fall(2,4)
 				col_3++
 				fall(3,3)
-				w("2,3")[IT]=toNum(w("2,3")[IT])*16;
+				w("2,3")[IT]=toNum(w("2,3")[IT])*8;
 			}
 			if(are(w("2,3")[IT],w("3,4")[IT],w("2,5")[IT])&&is(w("2,5")[IT],w("2,4")[IT])&&w("3,4")[IT]!=""){
 				w("2,3")[IT]="";
@@ -514,7 +513,7 @@ try{
 				fall(2,5)
 				col_4++
 				fall(3,4)
-				w("2,4")[IT]=toNum(w("2,4")[IT])*16;
+				w("2,4")[IT]=toNum(w("2,4")[IT])*8;
 			}
 			if(are(w("1,1")[IT],w("2,2")[IT],w("1,3")[IT])&&is(w("1,3")[IT],w("1,2")[IT])&&w("2,2")[IT]!=""){
 				w("1,1")[IT]="";
@@ -524,7 +523,7 @@ try{
 				col_3++
 				fall(1,3)
 				col_2++
-				w("1,2")[IT]=toNum(w("1,2")[IT])*16;
+				w("1,2")[IT]=toNum(w("1,2")[IT])*8;
 				fall(2,2)
 			}
 			if(are(w("1,2")[IT],w("2,3")[IT],w("1,4")[IT])&&is(w("1,4")[IT],w("1,3")[IT])&&w("2,3")[IT]!=""){
@@ -535,7 +534,7 @@ try{
 				col_4++
 				fall(1,4)
 				col_3++
-				w("1,3")[IT]=toNum(w("1,3")[IT])*16;
+				w("1,3")[IT]=toNum(w("1,3")[IT])*8;
 				fall(2,3)
 			}
 			if(are(w("1,3")[IT],w("2,4")[IT],w("1,5")[IT])&&is(w("1,5")[IT],w("1,4")[IT])&&w("2,4")[IT]!=""){
@@ -546,7 +545,7 @@ try{
 				col_5++
 				fall(1,5)
 				col_4++
-				w("1,4")[IT]=toNum(w("1,4")[IT])*16;
+				w("1,4")[IT]=toNum(w("1,4")[IT])*8;
 				fall(2,4)
 			}
 		}catch(matching_T){log("matching ┰: "+matching_T.message)}
@@ -558,7 +557,7 @@ try{
 				w("6,2")[IT]="";
 				col_2++
 				fall(6,2)
-				w("6,1")[IT]=toNum(w("6,1")[IT])*8;
+				w("6,1")[IT]=toNum(w("6,1")[IT])*4;
 			}
 			if(are(w("6,1")[IT],w("5,2")[IT],w("5,1")[IT])&&w("6,1")[IT]!=""){
 				w("6,1")[IT]="";
@@ -567,7 +566,7 @@ try{
 				w("5,2")[IT]="";
 				col_2++
 				fall(5,2)
-				w("5,1")[IT]=toNum(w("5,1")[IT])*8;
+				w("5,1")[IT]=toNum(w("5,1")[IT])*4;
 			}
 			if(are(w("5,1")[IT],w("4,2")[IT],w("4,1")[IT])&&w("5,1")[IT]!=""){
 				w("5,1")[IT]="";
@@ -576,7 +575,7 @@ try{
 				w("4,2")[IT]="";
 				col_2++
 				fall(4,2)
-				w("4,1")[IT]=toNum(w("4,1")[IT])*8;
+				w("4,1")[IT]=toNum(w("4,1")[IT])*4;
 			}
 			if(are(w("4,1")[IT],w("3,2")[IT],w("3,1")[IT])&&w("4,1")[IT]!=""){
 				w("4,1")[IT]="";
@@ -585,7 +584,7 @@ try{
 				w("3,2")[IT]="";
 				col_2++
 				fall(3,2)
-				w("3,1")[IT]=toNum(w("3,1")[IT])*8;
+				w("3,1")[IT]=toNum(w("3,1")[IT])*4;
 			}
 			if(are(w("3,1")[IT],w("2,2")[IT],w("2,1")[IT])&&w("3,1")[IT]!=""){
 				w("3,1")[IT]="";
@@ -594,7 +593,7 @@ try{
 				w("2,2")[IT]="";
 				col_2++
 				fall(2,2)
-				w("2,1")[IT]=toNum(w("2,1")[IT])*8;
+				w("2,1")[IT]=toNum(w("2,1")[IT])*4;
 			}
 			if(are(w("2,1")[IT],w("1,2")[IT],w("1,1")[IT])&&w("2,1")[IT]!=""){
 				w("2,1")[IT]="";
@@ -603,7 +602,7 @@ try{
 				w("1,2")[IT]="";
 				col_2++
 				fall(1,2)
-				w("1,1")[IT]=toNum(w("1,1")[IT])*8;
+				w("1,1")[IT]=toNum(w("1,1")[IT])*4;
 			}
 			if(are(w("7,2")[IT],w("6,3")[IT],w("6,2")[IT])&&w("7,2")[IT]!=""){
 				w("7,2")[IT]="";
@@ -612,7 +611,7 @@ try{
 				w("6,3")[IT]="";
 				col_3++
 				fall(6,3)
-				w("6,2")[IT]=toNum(w("6,2")[IT])*8;
+				w("6,2")[IT]=toNum(w("6,2")[IT])*4;
 			}
 			if(are(w("6,2")[IT],w("5,3")[IT],w("5,2")[IT])&&w("6,2")[IT]!=""){
 				w("6,2")[IT]="";
@@ -621,7 +620,7 @@ try{
 				w("5,3")[IT]="";
 				col_3++
 				fall(5,3)
-				w("5,2")[IT]=toNum(w("5,2")[IT])*8;
+				w("5,2")[IT]=toNum(w("5,2")[IT])*4;
 			}
 			if(are(w("5,2")[IT],w("4,3")[IT],w("4,2")[IT])&&w("5,2")[IT]!=""){
 				w("5,2")[IT]="";
@@ -630,7 +629,7 @@ try{
 				w("4,3")[IT]="";
 				col_3++
 				fall(4,3)
-				w("4,2")[IT]=toNum(w("4,2")[IT])*8;
+				w("4,2")[IT]=toNum(w("4,2")[IT])*4;
 			}
 			if(are(w("4,2")[IT],w("3,3")[IT],w("3,2")[IT])&&w("4,2")[IT]!=""){
 				w("4,2")[IT]="";
@@ -639,7 +638,7 @@ try{
 				w("3,3")[IT]="";
 				col_3++
 				fall(3,3)
-				w("3,2")[IT]=toNum(w("3,2")[IT])*8;
+				w("3,2")[IT]=toNum(w("3,2")[IT])*4;
 			}
 			if(are(w("3,2")[IT],w("2,3")[IT],w("2,2")[IT])&&w("3,2")[IT]!=""){
 				w("3,2")[IT]="";
@@ -648,7 +647,7 @@ try{
 				w("2,3")[IT]="";
 				col_3++
 				fall(2,3)
-				w("2,2")[IT]=toNum(w("2,2")[IT])*8;
+				w("2,2")[IT]=toNum(w("2,2")[IT])*4;
 			}
 			if(are(w("2,2")[IT],w("1,3")[IT],w("1,2")[IT])&&w("2,2")[IT]!=""){
 				w("2,2")[IT]="";
@@ -657,7 +656,7 @@ try{
 				w("1,3")[IT]="";
 				col_3++
 				fall(1,3)
-				w("1,2")[IT]=toNum(w("1,2")[IT])*8;
+				w("1,2")[IT]=toNum(w("1,2")[IT])*4;
 			}
 			if(are(w("7,3")[IT],w("6,4")[IT],w("6,3")[IT])&&w("7,3")[IT]!=""){
 				w("7,3")[IT]="";
@@ -666,7 +665,7 @@ try{
 				w("6,4")[IT]="";
 				col_4++
 				fall(6,4)
-				w("6,3")[IT]=toNum(w("6,3")[IT])*8;
+				w("6,3")[IT]=toNum(w("6,3")[IT])*4;
 			}
 			if(are(w("6,3")[IT],w("5,4")[IT],w("5,3")[IT])&&w("6,3")[IT]!=""){
 				w("6,3")[IT]="";
@@ -675,7 +674,7 @@ try{
 				w("5,4")[IT]="";
 				col_4++
 				fall(5,4)
-				w("5,3")[IT]=toNum(w("5,3")[IT])*8;
+				w("5,3")[IT]=toNum(w("5,3")[IT])*4;
 			}
 			if(are(w("5,3")[IT],w("4,4")[IT],w("4,3")[IT])&&w("5,3")[IT]!=""){
 				w("5,3")[IT]="";
@@ -684,7 +683,7 @@ try{
 				w("4,4")[IT]="";
 				col_4++
 				fall(4,4)
-				w("4,3")[IT]=toNum(w("4,3")[IT])*8;
+				w("4,3")[IT]=toNum(w("4,3")[IT])*4;
 			}
 			if(are(w("4,3")[IT],w("3,4")[IT],w("3,3")[IT])&&w("4,3")[IT]!=""){
 				w("4,3")[IT]="";
@@ -693,7 +692,7 @@ try{
 				w("3,4")[IT]="";
 				col_4++
 				fall(3,4)
-				w("3,3")[IT]=toNum(w("3,3")[IT])*8;
+				w("3,3")[IT]=toNum(w("3,3")[IT])*4;
 			}
 			if(are(w("3,3")[IT],w("2,4")[IT],w("2,3")[IT])&&w("3,3")[IT]!=""){
 				w("3,3")[IT]="";
@@ -702,7 +701,7 @@ try{
 				w("2,4")[IT]="";
 				col_4++
 				fall(2,4)
-				w("2,3")[IT]=toNum(w("2,3")[IT])*8;
+				w("2,3")[IT]=toNum(w("2,3")[IT])*4;
 			}
 			if(are(w("2,3")[IT],w("1,4")[IT],w("1,3")[IT])&&w("2,3")[IT]!=""){
 				w("2,3")[IT]="";
@@ -711,7 +710,7 @@ try{
 				w("1,4")[IT]="";
 				col_4++
 				fall(1,4)
-				w("1,3")[IT]=toNum(w("1,3")[IT])*8;
+				w("1,3")[IT]=toNum(w("1,3")[IT])*4;
 			}
 			if(are(w("7,4")[IT],w("6,5")[IT],w("6,4")[IT])&&w("7,4")[IT]!=""){
 				w("7,4")[IT]="";
@@ -720,7 +719,7 @@ try{
 				w("6,5")[IT]="";
 				col_5++
 				fall(6,5)
-				w("6,4")[IT]=toNum(w("6,4")[IT])*8;
+				w("6,4")[IT]=toNum(w("6,4")[IT])*4;
 			}
 			if(are(w("6,4")[IT],w("5,5")[IT],w("5,4")[IT])&&w("6,4")[IT]!=""){
 				w("6,4")[IT]="";
@@ -729,7 +728,7 @@ try{
 				w("5,5")[IT]="";
 				col_5++
 				fall(5,5)
-				w("5,4")[IT]=toNum(w("5,4")[IT])*8;
+				w("5,4")[IT]=toNum(w("5,4")[IT])*4;
 			}
 			if(are(w("5,4")[IT],w("4,5")[IT],w("4,4")[IT])&&w("5,4")[IT]!=""){
 				w("5,4")[IT]="";
@@ -738,7 +737,7 @@ try{
 				w("4,5")[IT]="";
 				col_5++
 				fall(4,5)
-				w("4,4")[IT]=toNum(w("4,4")[IT])*8;
+				w("4,4")[IT]=toNum(w("4,4")[IT])*4;
 			}
 			if(are(w("4,4")[IT],w("3,5")[IT],w("3,4")[IT])&&w("4,4")[IT]!=""){
 				w("4,4")[IT]="";
@@ -747,7 +746,7 @@ try{
 				w("3,5")[IT]="";
 				col_5++
 				fall(3,5)
-				w("3,4")[IT]=toNum(w("3,4")[IT])*8;
+				w("3,4")[IT]=toNum(w("3,4")[IT])*4;
 			}
 			if(are(w("3,4")[IT],w("2,5")[IT],w("2,4")[IT])&&w("3,4")[IT]!=""){
 				w("3,4")[IT]="";
@@ -756,7 +755,7 @@ try{
 				w("2,5")[IT]="";
 				col_5++
 				fall(2,5)
-				w("2,4")[IT]=toNum(w("2,4")[IT])*8;
+				w("2,4")[IT]=toNum(w("2,4")[IT])*4;
 			}
 			if(are(w("2,4")[IT],w("1,5")[IT],w("1,4")[IT])&&w("2,4")[IT]!=""){
 				w("2,4")[IT]="";
@@ -765,7 +764,7 @@ try{
 				w("1,5")[IT]="";
 				col_5++
 				fall(1,5)
-				w("1,4")[IT]=toNum(w("1,4")[IT])*8;
+				w("1,4")[IT]=toNum(w("1,4")[IT])*4;
 			}
 		}catch(matching_r){log("matching ┏: "+matching_r.message)}
 		try{
@@ -776,7 +775,7 @@ try{
 				w("6,1")[IT]="";
 				col_1++
 				fall(6,1)
-				w("6,2")[IT]=toNum(w("6,2")[IT])*8;
+				w("6,2")[IT]=toNum(w("6,2")[IT])*4;
 			}
 			if(are(w("6,2")[IT],w("5,1")[IT],w("5,2")[IT])&&w("6,2")[IT]!=""){
 				w("6,2")[IT]="";
@@ -785,7 +784,7 @@ try{
 				w("5,1")[IT]="";
 				col_1++
 				fall(5,1)
-				w("5,2")[IT]=toNum(w("5,2")[IT])*8;
+				w("5,2")[IT]=toNum(w("5,2")[IT])*4;
 			}
 			if(are(w("5,2")[IT],w("4,1")[IT],w("4,2")[IT])&&w("5,2")[IT]!=""){
 				w("5,2")[IT]="";
@@ -794,7 +793,7 @@ try{
 				w("4,1")[IT]="";
 				col_1++
 				fall(4,1)
-				w("4,2")[IT]=toNum(w("4,2")[IT])*8;
+				w("4,2")[IT]=toNum(w("4,2")[IT])*4;
 			}
 			if(are(w("4,2")[IT],w("3,1")[IT],w("3,2")[IT])&&w("4,2")[IT]!=""){
 				w("4,2")[IT]="";
@@ -803,7 +802,7 @@ try{
 				w("3,1")[IT]="";
 				col_1++
 				fall(3,1)
-				w("3,2")[IT]=toNum(w("3,2")[IT])*8;
+				w("3,2")[IT]=toNum(w("3,2")[IT])*4;
 			}
 			if(are(w("3,2")[IT],w("2,1")[IT],w("2,2")[IT])&&w("3,2")[IT]!=""){
 				w("3,2")[IT]="";
@@ -812,7 +811,7 @@ try{
 				w("2,1")[IT]="";
 				col_1++
 				fall(2,1)
-				w("2,2")[IT]=toNum(w("2,2")[IT])*8;
+				w("2,2")[IT]=toNum(w("2,2")[IT])*4;
 			}
 			if(are(w("2,2")[IT],w("1,1")[IT],w("1,2")[IT])&&w("2,2")[IT]!=""){
 				w("2,2")[IT]="";
@@ -821,7 +820,7 @@ try{
 				w("1,1")[IT]="";
 				col_1++
 				fall(1,1)
-				w("1,2")[IT]=toNum(w("1,2")[IT])*8;
+				w("1,2")[IT]=toNum(w("1,2")[IT])*4;
 			}
 			if(are(w("7,3")[IT],w("6,2")[IT],w("6,3")[IT])&&w("7,3")[IT]!=""){
 				w("7,3")[IT]="";
@@ -830,7 +829,7 @@ try{
 				w("6,2")[IT]="";
 				col_2++
 				fall(6,2)
-				w("6,3")[IT]=toNum(w("6,3")[IT])*8;
+				w("6,3")[IT]=toNum(w("6,3")[IT])*4;
 			}
 			if(are(w("6,3")[IT],w("5,2")[IT],w("5,3")[IT])&&w("6,3")[IT]!=""){
 				w("6,3")[IT]="";
@@ -839,7 +838,7 @@ try{
 				w("5,2")[IT]="";
 				col_2++
 				fall(5,2)
-				w("5,3")[IT]=toNum(w("5,3")[IT])*8;
+				w("5,3")[IT]=toNum(w("5,3")[IT])*4;
 			}
 			if(are(w("5,3")[IT],w("4,2")[IT],w("4,3")[IT])&&w("5,3")[IT]!=""){
 				w("5,3")[IT]="";
@@ -848,7 +847,7 @@ try{
 				w("4,2")[IT]="";
 				col_2++
 				fall(4,2)
-				w("4,3")[IT]=toNum(w("4,3")[IT])*8;
+				w("4,3")[IT]=toNum(w("4,3")[IT])*4;
 			}
 			if(are(w("4,3")[IT],w("3,2")[IT],w("3,3")[IT])&&w("4,3")[IT]!=""){
 				w("4,3")[IT]="";
@@ -857,7 +856,7 @@ try{
 				w("3,2")[IT]="";
 				col_2++
 				fall(3,2)
-				w("3,3")[IT]=toNum(w("3,3")[IT])*8;
+				w("3,3")[IT]=toNum(w("3,3")[IT])*4;
 			}
 			if(are(w("3,3")[IT],w("2,2")[IT],w("2,3")[IT])&&w("3,3")[IT]!=""){
 				w("3,3")[IT]="";
@@ -866,7 +865,7 @@ try{
 				w("2,2")[IT]="";
 				col_2++
 				fall(2,2)
-				w("2,3")[IT]=toNum(w("2,3")[IT])*8;
+				w("2,3")[IT]=toNum(w("2,3")[IT])*4;
 			}
 			if(are(w("2,3")[IT],w("1,2")[IT],w("1,3")[IT])&&w("2,3")[IT]!=""){
 				w("2,3")[IT]="";
@@ -875,7 +874,7 @@ try{
 				w("1,2")[IT]="";
 				col_2++
 				fall(1,2)
-				w("1,3")[IT]=toNum(w("1,3")[IT])*8;
+				w("1,3")[IT]=toNum(w("1,3")[IT])*4;
 			}
 			if(are(w("7,4")[IT],w("6,3")[IT],w("6,4")[IT])&&w("7,4")[IT]!=""){
 				w("7,4")[IT]="";
@@ -884,7 +883,7 @@ try{
 				w("6,3")[IT]="";
 				col_3++
 				fall(6,3)
-				w("6,4")[IT]=toNum(w("6,4")[IT])*8;
+				w("6,4")[IT]=toNum(w("6,4")[IT])*4;
 			}
 			if(are(w("6,4")[IT],w("5,3")[IT],w("5,4")[IT])&&w("6,4")[IT]!=""){
 				w("6,4")[IT]="";
@@ -893,7 +892,7 @@ try{
 				w("5,3")[IT]="";
 				col_3++
 				fall(5,3)
-				w("5,4")[IT]=toNum(w("5,4")[IT])*8;
+				w("5,4")[IT]=toNum(w("5,4")[IT])*4;
 			}
 			if(are(w("5,4")[IT],w("4,3")[IT],w("4,4")[IT])&&w("5,4")[IT]!=""){
 				w("5,4")[IT]="";
@@ -902,7 +901,7 @@ try{
 				w("4,3")[IT]="";
 				col_3++
 				fall(4,3)
-				w("4,4")[IT]=toNum(w("4,4")[IT])*8;
+				w("4,4")[IT]=toNum(w("4,4")[IT])*4;
 			}
 			if(are(w("4,4")[IT],w("3,3")[IT],w("3,4")[IT])&&w("4,4")[IT]!=""){
 				w("4,4")[IT]="";
@@ -911,7 +910,7 @@ try{
 				w("3,3")[IT]="";
 				col_3++
 				fall(3,3)
-				w("3,4")[IT]=toNum(w("3,4")[IT])*8;
+				w("3,4")[IT]=toNum(w("3,4")[IT])*4;
 			}
 			if(are(w("3,4")[IT],w("2,3")[IT],w("2,4")[IT])&&w("3,4")[IT]!=""){
 				w("3,4")[IT]="";
@@ -920,7 +919,7 @@ try{
 				w("2,3")[IT]="";
 				col_3++
 				fall(2,3)
-				w("2,4")[IT]=toNum(w("2,4")[IT])*8;
+				w("2,4")[IT]=toNum(w("2,4")[IT])*4;
 			}
 			if(are(w("2,4")[IT],w("1,3")[IT],w("1,4")[IT])&&w("2,4")[IT]!=""){
 				w("2,4")[IT]="";
@@ -929,7 +928,7 @@ try{
 				w("1,3")[IT]="";
 				col_3++
 				fall(1,3)
-				w("1,4")[IT]=toNum(w("1,4")[IT])*8;
+				w("1,4")[IT]=toNum(w("1,4")[IT])*4;
 			}
 			if(are(w("7,5")[IT],w("6,4")[IT],w("6,5")[IT])&&w("7,5")[IT]!=""){
 				w("7,5")[IT]="";
@@ -938,7 +937,7 @@ try{
 				w("6,4")[IT]="";
 				col_4++
 				fall(6,4)
-				w("6,5")[IT]=toNum(w("6,5")[IT])*8;
+				w("6,5")[IT]=toNum(w("6,5")[IT])*4;
 			}
 			if(are(w("6,5")[IT],w("5,4")[IT],w("5,5")[IT])&&w("6,5")[IT]!=""){
 				w("6,5")[IT]="";
@@ -947,7 +946,7 @@ try{
 				w("5,4")[IT]="";
 				col_4++
 				fall(5,4)
-				w("5,5")[IT]=toNum(w("5,5")[IT])*8;
+				w("5,5")[IT]=toNum(w("5,5")[IT])*4;
 			}
 			if(are(w("5,5")[IT],w("4,4")[IT],w("4,5")[IT])&&w("5,5")[IT]!=""){
 				w("5,5")[IT]="";
@@ -956,7 +955,7 @@ try{
 				w("4,4")[IT]="";
 				col_4++
 				fall(4,4)
-				w("4,5")[IT]=toNum(w("4,5")[IT])*8;
+				w("4,5")[IT]=toNum(w("4,5")[IT])*4;
 			}
 			if(are(w("4,5")[IT],w("3,4")[IT],w("3,5")[IT])&&w("4,5")[IT]!=""){
 				w("4,5")[IT]="";
@@ -965,7 +964,7 @@ try{
 				w("3,4")[IT]="";
 				col_4++
 				fall(3,4)
-				w("3,5")[IT]=toNum(w("3,5")[IT])*8;
+				w("3,5")[IT]=toNum(w("3,5")[IT])*4;
 			}
 			if(are(w("3,5")[IT],w("2,4")[IT],w("2,5")[IT])&&w("3,5")[IT]!=""){
 				w("3,5")[IT]="";
@@ -974,7 +973,7 @@ try{
 				w("2,4")[IT]="";
 				col_4++
 				fall(2,4)
-				w("2,5")[IT]=toNum(w("2,5")[IT])*8;
+				w("2,5")[IT]=toNum(w("2,5")[IT])*4;
 			}
 			if(are(w("2,5")[IT],w("1,4")[IT],w("1,5")[IT])&&w("2,5")[IT]!=""){
 				w("2,5")[IT]="";
@@ -983,7 +982,7 @@ try{
 				w("1,4")[IT]="";
 				col_4++
 				fall(1,4)
-				w("1,5")[IT]=toNum(w("1,5")[IT])*8;
+				w("1,5")[IT]=toNum(w("1,5")[IT])*4;
 			}
 		}catch(matching_l){log("matching ┓: "+matching_l.message)}
 		try{
