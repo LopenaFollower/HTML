@@ -51,7 +51,7 @@ function run(ccc){
 		var handler=document.createElement("script")
 		handler.type='text/javascript';
 		handler.id="script";
-		handler.text=`
+		handler.text=`"use strict";
 try{\n
 	${(ccc.includes('run_snake()')?build[0]:(ccc.includes('run_vertex()')?build[1]:ccc.replace("\t","    ")))};
 }catch(error){
