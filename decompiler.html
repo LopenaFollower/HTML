@@ -2,72 +2,155 @@
 <html>
 	<head>
 		<title>
-			decompiler v1.5e
+			decompiler v2
 		</title>
 		<style>
 			html,body,center{height:100%;width:100%;margin:0 auto;}
 			#errors{user-select:none;color:red;font-weight:900;text-shadow:0px 0px 3px rgb(235,0,0)}
 			#main{width:98%;height:80%;padding:10px;background-color:#444;color:white;font-size:14px;font-family:monospace;border-radius:5px}
-			button{width:85px;font-family:Arial;}
+			.button{width:85px;font-family:Arial;}
+			white-color{color:white;font-family:arial,verdana,sans-serif;}
 		</style>
 	</head>
 	<body bgcolor=#111>
 		<textarea id=main spellcheck=false contenteditable=true>alert("Hello World")</textarea><br>
 		<table>
 			<tr>
-				<td>
-					<input id=replace_text placeholder='replace text...'/>
+				<td colspan=2>
+					<input id=replace_text onkeyup='index_old=index'placeholder='selected text'/>
 				</td>
 				<td>
-					<button onclick='run(main.value)'>Run</button>
+					<button onclick='run(main.value)'class=button>Run</button>
 				</td>
 				<td>
-					<button onclick='main.value=""'>Clear</button>
+					<button onclick='main.value=""'class=button>Clear</button>
+				</td>
+			</tr>
+			<tr>
+				<td colspan=2>
+					<input id=replace_with placeholder='replace with'/>
+				</td>
+				<td>
+					<button onclick='select=0;find(text_to_find,index[select])'class=button>Find</button>
+				</td>
+				<td>
+					<button class=button onclick='main.setRangeText("\t",main.selectionStart,main.selectionEnd,"end");main.focus();'>Indent(Tab)</button>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<input id=replace_with placeholder='replace with...'/>
+					<white-color>Aa</white-color><input id=case_sensitive type=checkbox />
+				</td>
+				<td align="right">
+					<button class=button onclick='replace_text()'>Replace</button>
 				</td>
 				<td>
-					<button onclick='for(let i=0;i<1000;i++){main.value=main.value.replace(document.getElementById("replace_text").value,document.getElementById("replace_with").value)}'>Replace All</button>
+					<button class=button onclick='main.value=main.value.replace(new RegExp(text_to_find, "g"),document.getElementById("replace_with").value)'>Replace All</button>
 				</td>
 				<td>
-					<button onclick='main.setRangeText("\t",main.selectionStart,main.selectionEnd,"end");main.focus();'>Indent(Tab)</button>
+					<button style='width:40px;font-family:Arial' onclick='prev()'>Prev</button>
+					<button style='width:40px;font-family:Arial' onclick='next()'>Next</button>
 				</td>
 			</tr>
 		</table>
 		<p id=errors></p>
-		<p id=script></p>
 		<div id=here></div>
 		<script>
-var main=document.getElementById("main"),xhttp=new XMLHttpRequest(),build=[],settings={step:2.5,speed:100},r=255,g=0,b=0,r_g=false,g_g=true,b_g=false,r_l=false,g_l=false,b_l=false,m=255,f=![],t=!![];setInterval(()=>{if(r>m){r_g=false;r=m};if(g>m){g_g=f;g=m};if(b>m){b_g=f;b=m};if(r<0){r_l=f;r=0};if(g<0){g_l=f;g=0};if(b<0){b_l=f;b=0};if(r_g){r+=settings.step};if(g_g){g+=settings.step};if(b_g){b+=settings.step};if(r_l){r-=settings.step};if(g_l){g-=settings.step};if(b_l){b-=settings.step};},settings.speed);setInterval(()=>{if(r==m&&g==0&&b==0){g_g=t};if(r==m&&g==m&&b==0){r_l=t};if(r==0&&g==m&&b==0){b_g=t};if(r==0&&g==m&&b==m){g_l=t};if(r==0&&g==0&&b==m){r_g=t};if(r==m&&g==0&&b==m){b_l=t};function rgb_el(el,type){el.style[type]="rgb("+r+","+g+","+b+")"};function fetch_rgb(format){switch(format){case"rgb":return"rgb("+r+","+g+","+b+")";break;case"rbg":return"rgb("+r+","+b+","+g+")";break;case"grb":return"rgb("+g+","+r+","+b+")";break;case"gbr":return"rgb("+g+","+b+","+r+")";break;case"bgr":return"rgb("+b+","+g+","+r+")";break;case"brg":return"rgb("+b+","+r+","+g+")";break;}};rgb_el(main,'caretColor');main.style.textShadow="0px 0px 3px "+fetch_rgb("brg");},1);
+var main=document.getElementById("main"),replace=document.getElementById("replace_text"),text_to_find,select=0,index=[],index_old=[],_=["script","errors"],xhttp=new XMLHttpRequest(),build=[],settings={step:2.5,speed:100},r=255,g=0,b=0,r_g=false,g_g=true,b_g=false,r_l=false,g_l=false,b_l=false,m=255,f=![],t=!![];setInterval(()=>{if(r>m){r_g=false;r=m};if(g>m){g_g=f;g=m};if(b>m){b_g=f;b=m};if(r<0){r_l=f;r=0};if(g<0){g_l=f;g=0};if(b<0){b_l=f;b=0};if(r_g){r+=settings.step};if(g_g){g+=settings.step};if(b_g){b+=settings.step};if(r_l){r-=settings.step};if(g_l){g-=settings.step};if(b_l){b-=settings.step};},settings.speed);setInterval(()=>{if(r==m&&g==0&&b==0){g_g=t};if(r==m&&g==m&&b==0){r_l=t};if(r==0&&g==m&&b==0){b_g=t};if(r==0&&g==m&&b==m){g_l=t};if(r==0&&g==0&&b==m){r_g=t};if(r==m&&g==0&&b==m){b_l=t};function rgb_el(el,type){el.style[type]="rgb("+r+","+g+","+b+")"};function fetch_rgb(format){switch(format){case"rgb":return"rgb("+r+","+g+","+b+")";break;case"rbg":return"rgb("+r+","+b+","+g+")";break;case"grb":return"rgb("+g+","+r+","+b+")";break;case"gbr":return"rgb("+g+","+b+","+r+")";break;case"bgr":return"rgb("+b+","+g+","+r+")";break;case"brg":return"rgb("+b+","+r+","+g+")";break;}};rgb_el(main,'caretColor');main.style.textShadow="0px 0px 3px "+fetch_rgb("brg");replace.value.length>0?Index(main.value,text_to_find):""},1);
 main.addEventListener("keydown",e=>{if(e.keyCode==9){e.preventDefault();main.setRangeText("\t",main.selectionStart,main.selectionEnd,"end")}})
 xhttp.onreadystatechange=function(){if(this.readyState==4&&this.status==200){build[0]=this.responseText;}};xhttp.open("GET","https://raw.githubusercontent.com/LopenaFollower/JavaScript/main/snake_ext.js",true);xhttp.send()
 setTimeout(()=>{xhttp.onreadystatechange=function(){if(this.readyState==4&&this.status==200){build[1]=this.responseText;}};xhttp.open("GET","https://raw.githubusercontent.com/LopenaFollower/JavaScript/main/vertex_ext.js",true);xhttp.send()},200);
 function run(ccc){
 	if(ccc.length>0){
-		document.getElementById("script").remove()
-		var handler=document.createElement("script")
-		handler.type='text/javascript';
-		handler.id="script";
+		if(document.getElementById(_[0]))document.getElementById(_[0]).remove();
+		var handler=document.createElement(_[0]);
+		handler.type="text/javascript";
+		handler.id=_[0];
 		handler.text=`"use strict";
-try{\n
+try{
 	${(ccc.includes('run_snake()')?build[0]:(ccc.includes('run_vertex()')?build[1]:ccc.replace("\t","    ")))};
 }catch(error){
-	document.getElementById('errors').innerText=error;
-	document.getElementById('errors').style.opacity=1.05;
+	document.getElementById(_[1]).innerText=error;
+	document.getElementById(_[1]).style.opacity=1.05;
 	setTimeout(()=>{
 		var an_interval_for_fading_text=setInterval(()=>{
-			if(document.getElementById('errors').style.opacity<0){
+			if(document.getElementById(_[1]).style.opacity<0){
 				clearInterval(an_interval_for_fading_text)
 			}else{
-				document.getElementById('errors').style.opacity-=0.05;
+				document.getElementById(_[1]).style.opacity-=0.05;
 			}
 		},100);
 	},1000);
 }`;
 		document.getElementById("here").appendChild(handler);
+	}
+}
+String.prototype.replaceIndex=function(index,replacement,replacee){
+	console.log([index,replacement,replacee])
+	if(main.value.substring(0,replacee.length)==replacee){
+		return this.substring(0,index)+replacement+this.substring(index+replacee.length,this.length);
+	}else{
+		return this.substring(0,this.length);
+	}
+}
+setInterval(()=>{
+	if(document.getElementById("case_sensitive").checked){
+		text_to_find=replace.value
+	}else{
+		text_to_find=replace.value.toLowerCase()
+	}
+},0);
+function Index(str,s){
+	index=[]
+	for(let i=0;i<str.length-s.length+1;i++){
+		if (str.substring(i,s.length+i)==s){
+			index[index.length]=i
+		}
+	}
+}
+function replace_text(){
+	if(index.length>0){
+		main.focus();
+		main.value=main.value.replaceIndex(index_old[select],document.getElementById("replace_with").value,text_to_find)
+		main.setSelectionRange(index_old[select],index_old[select]+document.getElementById("replace_with").value.length);
+	}else{
+		alert(`No other instances of "${replace.value}" found`)
+	}
+}
+function find(text,occ){
+	if(index.length==0&&text.length>0){
+		alert(`No instances of "${replace.value}" found`)
+	}else if(text.length>0){
+		main.focus();
+		main.setSelectionRange(occ,occ+text.length);
+	}
+}
+function prev(){
+	if(index.length>1){
+		if(select<index.length&&select>0){
+			select--
+			find(text_to_find,index[select])
+		}else{
+			select=index.length-1
+			find(text_to_find,index[select])
+		}
+	}else{
+		select=select
+		find(text_to_find,index[select])
+	}
+}
+function next(){
+	if(index.length>1){
+		if(select<index.length-1){
+			select++
+			find(text_to_find,index[select])
+		}else{
+			select=0
+			find(text_to_find,index[select])
+		}
+	}else{
+		select=select
+		find(text_to_find,index[select])
 	}
 }
 		</script>
