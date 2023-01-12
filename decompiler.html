@@ -2,18 +2,19 @@
 <html>
 	<head>
 		<title>
-			decompiler v2.1b
+			decompiler v2.1c
 		</title>
 		<style>
 			html,body,center{height:100%;width:100%;margin:0 auto;}
 			#errors{user-select:none;color:red;font-weight:900;text-shadow:0px 0px 3px rgb(235,0,0)}
-			#main{width:98%;height:80%;padding:10px;background-color:#444;color:white;font-size:14px;font-family:monospace;border-radius:5px}
+			#main{height:20px;width:10px;transition:all 2s;position:relative;top:-25px;padding:10px;background-color:#444;color:white;font-size:14px;font-family:monospace;border-radius:5px}
 			.button{width:85px;font-family:Arial;}
+			table{position:relative;}
 			white-color{color:white;font-family:arial,verdana,sans-serif;}
 		</style>
 	</head>
-	<body bgcolor=#111>
-		<textarea id=main spellcheck=false contenteditable=true>alert("Hello World")</textarea><br>
+	<body bgcolor=#111 onload="start_up()">
+		<textarea id=main spellcheck=false style="opacity:0"contenteditable=true>alert("Hello World")</textarea>
 		<table>
 			<tr>
 				<td colspan=2>
@@ -59,7 +60,13 @@
 var main=document.getElementById("main"),replace=document.getElementById("replace_text"),text_to_find,select=0,index=[],index_old=[],_=["script","errors"],xhttp=new XMLHttpRequest(),build=[],settings={step:2.5,speed:100},r=255,g=0,b=0,r_g=false,g_g=true,b_g=false,r_l=false,g_l=false,b_l=false,m=255,f=![],t=!![];setInterval(()=>{if(r>m){r_g=false;r=m};if(g>m){g_g=f;g=m};if(b>m){b_g=f;b=m};if(r<0){r_l=f;r=0};if(g<0){g_l=f;g=0};if(b<0){b_l=f;b=0};if(r_g){r+=settings.step};if(g_g){g+=settings.step};if(b_g){b+=settings.step};if(r_l){r-=settings.step};if(g_l){g-=settings.step};if(b_l){b-=settings.step};},settings.speed);setInterval(()=>{if(r==m&&g==0&&b==0){g_g=t};if(r==m&&g==m&&b==0){r_l=t};if(r==0&&g==m&&b==0){b_g=t};if(r==0&&g==m&&b==m){g_l=t};if(r==0&&g==0&&b==m){r_g=t};if(r==m&&g==0&&b==m){b_l=t};function rgb_el(el,type){el.style[type]="rgb("+r+","+g+","+b+")"};function fetch_rgb(format){switch(format){case"rgb":return"rgb("+r+","+g+","+b+")";break;case"rbg":return"rgb("+r+","+b+","+g+")";break;case"grb":return"rgb("+g+","+r+","+b+")";break;case"gbr":return"rgb("+g+","+b+","+r+")";break;case"bgr":return"rgb("+b+","+g+","+r+")";break;case"brg":return"rgb("+b+","+r+","+g+")";break;}};rgb_el(main,'caretColor');main.style.textShadow="0px 0px 3px "+fetch_rgb("brg");replace.value.length>0?(document.getElementById("case_sensitive").checked?Index(main.value,text_to_find):Index(main.value.toLowerCase(),text_to_find)):""},1);
 main.addEventListener("keydown",e=>{if(e.keyCode==9){e.preventDefault();main.setRangeText("\t",main.selectionStart,main.selectionEnd,"end")}})
 xhttp.onreadystatechange=function(){if(this.readyState==4&&this.status==200){build[0]=this.responseText;}};xhttp.open("GET","https://raw.githubusercontent.com/LopenaFollower/JavaScript/main/snake_ext.js",true);xhttp.send()
-setTimeout(()=>{xhttp.onreadystatechange=function(){if(this.readyState==4&&this.status==200){build[1]=this.responseText;}};xhttp.open("GET","https://raw.githubusercontent.com/LopenaFollower/JavaScript/main/vertex_ext.js",true);xhttp.send()},200);
+setTimeout(()=>{
+	xhttp.onreadystatechange=function(){if(this.readyState==4&&this.status==200){build[1]=this.responseText;}};xhttp.open("GET","https://raw.githubusercontent.com/LopenaFollower/JavaScript/main/vertex_ext.js",true);xhttp.send()
+	setTimeout(()=>{
+		xhttp.onreadystatechange=function(){if(this.readyState==4&&this.status==200){build[2]=this.responseText;}};xhttp.open("GET","https://raw.githubusercontent.com/LopenaFollower/JavaScript/main/vertex_ext.js",true);xhttp.send()
+	},200);
+},200);
+
 function run(ccc){
 	if(ccc.length>0){
 		if(document.getElementById(_[0]))document.getElementById(_[0]).remove();
@@ -152,6 +159,23 @@ function next(){
 		select=select
 		find(text_to_find,index[select])
 	}
+}
+function start_up(){
+	setTimeout(()=>{
+		main.style.top="0px"
+		setTimeout(()=>{
+			main.style.opacity=1
+			setTimeout(()=>{
+				main.style.display="block"
+				setTimeout(()=>{
+					main.style.height="80%"
+					setTimeout(()=>{
+						main.style.width="98%"
+					},250)
+				},50)
+			},500)
+		},200)
+	},100)
 }
 		</script>
 	</body>
