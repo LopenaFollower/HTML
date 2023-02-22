@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<style>
+			body{margin-left:0;background-color:#333;display:flex;flex-direction:column;}
+			#mainbg{overflow-x:scroll;overflow-y:hidden;position:fixed;top:5px;-ms-transform:translateY(-5px);transform:translateY(-5px);width:100%;height:80%;background-color:#222;}
+			#line{position:absolute;width:5px;}
+			#controls{top:5px;color:white;font-size:14px;font-family:monospace;text-shadow:0px 0px 1px #b6b6f6;position:fixed;top:80%;}
+			.percentage{color:#b6b6f6;width:20px;position:fixed;left:0px}
+			
+		</style>
+	</head>
+	<body>
+		<div id="mainbg">
+			<div id="meter">
+				<div class="percentage" style="bottom:0%" id="max">10</div>
+				<div class="percentage" style="bottom:9.5%" id="90p">9</div>
+				<div class="percentage" style="bottom:19%" id="80p">8</div>
+				<div class="percentage" style="bottom:28.5%" id="70p">7</div>
+				<div class="percentage" style="bottom:38%" id="60p">6</div>
+				<div class="percentage" style="bottom:47.5%" id="50p">5</div>
+				<div class="percentage" style="bottom:57%" id="40p">4</div>
+				<div class="percentage" style="bottom:66.5%" id="30p">3</div>
+				<div class="percentage" style="bottom:76%" id="20p">2</div>
+				<div class="percentage" style="bottom:85.5%" id="10p">1</div>
+				<div class="percentage" style="bottom:95%" id="zero">0</div>
+			</div>
+		</div>
+		<div id="controls">
+			<div id="data">a</div>
+			<input id="run_collatz" style="width:100px"></input><button id="run_collatzB"onclick='if(!still_going){clear_graph();collatzConjecture(getElem("run_collatz").value)}'>Run</button><br>
+			<input id="scale" style="width:100px"></input><button id="scaleB"onclick='if(!still_going){update_display(getElem("scale").value)}'>Scale</button>
+		</div>
+		<script>
+const{log}=console,{round}=Math;
+var step=0,base=0,highest=0,still_going=false;
+function getElem(id){
+	return document.getElementById(id);
+}
+function create_elem(id,color,br,top,left,x,z,pos,zindex,value){
+	var a=document.createElement("div"),b;
+	a.id=id;
+	a.style.backgroundColor=color;
+	a.style.top=top;
+	a.style.left=left;
+	a.style.width=x;
+	a.style.height=z;
+	a.style.borderRadius=br;
+	a.style.zIndex=zindex;
+	a.style.position=pos;
+	a.innerText=value||""
+	a.dataset.value=value||0;
+	a.style.color="white";
+	a.style.textAlign="center";
+	a.style.padding=z/2+"px 0";
+	a.style.WebkitTransitionDuration='0.35s'
+	getElem("mainbg").appendChild(a);
+	return a;
+}
+function adjustLine(from,to,line){
+	var fT=from.offsetTop+from.offsetHeight/2;
+	var tT=to.offsetTop+to.offsetHeight/2;
+	var fL=from.offsetLeft+from.offsetWidth/2;
+	var tL=to.offsetLeft+to.offsetWidth/2;
+	var CA=Math.abs(tT-fT);
+	var CO=Math.abs(tL-fL);
+	var H=Math.sqrt(CA*CA+CO*CO);
+	var ANG=180/Math.PI*Math.acos(CA/H);
+	if(tT>fT){
+		var top=(tT-fT)/2+fT;
+	}else{
+		var top=(fT-tT)/2+tT;
+	}
+	if(tL > fL){
+		var left=(tL-fL)/2+fL;
+	}else{
+		var left=(fL-tL)/2+tL;
+	}
+	if((fT<tT&&fL<tL)||(tT<fT&&tL<fL)||(fT>tT&&fL>tL)||(tT>fT&&tL>fL)){
+		ANG*=-1;
+	}
+	top-=H/2;
+	line.style.WebkitTransitionDuration='1s'
+	line.style["-webkit-transform"]='rotate('+ANG+'deg)';
+	line.style["-moz-transform"]='rotate('+ANG+'deg)';
+	line.style["-ms-transform"]='rotate('+ANG+'deg)';
+	line.style["-o-transform"]='rotate('+ANG+'deg)';
+	line.style["-transform"]='rotate('+ANG+'deg)';
+	line.style.top=top+'px';
+	line.style.left=left+'px';
+	line.style.height=H+'px';
+}
+function clear_graph(){
+	if(!still_going){
+		getElem("max").innerText=10
+		getElem("90p").innerText=9
+		getElem("80p").innerText=8
+		getElem("70p").innerText=7
+		getElem("60p").innerText=6
+		getElem("50p").innerText=5
+		getElem("40p").innerText=4
+		getElem("30p").innerText=3
+		getElem("20p").innerText=2
+		getElem("10p").innerText=1
+		for(let i=0;i<step;i++){
+			try{
+				getElem(i+1).remove()
+				getElem("line"+i).remove()
+			}catch(e){}
+		}
+	}
+}
+function update_display(h){
+	getElem("max").innerText=h
+	getElem("90p").innerText=round(h*0.9)
+	getElem("80p").innerText=round(h*0.8)
+	getElem("70p").innerText=round(h*0.7)
+	getElem("60p").innerText=round(h*0.6)
+	getElem("50p").innerText=round(h*0.5)
+	getElem("40p").innerText=round(h*0.4)
+	getElem("30p").innerText=round(h*0.3)
+	getElem("20p").innerText=round(h*0.2)
+	getElem("10p").innerText=round(h*0.1)
+	for(let i=1;i<step;i++){
+		getElem(i).style.top=(getElem(i).dataset.value/h)*95+"%"
+		adjustLine(getElem(i),getElem(i+1),getElem("line"+i))
+	}
+	setTimeout(()=>{
+		for(let i=1;i<step;i++){
+			getElem(i).style.top=(getElem(i).dataset.value/h)*95+"%"
+			adjustLine(getElem(i),getElem(i+1),getElem("line"+i))
+		}
+	},250);
+	
+}
+function collatzConjecture(num,prev,peak,b){
+    if(!isNaN(num)){
+        step=prev||0;
+        current=parseInt(num);
+        base=b||parseInt(num);
+	highest=peak||parseInt(num);
+	still_going=true;
+        if(current!=1){
+            if(current%2===1&&current>1){
+                current=(current*3)+1;
+		step++;
+		create_elem(step,  "grey", "1000px",((current/highest)*100)+"%",  step*35+"px",  "25px", "25px","fixed","2147483647",current);
+		if(step>1){
+			create_elem("line"+(step-1),"green","0px",   "0px",  "0px",  "2.5px","0px", "fixed","0")
+		}
+		update_display(highest)
+                if(highest<num){
+                    highest=num;
+                }
+                setTimeout(()=>{
+			update_display(highest)
+			collatzConjecture(current,step,highest,base);
+		},150);
+            }else if(current%2===0&&current>1){
+                current/=2;
+		step++;
+		create_elem(step,  "grey", "1000px",((current/highest)*100)+"%",  step*35+"px",  "25px", "25px","fixed","2147483647",current);
+		if(step>1){
+			create_elem("line"+(step-1),"red","0px",   "0px",  "0px",  "2.5px","0px", "fixed","0")
+		}
+		update_display(highest)
+                if(highest<=num){
+                    highest=num;
+                }
+                setTimeout(()=>{
+			update_display(highest)
+			collatzConjecture(current,step,highest,base);
+			update_display(highest);
+		},150);
+            }
+        }else{getElem("data").innerHTML=("Iterations: "+step.toLocaleString()+"<br>Highest: "+highest.toLocaleString()+"<br>Base: "+base.toLocaleString());still_going=false;update_display(highest);}
+    }else log("must be a number");
+}
+		</script>
+	</body>
+</html>
