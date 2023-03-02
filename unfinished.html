@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>v2</title>
+		<style>
+		</style>
+	</head>
+	<body bgcolor=#111>
+		<script>
+const m={
+    m:Math,
+    n:Number,
+    pi:parseInt,
+    pf:parseFloat,
+    w:window,
+    d:document
+},
+      {floor}=m.m,
+      {round}=m.m,
+      {random}=m.m,
+      {log}=console
+var score,
+    apple,
+    speed,
+    head,
+    size="25px";
+function spawn(){
+    let area={x:m.w.innerWidth-m.w.innerWidth%m.pf(size),y:m.w.innerHeight-m.w.innerHeight%m.pf(size)},
+        h=m.d.createElement("div"),
+        hs=h.style;
+    hs.width=size;
+    hs.height=size;
+    hs.backgroundColor="blue";
+    hs.borderRadius="5px";
+
+    hs.top=floor(random()*area.y)-5+'px';
+    hs.left=floor(random()*area.x)-5+'px';
+    hs.position="relative";
+    hs.zIndex="2147483648";
+    m.d.body.appendChild(h);
+}
+spawn()
+		</script>
+	</body>
+</html>
