@@ -3,6 +3,9 @@
 	<head>
 		<title>v2</title>
 		<style>
+			body{
+				overflow:hidden;
+			}
 		</style>
 	</head>
 	<body bgcolor=#111>
@@ -18,28 +21,103 @@ const m={
       {floor}=m.m,
       {round}=m.m,
       {random}=m.m,
-      {log}=console
+      {log}=console,
+      {sqrt}=m.m,
+      {pow}=m.m;
 var score,
-    apple,
     speed,
-    head,
     size="25px";
+function getElem(id){
+    return m.d.getElementById(id)
+}
+function magnitude(one,two){
+    return sqrt(pow(m.pf(one.left)-m.pf(two.left),2)+pow(m.pf(one.top)-m.pf(two.top),2));
+}
+function obj_len(object){
+    return Object.keys(object).length
+}
+function coords(elem){
+    return{x:elem.left,y:elem.top}
+}
 function spawn(){
-    let area={x:m.w.innerWidth-m.w.innerWidth%m.pf(size),y:m.w.innerHeight-m.w.innerHeight%m.pf(size)},
-        h=m.d.createElement("div"),
+    let x={},y={}
+    for(let i=1;(x[i-1]?x[i-1]:0)<m.w.innerWidth-m.w.innerWidth%m.pf(size);i++){
+        x[i]=i*m.pf(size)
+    }
+    for(let i=1;(y[i-1]?y[i-1]:0)<m.w.innerHeight-m.w.innerHeight%m.pf(size);i++){
+        y[i]=i*m.pf(size)
+    }
+    let h=m.d.createElement("div"),
         hs=h.style;
+    h.id="head"
     hs.width=size;
     hs.height=size;
     hs.backgroundColor="blue";
     hs.borderRadius="5px";
-
-    hs.top=floor(random()*area.y)-5+'px';
-    hs.left=floor(random()*area.x)-5+'px';
+    hs.top=y[floor(random()*obj_len(y))]+'px';
+    hs.left=x[floor(random()*obj_len(x))]+'px';
     hs.position="relative";
     hs.zIndex="2147483648";
+    hs.WebkitTransitionDuration='200ms'
     m.d.body.appendChild(h);
 }
-spawn()
+function apple(){
+    let x={},y={}
+    for(let i=1;(x[i-1]?x[i-1]:0)<m.w.innerWidth-m.w.innerWidth%m.pf(size);i++){
+        x[i]=i*m.pf(size)
+    }
+    for(let i=1;(y[i-1]?y[i-1]:0)<m.w.innerHeight-m.w.innerHeight%m.pf(size);i++){
+        y[i]=i*m.pf(size)
+    }
+    let h=m.d.createElement("div"),
+        hs=h.style;
+    h.id="apple"
+    hs.width=size;
+    hs.height=size;
+    hs.backgroundColor="#f00";
+    hs.borderRadius="10px";
+    for(let i=0;i<20;i++){
+        let chosen_x=x[floor(random()*obj_len(x))],chosen_y=y[floor(random()*obj_len(y))];
+        if(chosen_y!=coords(getElem("head")).y){
+            hs.top=chosen_y+'px';
+        }
+        if(chosen_x!=coords(getElem("head")).x){
+            hs.left=chosen_x+'px';
+        }
+    }
+    hs.position="relative";
+    hs.zIndex="2147483647";
+    m.d.body.appendChild(h);
+}
+m.d.addEventListener('keydown',(e)=>{
+    switch(e.keyCode){
+        case 87||38:
+
+            break;
+        case 65||37:
+
+            break;
+        case 83||40:
+
+            break;
+        case 68||39:
+
+            break;
+        case 38:
+
+            break;
+        case 37:
+
+            break;
+        case 40:
+
+            break;
+        case 39:
+
+            break;
+    }
+})
+spawn();apple()
 		</script>
 	</body>
 </html>
