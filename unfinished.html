@@ -17,6 +17,16 @@ const m={
     pf:parseFloat,
     w:window,
     d:document
+},b={
+	t:true,
+	f:false,
+	n:null,
+	u:undefined
+},restrict={
+	up:b.f,
+	down:b.f,
+	left:b.f,
+	right:b.f
 },
       {floor}=m.m,
       {round}=m.m,
@@ -24,17 +34,28 @@ const m={
       {log}=console,
       {sqrt}=m.m,
       {pow}=m.m;
-var score,
+var score=0,
     speed,
+	dir,
+	js_cd=b.t,
     size="25px";
 function getElem(id){
     return m.d.getElementById(id)
 }
-function magnitude(one,two){
-    return sqrt(pow(m.pf(one.left)-m.pf(two.left),2)+pow(m.pf(one.top)-m.pf(two.top),2));
+Element.prototype.get=function(css){
+	return this.style[css]
 }
-function obj_len(object){
-    return Object.keys(object).length
+Element.prototype.set=function(css,v){
+	return this.style[css]=v;
+}
+Element.prototype.add=function(css,v){
+	return this.style[css]=m.pf(this.get(css))+v+"px";
+}
+function magnitude(one,two){
+    return sqrt(pow(m.pf(one.style.left)-m.pf(two.style.left),2)+pow(m.pf(one.style.top)-m.pf(two.style.top),2))/m.pf(size);
+}
+Object.prototype.len=function(){
+    return Object.keys(this).length
 }
 function coords(elem){
     return{x:elem.left,y:elem.top}
@@ -54,9 +75,9 @@ function spawn(){
     hs.height=size;
     hs.backgroundColor="blue";
     hs.borderRadius="5px";
-    hs.top=y[floor(random()*obj_len(y))]+'px';
-    hs.left=x[floor(random()*obj_len(x))]+'px';
-    hs.position="relative";
+    hs.top=y[floor(random()*y.len())]+'px';
+    hs.left=x[floor(random()*x.len())]+'px';
+    hs.position="fixed";
     hs.zIndex="2147483648";
     hs.WebkitTransitionDuration='200ms'
     m.d.body.appendChild(h);
@@ -77,7 +98,7 @@ function apple(){
     hs.backgroundColor="#f00";
     hs.borderRadius="10px";
     for(let i=0;i<20;i++){
-        let chosen_x=x[floor(random()*obj_len(x))],chosen_y=y[floor(random()*obj_len(y))];
+        let chosen_x=x[floor(random()*x.len())],chosen_y=y[floor(random()*y.len())];
         if(chosen_y!=coords(getElem("head")).y){
             hs.top=chosen_y+'px';
         }
@@ -85,39 +106,93 @@ function apple(){
             hs.left=chosen_x+'px';
         }
     }
-    hs.position="relative";
+    hs.position="fixed";
     hs.zIndex="2147483647";
     m.d.body.appendChild(h);
 }
-m.d.addEventListener('keydown',(e)=>{
+function move(dir){
+	if(!restrict[dir]){
+		switch(dir){
+			case"up":
+				getElem("head").add("top",-25);
+				break;
+			case"down":
+				getElem("head").add("top",25);
+				break;
+			case"left":
+				getElem("head").add("left",-25);
+				break;
+			case"right":
+				getElem("head").add("left",25);
+				break;
+		}
+	}
+}
+m.d.addEventListener("keydown",e=>{
     switch(e.keyCode){
-        case 87||38:
-
+        case 87:
+			move("up")
+			restrict["down"]=b.t
+			restrict["left"]=b.f
+			restrict["right"]=b.f
             break;
-        case 65||37:
-
+        case 65:
+			move("left")
+			restrict["down"]=b.f
+			restrict["up"]=b.f
+			restrict["right"]=b.t
             break;
-        case 83||40:
-
+        case 83:
+			move("down")
+			restrict["left"]=b.f
+			restrict["up"]=b.t
+			restrict["right"]=b.f
             break;
-        case 68||39:
-
+        case 68:
+			move("right")
+			restrict["left"]=b.t
+			restrict["up"]=b.f
+			restrict["down"]=b.f
             break;
         case 38:
-
+			move("up")
+			restrict["down"]=b.t
+			restrict["left"]=b.f
+			restrict["right"]=b.f
             break;
         case 37:
-
+			move("left")
+			restrict["down"]=b.f
+			restrict["up"]=b.f
+			restrict["right"]=b.t
             break;
         case 40:
-
+			move("down")
+			restrict["left"]=b.f
+			restrict["up"]=b.t
+			restrict["right"]=b.f
             break;
         case 39:
-
+			move("right")
+			restrict["left"]=b.t
+			restrict["up"]=b.f
+			restrict["down"]=b.f
             break;
     }
 })
+setInterval(function eat(){
+	if(magnitude(getElem("head"),getElem("apple"))==1&&js_cd){
+		js_cd=b.f
+		setTimeout(()=>{
+			getElem("apple").remove()
+			score++
+			js_cd=b.t
+			apple()
+		},200);
+	}
+},1);
 spawn();apple()
+log(magnitude(getElem("head"),getElem("apple")))
 		</script>
 	</body>
 </html>
