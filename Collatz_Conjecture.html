@@ -221,7 +221,7 @@ function update_display(h){
         for(let i=0;i<step+1;i++){
 			try{
 				getElem(i).style.top=(getElem(i).dataset.value/h)*95+"%"
-				adjustLine(getElem(i),getElem(i+1),getElem("line"+i))
+				adjustLine(getElem(i-1),getElem(i),getElem("line"+i))
 			}catch(e){}
         }
     },25);
