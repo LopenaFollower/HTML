@@ -27,6 +27,12 @@ const m={
 	down:b.f,
 	left:b.f,
 	right:b.f
+},js_cd={
+	eat:b.t,
+	move:b.t
+},js_to={
+	eat:b.u,
+	move:b.u
 },
       {floor}=m.m,
       {round}=m.m,
@@ -35,10 +41,11 @@ const m={
       {sqrt}=m.m,
       {pow}=m.m;
 var score=0,
-    speed,
+	status=b.f,
+	direction,
+    speed=350,
 	dir,
-	js_cd=b.t,
-    size="25px";
+	size="25px";
 function getElem(id){
     return m.d.getElementById(id)
 }
@@ -75,11 +82,11 @@ function spawn(){
     hs.height=size;
     hs.backgroundColor="blue";
     hs.borderRadius="5px";
-    hs.top=y[floor(random()*y.len())]+'px';
-    hs.left=x[floor(random()*x.len())]+'px';
+    hs.top=y[floor(random()*(y.len()-1)+1)]+'px';
+    hs.left=x[floor(random()*(x.len()-1)+1)]+'px';
     hs.position="fixed";
     hs.zIndex="2147483648";
-    hs.WebkitTransitionDuration='200ms'
+    hs.WebkitTransitionDuration=speed+200+'ms'
     m.d.body.appendChild(h);
 }
 function apple(){
@@ -96,7 +103,7 @@ function apple(){
     hs.width=size;
     hs.height=size;
     hs.backgroundColor="#f00";
-    hs.borderRadius="10px";
+    hs.borderRadius=m.pf(size)*0.4+"px";
     for(let i=0;i<20;i++){
         let chosen_x=x[floor(random()*x.len())],chosen_y=y[floor(random()*y.len())];
         if(chosen_y!=coords(getElem("head")).y){
@@ -107,26 +114,14 @@ function apple(){
         }
     }
     hs.position="fixed";
-    hs.zIndex="2147483647";
+    hs.zIndex="-1";
     m.d.body.appendChild(h);
 }
 function move(dir){
 	if(!restrict[dir]){
-		switch(dir){
-			case"up":
-				getElem("head").add("top",-25);
-				break;
-			case"down":
-				getElem("head").add("top",25);
-				break;
-			case"left":
-				getElem("head").add("left",-25);
-				break;
-			case"right":
-				getElem("head").add("left",25);
-				break;
-		}
+		direction=dir;
 	}
+	status=b.t
 }
 m.d.addEventListener("keydown",e=>{
     switch(e.keyCode){
@@ -180,19 +175,59 @@ m.d.addEventListener("keydown",e=>{
             break;
     }
 })
-setInterval(function eat(){
-	if(magnitude(getElem("head"),getElem("apple"))==1&&js_cd){
-		js_cd=b.f
-		setTimeout(()=>{
-			getElem("apple").remove()
-			score++
-			js_cd=b.t
-			apple()
-		},200);
+setInterval(()=>{
+	if(m.pf(getElem("head").get("top"))<0||m.pf(getElem("head").get("left"))<0||m.pf(getElem("head").get("left"))>m.w.innerWidth-m.w.innerWidth%m.pf(size)||m.pf(getElem("head").get("top"))>m.w.innerHeight-m.w.innerHeight%m.pf(size)){
+		status=b.f
+		getElem("apple").remove()
+		getElem("head").remove()
+		clearTimeout(js_to["eat"])
+		clearTimeout(js_to["move"])
+		score=0
+		direction=b.u
+		restrict["left"]=b.f
+		restrict["right"]=b.f
+		restrict["up"]=b.f
+		restrict["down"]=b.f
+		spawn();apple()
+		js_cd["eat"]=b.t
+		js_cd["move"]=b.t
 	}
-},1);
+	if(magnitude(getElem("head"),getElem("apple"))<1&&js_cd["eat"]&&status){
+		js_cd["eat"]=b.f
+		js_to["eat"]=setTimeout(()=>{
+			if(status){
+				getElem("apple").remove()
+				score++
+				js_cd["eat"]=b.t
+				apple()
+			}
+		},speed/2);
+	}
+	if(js_cd["move"]&&status){
+		js_cd["move"]=b.f
+		switch(direction){
+			case"up":
+				getElem("head").add("top",-m.pf(size));
+				break;
+			case"down":
+				getElem("head").add("top",m.pf(size));
+				break;
+			case"left":
+				getElem("head").add("left",-m.pf(size));
+				break;
+			case"right":
+				getElem("head").add("left",m.pf(size));
+				break;
+		}
+		js_to["eat"]=setTimeout(()=>{
+			if(status){
+				js_cd["move"]=b.t
+			}
+			speed=300-(score>=50?50:score)*5
+		},speed);
+	}
+},0);
 spawn();apple()
-log(magnitude(getElem("head"),getElem("apple")))
 		</script>
 	</body>
 </html>
