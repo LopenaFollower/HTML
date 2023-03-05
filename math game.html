@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>press e to start</title>
+		<style>
+			tbody{
+				display:flex;
+				align-content:center;
+				flex-direction:column;
+				justify-content:space-evenly;
+				flex-wrap:wrap;
+				position:fixed;
+				height:70%;
+				width:100%;
+			}
+			#question{
+				color:white;
+				font-size:50px;
+				text-align:center;
+				font-family:monospace;
+				text-shadow:0px 0px 1px #b6b6f6;
+			}
+			#back,#fill{
+				width:100%;
+				height:40px;
+				position:fixed;
+				top:0%;
+				left:0%;
+				transition-duration:5s;
+			}
+			#back{
+				background-color:#f00;
+			}
+			#fill{
+				background-color:#0f0;
+			}
+			button{
+				width:100px;
+			}
+		</style>
+	</head>
+	<body bgcolor=#111>
+		<table><!---->
+			<tr style="display:flex;flex-wrap:wrap;justify-content:space-around;">
+				<td>
+					<div id=container>
+						<div class=timer>
+							<div id=back></div>
+							<div id=fill></div>
+						</div>
+						<p id=question>h</p>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<button id=1 onclick='answer=this.textContent'>Option 1</button>
+					<button id=2 onclick='answer=this.textContent'>Option 2</button>
+					<button id=3 onclick='answer=this.textContent'>Option 3</button>
+					<button id=4 onclick='answer=this.textContent'>Option 4</button>
+					<button id=5 onclick='answer=this.textContent'>Option 5</button>
+				</td>
+			</tr>
+		</table>
+		<script>
+const{floor}=Math,{round}=Math,{random}=Math,{ceil}=Math,{log}=console;
+var total_qs=0,
+	correct_qs=0,
+	answer,
+	on_going=false;
+function getElem(id){
+	return document.getElementById(id)
+}
+Element.prototype.get=function(css){
+	return this.style[css]
+}
+Array.prototype.random=function(){
+	return this[floor(random()*this.length)]
+}
+Element.prototype.set=function(css,v){
+	return this.style[css]=v;
+}
+function randomV2(range){
+	return random()*(range.max-range.min)+range.min
+}
+function shuffle(array){
+	var m = array.length, t, i;
+	while (m) {
+		i = Math.floor(Math.random() * m--);
+		t = array[m];
+		array[m] = array[i];
+		array[i] = t;
+	  }
+  return array;
+}
+setInterval(()=>{
+	document.body.set("padding",window.innerHeight-parseFloat(getElem("container").get("height"))+"px")
+},0);
+document.addEventListener("keypress",e=>{
+	try{
+		getElem(e.key).click();
+	}catch(e){}
+	if(!on_going){
+		on_going=true
+		start();
+	}
+})
+function ask(lvl){
+	answer=undefined;
+	getElem("fill").set("transition-duration","249ms")
+	getElem("fill").set("width","100%")
+	if(lvl===0){//basic addition/subtraction
+		let num_range={
+			min:1,
+			max:25
+		}
+		let operators=[
+			" + ",
+			" - "
+		]
+		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		options.forEach(e=>{
+			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
+		})
+		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+	}
+	if(lvl===1){//larger number from lvl 0
+		let num_range={
+			min:5,
+			max:50
+		}
+		let operators=[
+			" + ",
+			" - "
+		]
+		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		options.forEach(e=>{
+			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
+		})
+		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+	}
+	if(lvl===2){//added multiplication/division
+		let num_range={
+			min:10,
+			max:75
+		}
+		let operators=[
+			" + ",
+			" - ",
+			" * ",
+			" / "
+		]
+		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		options.forEach(e=>{
+			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
+		})
+		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+	}
+	if(lvl===3){//larger number from lvl 2
+		let num_range={
+			min:15,
+			max:100
+		}
+		let operators=[
+			" + ",
+			" - ",
+			" * ",
+			" / "
+		]
+		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		options.forEach(e=>{
+			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
+		})
+		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+	}
+	if(lvl===4){//multiple equations
+		let num_range={
+			min:50,
+			max:100
+		}
+		let operators=[
+			" + ",
+			" - ",
+			" * ",
+			" / "
+		]
+		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		options.forEach(e=>{
+			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
+		})
+		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+	}
+	if(lvl===5){//larger numbers
+		let num_range={
+			min:50,
+			max:500
+		}
+		let operators=[
+			" + ",
+			" - ",
+			" * ",
+			" / "
+		]
+		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		options.forEach(e=>{
+			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
+		})
+		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+	}
+	if(lvl===6){//larger numbers for lvl 4
+		let num_range={
+			min:50,
+			max:250
+		}
+		let operators=[
+			" + ",
+			" - ",
+			" * ",
+			" / "
+		]
+		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		options.forEach(e=>{
+			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
+		})
+		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+	}
+	if(lvl===7){//modulus aka. remainder
+		let num_range={
+			min:15,
+			max:100
+		}
+		let operators=[
+			" + ",
+			" - ",
+			" * ",
+			" / ",
+			" % "
+		]
+		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		options.forEach(e=>{
+			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
+		})
+		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+	}
+	if(lvl===8){//larger num of lvl 7
+		let num_range={
+			min:25,
+			max:250
+		}
+		let operators=[
+			" + ",
+			" - ",
+			" * ",
+			" / ",
+			" % "
+		]
+		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		options.forEach(e=>{
+			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
+		})
+		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+	}
+	if(lvl===9){//multiple equations lvl 7
+		let num_range={
+			min:15,
+			max:100
+		}
+		let operators=[
+			" + ",
+			" - ",
+			" * ",
+			" / ",
+			" % "
+		]
+		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		options.forEach(e=>{
+			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
+		})
+		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+	}
+	if(lvl===10){//larger numbers of lvl 9
+		let num_range={
+			min:50,
+			max:200
+		}
+		let operators=[
+			" + ",
+			" - ",
+			" * ",
+			" / ",
+			" % "
+		]
+		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		options.forEach(e=>{
+			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
+		})
+		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+	}
+	if(lvl===11){
+		let num_range={
+			min:15,
+			max:100
+		}
+		let operators=[
+			" + ",
+			" - ",
+			" * ",
+			" / "
+		]
+		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		options.forEach(e=>{
+			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
+		})
+		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+	}
+	if(lvl===12){
+		let num_range={
+			min:15,
+			max:100
+		}
+		let operators=[
+			" + ",
+			" - ",
+			" * ",
+			" / "
+		]
+		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		options.forEach(e=>{
+			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
+		})
+		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+	}
+	if(lvl===13){
+		let num_range={
+			min:15,
+			max:100
+		}
+		let operators=[
+			" + ",
+			" - ",
+			" * ",
+			" / "
+		]
+		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		options.forEach(e=>{
+			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
+		})
+		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+	}
+	if(lvl===14){
+		let num_range={
+			min:15,
+			max:100
+		}
+		let operators=[
+			" + ",
+			" - ",
+			" * ",
+			" / "
+		]
+		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		options.forEach(e=>{
+			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
+		})
+		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+	}
+	if(lvl===15){
+		let num_range={
+			min:15,
+			max:100
+		}
+		let operators=[
+			" + ",
+			" - ",
+			" * ",
+			" / "
+		]
+		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		options.forEach(e=>{
+			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
+		})
+		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+	}
+	return new Promise((resolve,reject)=>{
+		setTimeout(()=>{
+			getElem("fill").set("transition-duration","15s")
+			getElem("fill").set("width","0px")
+			var a=setTimeout(()=>{
+				resolve(false)
+			},10000)
+			var b=setInterval(()=>{
+				if(answer){
+					if(parseFloat(answer)===eval(getElem("question").innerHTML)){
+						resolve(true)
+					}else{
+						resolve(false)
+					}
+					clearTimeout(a);
+					clearInterval(b);
+				}
+			},0);
+		},250);
+	})
+}
+async function start(){
+	correct_qs=0
+	total_qs=0
+	await ask(0)?correct_qs++:null
+	total_qs++
+	await ask(1)?correct_qs++:null
+	total_qs++
+	await ask(2)?correct_qs++:null
+	total_qs++
+	await ask(2)?correct_qs++:null
+	total_qs++
+	await ask(3)?correct_qs++:null
+	total_qs++
+	await ask(3)?correct_qs++:null
+	total_qs++
+	await ask(4)?correct_qs++:null
+	total_qs++
+	await ask(5)?correct_qs++:null
+	total_qs++
+	await ask(6)?correct_qs++:null
+	total_qs++
+	await ask(7)?correct_qs++:null
+	total_qs++
+	await ask(8)?correct_qs++:null
+	total_qs++
+	await ask(8)?correct_qs++:null
+	total_qs++
+	await ask(9)?correct_qs++:null
+	total_qs++
+	await ask(10)?correct_qs++:null
+	total_qs++
+	await ask(10)?correct_qs++:null
+	total_qs++
+	getElem("question").innerHTML="You got "+correct_qs+" out of "+total_qs;
+	on_going=false
+	
+}
+		</script>
+	</body>
+</html>
