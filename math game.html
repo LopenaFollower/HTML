@@ -35,7 +35,9 @@
 				background-color:#0f0;
 			}
 			button{
-				width:100px;
+				width:150px;
+				height:50px;
+				font-size:30px;
 			}
 		</style>
 	</head>
@@ -403,7 +405,7 @@ function ask(lvl){
 			getElem("fill").set("width","0px")
 			var a=setTimeout(()=>{
 				resolve(false)
-			},10000)
+			},15000)
 			var b=setInterval(()=>{
 				if(answer){
 					if(parseFloat(answer)===eval(getElem("question").innerHTML)){
