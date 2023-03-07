@@ -24,9 +24,9 @@
 				width:100%;
 				height:40px;
 				position:fixed;
-				top:0%;
-				left:0%;
-				transition-duration:5s;
+				top:0;
+				left:0;
+				transition-timing-function:linear;
 			}
 			#back{
 				background-color:#f00;
@@ -38,11 +38,12 @@
 				width:150px;
 				height:50px;
 				font-size:30px;
+				overflow:hidden;
 			}
 		</style>
 	</head>
 	<body bgcolor=#111>
-		<table><!---->
+		<table>
 			<tr style="display:flex;flex-wrap:wrap;justify-content:space-around;">
 				<td>
 					<div id=container>
@@ -65,12 +66,12 @@
 			</tr>
 		</table>
 		<script>
-const{floor}=Math,{round}=Math,{random}=Math,{ceil}=Math,{log}=console;
+const{floor}=Math,{round}=Math,{random}=Math,{ceil}=Math,{log}=console,{sqrt}=Math,{pow}=Math;
 var total_qs=0,
 	correct_qs=0,
 	answer,
 	on_going=false;
-function getElem(id){
+function $(id){
 	return document.getElementById(id)
 }
 Element.prototype.get=function(css){
@@ -95,12 +96,27 @@ function shuffle(array){
 	  }
   return array;
 }
+function prep(from,symbol,replace,additional){
+	let res="";
+	from.split(" ").forEach(e=>{
+		if(e.includes(symbol)){
+			res+=e.replace(symbol,replace)+additional+" ";
+		}else{
+			res+=e+" "
+		}
+	})
+	return res.trim()
+}
+function prf_sqr(range){
+	return pow(ceil(random()*(range||10)),2)
+}
+//√
 setInterval(()=>{
-	document.body.set("padding",window.innerHeight-parseFloat(getElem("container").get("height"))+"px")
+	document.body.set("padding",window.innerHeight-parseFloat($("container").get("height"))+"px")
 },0);
 document.addEventListener("keypress",e=>{
 	try{
-		getElem(e.key).click();
+		$(e.key).click();
 	}catch(e){}
 	if(!on_going){
 		on_going=true
@@ -109,8 +125,8 @@ document.addEventListener("keypress",e=>{
 })
 function ask(lvl){
 	answer=undefined;
-	getElem("fill").set("transition-duration","249ms")
-	getElem("fill").set("width","100%")
+	$("fill").set("transition-duration","249ms")
+	$("fill").set("width","100%")
 	if(lvl===0){//basic addition/subtraction
 		let num_range={
 			min:1,
@@ -120,12 +136,12 @@ function ask(lvl){
 			" + ",
 			" - "
 		]
-		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
-		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		$("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([$(1),$(2),$(3),$(4),$(5)])
 		options.forEach(e=>{
 			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
 		})
-		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+		$(ceil(random()*5)).innerText=eval($("question").innerHTML)
 	}
 	if(lvl===1){//larger number from lvl 0
 		let num_range={
@@ -136,12 +152,12 @@ function ask(lvl){
 			" + ",
 			" - "
 		]
-		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
-		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		$("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([$(1),$(2),$(3),$(4),$(5)])
 		options.forEach(e=>{
 			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
 		})
-		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+		$(ceil(random()*5)).innerText=eval($("question").innerHTML)
 	}
 	if(lvl===2){//added multiplication/division
 		let num_range={
@@ -154,12 +170,12 @@ function ask(lvl){
 			" * ",
 			" / "
 		]
-		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
-		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		$("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([$(1),$(2),$(3),$(4),$(5)])
 		options.forEach(e=>{
 			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
 		})
-		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+		$(ceil(random()*5)).innerText=eval($("question").innerHTML)
 	}
 	if(lvl===3){//larger number from lvl 2
 		let num_range={
@@ -172,12 +188,12 @@ function ask(lvl){
 			" * ",
 			" / "
 		]
-		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
-		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		$("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([$(1),$(2),$(3),$(4),$(5)])
 		options.forEach(e=>{
 			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
 		})
-		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+		$(ceil(random()*5)).innerText=eval($("question").innerHTML)
 	}
 	if(lvl===4){//multiple equations
 		let num_range={
@@ -190,12 +206,12 @@ function ask(lvl){
 			" * ",
 			" / "
 		]
-		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
-		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		$("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([$(1),$(2),$(3),$(4),$(5)])
 		options.forEach(e=>{
 			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
 		})
-		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+		$(ceil(random()*5)).innerText=eval($("question").innerHTML)
 	}
 	if(lvl===5){//larger numbers
 		let num_range={
@@ -208,12 +224,12 @@ function ask(lvl){
 			" * ",
 			" / "
 		]
-		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
-		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		$("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([$(1),$(2),$(3),$(4),$(5)])
 		options.forEach(e=>{
 			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
 		})
-		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+		$(ceil(random()*5)).innerText=eval($("question").innerHTML)
 	}
 	if(lvl===6){//larger numbers for lvl 4
 		let num_range={
@@ -226,12 +242,12 @@ function ask(lvl){
 			" * ",
 			" / "
 		]
-		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
-		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		$("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([$(1),$(2),$(3),$(4),$(5)])
 		options.forEach(e=>{
 			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
 		})
-		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+		$(ceil(random()*5)).innerText=eval($("question").innerHTML)
 	}
 	if(lvl===7){//modulus aka. remainder
 		let num_range={
@@ -245,12 +261,12 @@ function ask(lvl){
 			" / ",
 			" % "
 		]
-		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
-		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		$("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([$(1),$(2),$(3),$(4),$(5)])
 		options.forEach(e=>{
 			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
 		})
-		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+		$(ceil(random()*5)).innerText=eval($("question").innerHTML)
 	}
 	if(lvl===8){//larger num of lvl 7
 		let num_range={
@@ -264,12 +280,12 @@ function ask(lvl){
 			" / ",
 			" % "
 		]
-		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
-		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		$("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([$(1),$(2),$(3),$(4),$(5)])
 		options.forEach(e=>{
 			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
 		})
-		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+		$(ceil(random()*5)).innerText=eval($("question").innerHTML)
 	}
 	if(lvl===9){//multiple equations lvl 7
 		let num_range={
@@ -283,12 +299,12 @@ function ask(lvl){
 			" / ",
 			" % "
 		]
-		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
-		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		$("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([$(1),$(2),$(3),$(4),$(5)])
 		options.forEach(e=>{
 			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
 		})
-		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+		$(ceil(random()*5)).innerText=eval($("question").innerHTML)
 	}
 	if(lvl===10){//larger numbers of lvl 9
 		let num_range={
@@ -302,14 +318,14 @@ function ask(lvl){
 			" / ",
 			" % "
 		]
-		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
-		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		$("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([$(1),$(2),$(3),$(4),$(5)])
 		options.forEach(e=>{
 			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
 		})
-		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+		$(ceil(random()*5)).innerText=eval($("question").innerHTML)
 	}
-	if(lvl===11){
+	if(lvl===11){//intro to square roots
 		let num_range={
 			min:15,
 			max:100
@@ -320,12 +336,12 @@ function ask(lvl){
 			" * ",
 			" / "
 		]
-		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
-		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		$("question").innerHTML="√"+prf_sqr(15)
+		let options=shuffle([$(1),$(2),$(3),$(4),$(5)])
 		options.forEach(e=>{
-			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
+			e.innerText=sqrt(prf_sqr(15))
 		})
-		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+		$(ceil(random()*5)).innerText=eval(prep($("question").innerHTML,"√","sqrt(",")"))
 	}
 	if(lvl===12){
 		let num_range={
@@ -338,12 +354,12 @@ function ask(lvl){
 			" * ",
 			" / "
 		]
-		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
-		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		$("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([$(1),$(2),$(3),$(4),$(5)])
 		options.forEach(e=>{
 			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
 		})
-		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+		$(ceil(random()*5)).innerText=eval($("question").innerHTML)
 	}
 	if(lvl===13){
 		let num_range={
@@ -356,12 +372,12 @@ function ask(lvl){
 			" * ",
 			" / "
 		]
-		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
-		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		$("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([$(1),$(2),$(3),$(4),$(5)])
 		options.forEach(e=>{
 			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
 		})
-		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+		$(ceil(random()*5)).innerText=eval($("question").innerHTML)
 	}
 	if(lvl===14){
 		let num_range={
@@ -374,12 +390,12 @@ function ask(lvl){
 			" * ",
 			" / "
 		]
-		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
-		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		$("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([$(1),$(2),$(3),$(4),$(5)])
 		options.forEach(e=>{
 			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
 		})
-		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+		$(ceil(random()*5)).innerText=eval($("question").innerHTML)
 	}
 	if(lvl===15){
 		let num_range={
@@ -392,27 +408,28 @@ function ask(lvl){
 			" * ",
 			" / "
 		]
-		getElem("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
-		let options=shuffle([getElem(1),getElem(2),getElem(3),getElem(4),getElem(5)])
+		$("question").innerHTML=floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range))
+		let options=shuffle([$(1),$(2),$(3),$(4),$(5)])
 		options.forEach(e=>{
 			e.innerText=eval(floor(randomV2(num_range))+operators.random()+floor(randomV2(num_range)))
 		})
-		getElem(ceil(random()*5)).innerText=eval(getElem("question").innerHTML)
+		$(ceil(random()*5)).innerText=eval($("question").innerHTML)
 	}
 	return new Promise((resolve,reject)=>{
 		setTimeout(()=>{
-			getElem("fill").set("transition-duration","15s")
-			getElem("fill").set("width","0px")
+			$("fill").set("transition-duration","10s")
+			$("fill").set("width","0px")
 			var a=setTimeout(()=>{
 				resolve(false)
-			},15000)
+			},10000)
 			var b=setInterval(()=>{
 				if(answer){
-					if(parseFloat(answer)===eval(getElem("question").innerHTML)){
+					if(parseFloat(answer)===eval(prep($("question").innerHTML,"√","sqrt(",")"))){
 						resolve(true)
 					}else{
 						resolve(false)
 					}
+					log("Question: "+$("question").innerHTML+"\nYour answer: "+answer+"\nCorrect: "+eval(prep($("question").innerHTML,"√","sqrt(",")")))
 					clearTimeout(a);
 					clearInterval(b);
 				}
@@ -445,15 +462,15 @@ async function start(){
 	total_qs++
 	await ask(8)?correct_qs++:null
 	total_qs++
-	await ask(8)?correct_qs++:null
-	total_qs++
 	await ask(9)?correct_qs++:null
 	total_qs++
-	await ask(10)?correct_qs++:null
+	await ask(8)?correct_qs++:null
 	total_qs++
 	await ask(10)?correct_qs++:null
 	total_qs++
-	getElem("question").innerHTML="You got "+correct_qs+" out of "+total_qs;
+	await ask(11)?correct_qs++:null
+	total_qs++
+	$("question").innerHTML="You got "+correct_qs+" out of "+total_qs;
 	on_going=false
 	
 }
