@@ -129,13 +129,14 @@ function make_cell(){
 		h.className="cell_w"
 		hs.width=size;
 		hs.height=size;
-		hs.top='-25px';
-		hs.left='-25px';
 		hs.backgroundColor="#fff";
-		hs.borderRadius="5px";
+		hs.borderRadius=m.pf(size)*0.2+"px";
+		hs.top='5px';
+		hs.left='5px';
 		hs.position="fixed";
 		hs.zIndex="0"
-		hs.WebkitTransitionDuration=speed+25+'ms'
+		hs["transition-timing-function"]="linear"
+		hs.WebkitTransitionDuration=speed+50+'ms'
 		m.d.body.appendChild(h);
 	}
 }
@@ -257,6 +258,7 @@ setInterval(()=>{
 	}
 	if(js_cd["move"]&&status&&direction){
 		js_cd["move"]=b.f
+		make_cell()
 		switch(direction){
 			case"up":
 				getElem("head").add("top",-m.pf(size));
@@ -271,10 +273,8 @@ setInterval(()=>{
 				getElem("head").add("left",m.pf(size));
 				break;
 		}
-		_=true;
 		log_path(getElem("head").get("top")+","+getElem("head").get("left"))
 		let id=1;
-		make_cell()
 		if(m.d.getElementsByClassName("cell_w").length>0){
 			Array.from(m.d.getElementsByClassName("cell_w")).forEach(e=>{
 				e.id=id
@@ -285,6 +285,7 @@ setInterval(()=>{
 				}
 			})
 		}
+		_=true;
 		js_to["move"]=setTimeout(()=>{
 			if(status){
 				js_cd["move"]=b.t
