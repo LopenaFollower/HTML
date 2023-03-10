@@ -6,6 +6,9 @@
 			body{
 				overflow:hidden;
 			}
+			#head,.cell_w{
+				transition-timing-function:linear;
+			}
 		</style>
 	</head>
 	<body bgcolor=#111>
@@ -44,8 +47,8 @@ var score=0,
 	status=b.f,
 	direction,
     speed=350,
-	cells_made=0,
 	memory_table=[],
+	_=true,
 	size="25px";
 function getElem(id){
     return m.d.getElementById(id)
@@ -82,10 +85,11 @@ function spawn(){
     hs.width=size;
     hs.height=size;
     hs.backgroundColor="blue";
-    hs.borderRadius="5px";
+    hs.borderRadius=m.pf(size)*0.2+"px";
     hs.top=y[floor(random()*(y.len()-1)+1)]+'px';
     hs.left=x[floor(random()*(x.len()-1)+1)]+'px';
     hs.position="fixed";
+	hs.zIndex="1";
     hs.WebkitTransitionDuration=speed+25+'ms'
     m.d.body.appendChild(h);
 }
@@ -121,14 +125,16 @@ function make_cell(){
 	if(score>0){
 		let h=m.d.createElement("div"),
 			hs=h.style;
-		cells_made++
-		h.id=cells_made
+		h.id=""
 		h.className="cell_w"
 		hs.width=size;
 		hs.height=size;
-		hs.backgroundColor="#000";
+		hs.top='-25px';
+		hs.left='-25px';
+		hs.backgroundColor="#fff";
 		hs.borderRadius="5px";
 		hs.position="fixed";
+		hs.zIndex="0"
 		hs.WebkitTransitionDuration=speed+25+'ms'
 		m.d.body.appendChild(h);
 	}
@@ -142,15 +148,12 @@ function move(dir){
 function log_path(newMemory){
 	memory_table.reverse()
 	memory_table[memory_table.length]=newMemory
-	log(memory_table);
 	return memory_table.reverse();
 }
 function ss(elem,string){
-	let top=string.split(",")[0]
-	let left=string.split(",")[1]
 	try{
-		elem.set("top",top)
-		elem.set("left",left)
+		elem.set("top",string.split(",")[0])
+		elem.set("left",string.split(",")[1])
 	}catch(e){}
 }
 m.d.addEventListener("keydown",e=>{
@@ -163,7 +166,8 @@ m.d.addEventListener("keydown",e=>{
 		}
 	}
 	if(e.shiftKey||e.altKey||e.ctrlKey)e.preventDefault();
-	if(status){
+	if(status&&_){
+		_=false
 		switch(e.keyCode){
 			case 87:
 				move("up")
@@ -228,7 +232,6 @@ setInterval(()=>{
 		}
 		clearTimeout(js_to["eat"])
 		clearTimeout(js_to["move"])
-		cells_made=0
 		score=0
 		direction=b.u
 		restrict["left"]=b.f
@@ -240,9 +243,6 @@ setInterval(()=>{
 		js_cd["move"]=b.t
 		m.d.title="v2";
 	}
-	try{
-		getElem(cells_made-score).remove();
-	}catch(e){}
 	if(magnitude(getElem("head"),getElem("apple"))<1&&js_cd["eat"]&&status){
 		js_cd["eat"]=b.f
 		m.d.title="v2 - "+(score+1);
@@ -271,18 +271,25 @@ setInterval(()=>{
 				getElem("head").add("left",m.pf(size));
 				break;
 		}
+		_=true;
+		log_path(getElem("head").get("top")+","+getElem("head").get("left"))
+		let id=1;
+		make_cell()
 		if(m.d.getElementsByClassName("cell_w").length>0){
 			Array.from(m.d.getElementsByClassName("cell_w")).forEach(e=>{
-				ss(e,memory_table[e.id-1])
+				e.id=id
+				id++
+				ss(e,memory_table[e.id])
+				if(e.id>score){
+					e.remove()
+				}
 			})
 		}
-		log_path(getElem("head").get("top")+","+getElem("head").get("left"))
-		make_cell()
 		js_to["move"]=setTimeout(()=>{
 			if(status){
 				js_cd["move"]=b.t
 			}
-			speed=300-(score>=30?30:score)*5
+			speed=300-(score>=50?50:score)*5
 		},speed);
 	}
 },0);
