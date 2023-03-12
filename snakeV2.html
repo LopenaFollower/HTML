@@ -30,6 +30,11 @@
 				height:70%;
 				color:#fff;
 			}
+			#sd,#tptd,#sptd{
+				width:fit-content;
+				overflow:visible;
+				margin:5px;
+			}
 		</style>
 	</head>
 	<body bgcolor=#111>
@@ -84,7 +89,7 @@ function getElem(id){
 	return m.d.getElementById(id)
 }
 function func(n,fc){
-    window[n]=fc
+	window[n]=fc
 }
 func("date",()=>{return floor(Date.now()/1000)})
 Element.prototype.get=function(css){
@@ -213,19 +218,19 @@ function ss(elem,string){
 	}catch(e){}
 }
 function HMS(s){
-    var sec=s;
-    var hrs=m.pi(sec/3600);
-    sec=sec%3600;
-    var min=m.pi(sec/60);
-    sec=sec%60;
-    return (hrs<10?"0"+hrs:hrs)+" : "+(min<10?"0"+min:min)+" : "+(m.pi(sec)<10?"0"+m.pi(sec):m.pi(sec));
+	var sec=s;
+	var hrs=m.pi(sec/3600);
+	sec=sec%3600;
+	var min=m.pi(sec/60);
+	sec=sec%60;
+	return (hrs<10?"0"+hrs:hrs)+" : "+(min<10?"0"+min:min)+" : "+(m.pi(sec)<10?"0"+m.pi(sec):m.pi(sec));
 }
 getElem("blur").set("display","none")
 if(!ls.getItem("hs")){
 	ls.setItem("hs",0)
 }
-if(!ls.getItem("first_time")){
-	ls.setItem("first_time",date())
+if(!ls.getItem("total_time")){
+	ls.setItem("total_time",date())
 }
 ls.setItem("run_time",date())
 getElem("sd").innerHTML="Highest Score: "+ls.getItem("hs")
@@ -369,10 +374,19 @@ setInterval(()=>{
 	}
 	if(status){
 		getElem("head").style.WebkitTransitionDuration=speed+"ms"
-		getElem("tptd").innerHTML="Playtime total: "+HMS(date()-ls.getItem("first_time"))
+		getElem("tptd").innerHTML="Playtime total: "+HMS(date()-ls.getItem("total_time"))
 		getElem("sptd").innerHTML="Playtime session: "+HMS(date()-ls.getItem("run_time"))
 	}
 },0);
+document.onbeforeunload=()=>{
+	ls.setItem("total_time",date()-ls.getItem("run_time"))
+}
+document.body.onblur=()=>{
+	getElem("blur").set("display","flex")
+	od=direction
+	direction=null
+	_=false
+}
 spawn();apple()
 		</script>
 	</body>
