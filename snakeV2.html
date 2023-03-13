@@ -43,6 +43,13 @@
 				<p id=sd>Highest Score:</p>
 				<p id=tptd>Playtime total:</p>
 				<p id=sptd>Playtime session:</p>
+				<div id=cell_color>
+					<input id=r type=range min=0 max=255 oninput="this.style.accentColor='rgb('+this.value+',0,0)';$('color_res').set('color','rgb('+$('r').value+','+$('g').value+','+$('b').value+')')"/><br>
+					<input id=g type=range min=0 max=255 oninput="this.style.accentColor='rgb(0,'+this.value+',0)';$('color_res').set('color','rgb('+$('r').value+','+$('g').value+','+$('b').value+')')"/><br>
+					<input id=b type=range min=0 max=255 oninput="this.style.accentColor='rgb(0,0,'+this.value+')';$('color_res').set('color','rgb('+$('r').value+','+$('g').value+','+$('b').value+')')"/><br>
+					<div id=color_res>Result Color</div><br>
+					random?<input type=checkbox id=randomc />
+				</div>
 			</div>
 		</div>
 		<script>
@@ -85,11 +92,14 @@ var score=0,
 	memory_table=[],
 	_=true,
 	size="25px";
-function getElem(id){
+function $(id){
 	return m.d.getElementById(id)
 }
 function func(n,fc){
 	window[n]=fc
+}
+function randomV2(range){
+	return random()*(range.max-range.min)+range.min
 }
 func("date",()=>{return floor(Date.now()/1000)})
 Element.prototype.get=function(css){
@@ -147,10 +157,10 @@ function apple(){
 	hs.borderRadius=m.pf(size)*0.4+"px";
 	for(let i=0;i<20;i++){
 		let chosen_x=x[floor(random()*x.len())],chosen_y=y[floor(random()*y.len())];
-		if(chosen_y!=coords(getElem("head")).y){
+		if(chosen_y!=coords($("head")).y){
 			hs.top=chosen_y+"px";
 		}
-		if(chosen_x!=coords(getElem("head")).x){
+		if(chosen_x!=coords($("head")).x){
 			hs.left=chosen_x+"px";
 		}
 	}
@@ -164,8 +174,8 @@ function apple(){
 }
 function die(){
 	status=b.f
-	getElem("apple").remove()
-	getElem("head").remove()
+	$("apple").remove()
+	$("head").remove()
 	m.d.title="v2";
 	if(score>0){
 		Array.from(m.d.getElementsByClassName("cell_w")).forEach(e=>{
@@ -192,7 +202,11 @@ function make_cell(){
 		h.className="cell_w"
 		hs.width=size;
 		hs.height=size;
-		hs.backgroundColor="#fff";
+		if($("randomc").checked){
+			hs.backgroundColor="rgb("+randomV2({min:0,max:255})+","+randomV2({min:0,max:255})+","+randomV2({min:0,max:255})+")";
+		}else{
+			hs.backgroundColor=$('color_res').get("color")||"#fff";
+		}
 		hs.borderRadius=m.pf(size)*0.2+"px";
 		hs.top="0px";
 		hs.left="0px";
@@ -225,7 +239,7 @@ function HMS(s){
 	sec=sec%60;
 	return (hrs<10?"0"+hrs:hrs)+" : "+(min<10?"0"+min:min)+" : "+(m.pi(sec)<10?"0"+m.pi(sec):m.pi(sec));
 }
-getElem("blur").set("display","none")
+$("blur").set("display","none")
 if(!ls.getItem("hs")){
 	ls.setItem("hs",0)
 }
@@ -233,7 +247,7 @@ if(!ls.getItem("total_time")){
 	ls.setItem("total_time",date())
 }
 ls.setItem("run_time",date())
-getElem("sd").innerHTML="Highest Score: "+ls.getItem("hs")
+$("sd").innerHTML="Highest Score: "+ls.getItem("hs")
 m.d.addEventListener("keydown",e=>{
 	if(status&&_){
 		switch(e.keyCode){
@@ -297,13 +311,13 @@ m.d.addEventListener("keydown",e=>{
 	}
 	if(e.keyCode==9){
 		e.preventDefault();
-		if(getElem("blur").get("display")=="none"){
-			getElem("blur").set("display","flex")
+		if($("blur").get("display")=="none"){
+			$("blur").set("display","flex")
 			od=direction
 			direction=null
 			_=false
 		}else{
-			getElem("blur").set("display","none")
+			$("blur").set("display","none")
 			_=true
 			direction=od
 		}
@@ -312,16 +326,16 @@ m.d.addEventListener("keydown",e=>{
 })
 setInterval(()=>{
 	speed=350-((score>=50?50:score)*5)
-	if(m.pf(getElem("head").get("top"))<0||m.pf(getElem("head").get("left"))<0||m.pf(getElem("head").get("left"))>m.w.innerWidth-m.w.innerWidth%m.pf(size)||m.pf(getElem("head").get("top"))>m.w.innerHeight-m.w.innerHeight%m.pf(size)){
+	if(m.pf($("head").get("top"))<0||m.pf($("head").get("left"))<0||m.pf($("head").get("left"))>m.w.innerWidth-m.w.innerWidth%m.pf(size)||m.pf($("head").get("top"))>m.w.innerHeight-m.w.innerHeight%m.pf(size)){
 		die()
 	}
-	if(magnitude(getElem("head"),getElem("apple"))<1&&js_cd["eat"]&&status){
+	if(magnitude($("head"),$("apple"))<1&&js_cd["eat"]&&status){
 		js_cd["eat"]=b.f
 		m.d.title="v2 - "+(score+1);
-		getElem("apple").set("opacity",0);
+		$("apple").set("opacity",0);
 		js_to["eat"]=setTimeout(()=>{
 			if(status){
-				getElem("apple").remove()
+				$("apple").remove()
 				score++
 				js_cd["eat"]=b.t
 				apple()
@@ -333,19 +347,19 @@ setInterval(()=>{
 		make_cell()
 		switch(direction){
 			case"up":
-				getElem("head").add("top",-m.pf(size));
+				$("head").add("top",-m.pf(size));
 				break;
 			case"down":
-				getElem("head").add("top",m.pf(size));
+				$("head").add("top",m.pf(size));
 				break;
 			case"left":
-				getElem("head").add("left",-m.pf(size));
+				$("head").add("left",-m.pf(size));
 				break;
 			case"right":
-				getElem("head").add("left",m.pf(size));
+				$("head").add("left",m.pf(size));
 				break;
 		}
-		log_path(getElem("head").get("top")+","+getElem("head").get("left"))
+		log_path($("head").get("top")+","+$("head").get("left"))
 		if(score>0){
 			let id=1;
 			Array.from(m.d.getElementsByClassName("cell_w")).forEach(e=>{
@@ -353,7 +367,7 @@ setInterval(()=>{
 				e.style.WebkitTransitionDuration=speed+"ms"
 				id++
 				ss(e,memory_table[e.id])
-				if(magnitude(getElem("head"),e)<0.5){
+				if(magnitude($("head"),e)<0.5){
 					die()
 				}
 				if(e.id>score){
@@ -370,19 +384,19 @@ setInterval(()=>{
 	}
 	if(score>ls.getItem("hs")){
 		ls.setItem("hs",score)
-		getElem("sd").innerHTML="\x48\x69\x67\x68\x65\x73\x74\x20\x53\x63o\x73e:\x20"+ls.getItem("hs")
+		$("sd").innerHTML="\x48\x69\x67\x68\x65\x73\x74\x20\x53\x63o\x73e:\x20"+ls.getItem("hs")
 	}
 	if(status){
-		getElem("head").style.WebkitTransitionDuration=speed+"ms"
-		getElem("tptd").innerHTML="\x50laytime\x20total:\x20"+HMS(date()-ls.getItem("total_time"))
-		getElem("sptd").innerHTML="\x50laytime\x20session:\x20"+HMS(date()-ls.getItem("run_time"))
+		$("head").style.WebkitTransitionDuration=speed+"ms"
+		$("tptd").innerHTML="\x50laytime\x20total:\x20"+HMS(date()-ls.getItem("total_time"))
+		$("sptd").innerHTML="\x50laytime\x20session:\x20"+HMS(date()-ls.getItem("run_time"))
 	}
 },0);
 document.onbeforeunload=()=>{
 	ls.setItem("total_time",date()-ls.getItem("run_time"))
 }
 document.body.onblur=()=>{
-	getElem("blur").set("display","flex")
+	$("blur").set("display","flex")
 	od=direction
 	direction=null
 	_=false
