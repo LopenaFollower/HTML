@@ -20,23 +20,78 @@
 		</style>
 	</head>
 	<body bgcolor=#111>
-		<div id="main"contenteditable>alert(<span class=string>"hello world"</span>)</div>
+		<div id="main"onkeyup="highlight()"contenteditable>alert(<span class=number>234</span>)</div>
 		<script>
 function $(id){
-	return document.getElementById(id)
+	return document.getElementById(id);
 }
 Element.prototype.get=function(css){
-	return this.style[css]
+	return this.style[css];
 }
 Element.prototype.set=function(css,v){
 	return this.style[css]=v;
 }
-Object.prototype.len=function(){
-	return Object.keys(this).length
+Element.prototype.text=function(){
+	return this.innerText;
 }
-setInterval(hightlight(){
-	var from=$("main")
-},0);
+Object.prototype.len=function(){
+	return Object.keys(this).length;
+}
+String.prototype.insert=function(s,i){
+    return this.slice(0,i)+s+this.slice(i);
+};
+const{log}=console;
+var str_index={},pbb_index={},def=[]
+function index(str,s,w){
+	str_index={}
+	pbb_index={}
+	def=[]
+	let pair=0,
+		next="start";	
+	for(let i=0;i<str.length-s.length+1;i++){
+		if(str.substring(i,s.length+i)==s){
+			switch(w){
+				case"str":
+					if(next=="start"){
+						str_index[pair]={
+							start:i
+						}
+						next="end"
+					}else if(next=="end"){
+						str_index[pair]={
+							start:str_index[pair].start,
+							end:i+1
+						}
+						pair++
+						next="start";
+					}
+					break;
+				case"pbb":
+				
+					break;
+				default:
+					def[def.length]=i
+					break;
+			}
+		}
+	}
+}
+function highlight(){
+	var main=$("main"),
+		res=main.innerHTML
+		,	semi=main.text()
+	index(main.innerText,"\"","str")
+	for(let i=str_index.len();i>0;i--){
+		index(main.innerText,"\"","str")
+		
+		log(semi)
+		log(str_index[i-1].end)
+		main.innerHTML=semi.insert("</span>",str_index[i-1].end)
+		main.innerHTML=semi.insert("<span class=string>",str_index[i-1].start)
+		
+	}
+	//main.innerHTML=res
+}
 		</script>
 	</body>
 </html>
