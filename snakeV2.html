@@ -370,12 +370,12 @@ setInterval(()=>{
 	}
 	if(score>ls.getItem("hs")){
 		ls.setItem("hs",score)
-		getElem("sd").innerHTML="Highest Score: "+ls.getItem("hs")
+		getElem("sd").innerHTML="\x48\x69\x67\x68\x65\x73\x74\x20\x53\x63o\x73e:\x20"+ls.getItem("hs")
 	}
 	if(status){
 		getElem("head").style.WebkitTransitionDuration=speed+"ms"
-		getElem("tptd").innerHTML="Playtime total: "+HMS(date()-ls.getItem("total_time"))
-		getElem("sptd").innerHTML="Playtime session: "+HMS(date()-ls.getItem("run_time"))
+		getElem("tptd").innerHTML="\x50laytime\x20total:\x20"+HMS(date()-ls.getItem("total_time"))
+		getElem("sptd").innerHTML="\x50laytime\x20session:\x20"+HMS(date()-ls.getItem("run_time"))
 	}
 },0);
 document.onbeforeunload=()=>{
