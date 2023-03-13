@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>
+			decompiler v3
+		</title>
+		<style>
+			#main{
+				color:white;
+			}
+			.keyword{
+				color:#f92672;
+			}
+			.string{
+				color:#e6db74;
+			}
+			.number,.bool{
+				color:#ae81ff;
+			}
+		</style>
+	</head>
+	<body bgcolor=#111>
+		<div id="main"contenteditable>alert(<span class=string>"hello world"</span>)</div>
+		<script>
+function $(id){
+	return document.getElementById(id)
+}
+Element.prototype.get=function(css){
+	return this.style[css]
+}
+Element.prototype.set=function(css,v){
+	return this.style[css]=v;
+}
+Object.prototype.len=function(){
+	return Object.keys(this).length
+}
+setInterval(hightlight(){
+	var from=$("main")
+},0);
+		</script>
+	</body>
+</html>
