@@ -35,6 +35,12 @@
 				overflow:visible;
 				margin:5px;
 			}
+			#cell_color{
+				width:fit-content;
+			}
+			#speed_mult{
+				width:40px;
+			}
 		</style>
 	</head>
 	<body bgcolor=#111 onbeforeunload='return ls.setItem("total_time",m.pf(ls.getItem("total_time"))+m.pf(date()-ls.getItem("run_time")))'>
@@ -44,11 +50,11 @@
 				<p id=tptd>Playtime total:</p>
 				<p id=sptd>Playtime session:</p>
 				<div id=cell_color>
-					<input id=r type=range min=0 max=255 oninput="this.style.accentColor='rgb('+this.value+',0,0)';$('color_res').set('color','rgb('+$('r').value+','+$('g').value+','+$('b').value+')')"/><br>
-					<input id=g type=range min=0 max=255 oninput="this.style.accentColor='rgb(0,'+this.value+',0)';$('color_res').set('color','rgb('+$('r').value+','+$('g').value+','+$('b').value+')')"/><br>
-					<input id=b type=range min=0 max=255 oninput="this.style.accentColor='rgb(0,0,'+this.value+')';$('color_res').set('color','rgb('+$('r').value+','+$('g').value+','+$('b').value+')')"/><br>
-					<div id=color_res>Result Color</div><br>
-					random color?<input type=checkbox id=randomc />
+					<input id=r type=range min=0 max=255 oninput="this.style.accentColor='rgb('+this.value+',0,0)';$('rval').innerText=this.value;$('rval').set('color','rgb('+$('r').value+','+$('g').value+','+$('b').value+')');$('gval').set('color','rgb('+$('r').value+','+$('g').value+','+$('b').value+')');$('bval').set('color','rgb('+$('r').value+','+$('g').value+','+$('b').value+')')"/><span id=rval></span><br>
+					<input id=g type=range min=0 max=255 oninput="this.style.accentColor='rgb(0,'+this.value+',0)';$('gval').innerText=this.value;$('rval').set('color','rgb('+$('r').value+','+$('g').value+','+$('b').value+')');$('gval').set('color','rgb('+$('r').value+','+$('g').value+','+$('b').value+')');$('bval').set('color','rgb('+$('r').value+','+$('g').value+','+$('b').value+')')"/><span id=gval></span><br>
+					<input id=b type=range min=0 max=255 oninput="this.style.accentColor='rgb(0,0,'+this.value+')';$('bval').innerText=this.value;$('rval').set('color','rgb('+$('r').value+','+$('g').value+','+$('b').value+')');$('gval').set('color','rgb('+$('r').value+','+$('g').value+','+$('b').value+')');$('bval').set('color','rgb('+$('r').value+','+$('g').value+','+$('b').value+')')"/><span id=bval></span><br>
+					random color?<input type=checkbox id=randomc /><br>
+					Speed mult <input type=number value=5 id=speed_mult min=1 max=50 />
 				</div>
 			</div>
 		</div>
@@ -205,7 +211,7 @@ function make_cell(){
 		if($("randomc").checked){
 			hs.backgroundColor="rgb("+randomV2({min:0,max:255})+","+randomV2({min:0,max:255})+","+randomV2({min:0,max:255})+")";
 		}else{
-			hs.backgroundColor=$('color_res').get("color")||"#fff";
+			hs.backgroundColor='rgb('+$('r').value+','+$('g').value+','+$('b').value+')'||"#fff";
 		}
 		hs.borderRadius=m.pf(size)*0.2+"px";
 		hs.top="0px";
@@ -237,7 +243,7 @@ function HMS(s){
 	sec=sec%3600;
 	var min=m.pi(sec/60);
 	sec=sec%60;
-	return (hrs<10?"0"+hrs:hrs)+" : "+(min<10?"0"+min:min)+" : "+(m.pi(sec)<10?"0"+m.pi(sec):m.pi(sec));
+	return(hrs<10?"0"+hrs:hrs)+" : "+(min<10?"0"+min:min)+" : "+(m.pi(sec)<10?"0"+m.pi(sec):m.pi(sec));
 }
 $("blur").set("display","none")
 if(!ls.getItem("hs")){
@@ -325,7 +331,12 @@ m.d.addEventListener("keydown",e=>{
 	if(e.shiftKey||e.altKey||e.ctrlKey)e.preventDefault();
 })
 setInterval(()=>{
-	speed=350-((score>=50?50:score)*5)
+	if(m.pi($("speed_mult").max)<m.pi($("speed_mult").value)){
+		$("speed_mult").value=50
+	}else if(m.pi($("speed_mult").min)>m.pi($("speed_mult").value)){
+		$("speed_mult").value=1
+	}
+	speed=350-((score>=50?50:score)*$("speed_mult").value)
 	if(m.pf($("head").get("top"))<0||m.pf($("head").get("left"))<0||m.pf($("head").get("left"))>m.w.innerWidth-m.w.innerWidth%m.pf(size)||m.pf($("head").get("top"))>m.w.innerHeight-m.w.innerHeight%m.pf(size)){
 		die()
 	}
