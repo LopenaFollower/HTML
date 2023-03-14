@@ -37,7 +37,7 @@
 			}
 		</style>
 	</head>
-	<body bgcolor=#111>
+	<body bgcolor=#111 onbeforeunload='return ls.setItem("total_time",m.pf(ls.getItem("total_time"))+m.pf(date()-ls.getItem("run_time")))'>
 		<div id="blur">
 			<div id="menu">
 				<p id=sd>Highest Score:</p>
@@ -48,7 +48,7 @@
 					<input id=g type=range min=0 max=255 oninput="this.style.accentColor='rgb(0,'+this.value+',0)';$('color_res').set('color','rgb('+$('r').value+','+$('g').value+','+$('b').value+')')"/><br>
 					<input id=b type=range min=0 max=255 oninput="this.style.accentColor='rgb(0,0,'+this.value+')';$('color_res').set('color','rgb('+$('r').value+','+$('g').value+','+$('b').value+')')"/><br>
 					<div id=color_res>Result Color</div><br>
-					random?<input type=checkbox id=randomc />
+					random color?<input type=checkbox id=randomc />
 				</div>
 			</div>
 		</div>
@@ -244,7 +244,7 @@ if(!ls.getItem("hs")){
 	ls.setItem("hs",0)
 }
 if(!ls.getItem("total_time")){
-	ls.setItem("total_time",date())
+	ls.setItem("total_time",1)
 }
 ls.setItem("run_time",date())
 $("sd").innerHTML="Highest Score: "+ls.getItem("hs")
@@ -388,13 +388,10 @@ setInterval(()=>{
 	}
 	if(status){
 		$("head").style.WebkitTransitionDuration=speed+"ms"
-		$("tptd").innerHTML="\x50laytime\x20total:\x20"+HMS(date()-ls.getItem("total_time"))
+		$("tptd").innerHTML="\x50laytime\x20total:\x20"+HMS(m.pf(ls.getItem("total_time"))+m.pf(date()-ls.getItem("run_time")))
 		$("sptd").innerHTML="\x50laytime\x20session:\x20"+HMS(date()-ls.getItem("run_time"))
 	}
 },0);
-document.onbeforeunload=()=>{
-	ls.setItem("total_time",date()-ls.getItem("run_time"))
-}
 document.body.onblur=()=>{
 	$("blur").set("display","flex")
 	od=direction
