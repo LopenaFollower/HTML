@@ -60,44 +60,17 @@
 		</div>
 		<script>
 const m={
-	m:Math,
-	n:Number,
-	pi:parseInt,
-	pf:parseFloat,
-	w:window,
-	d:document
+	m:Math,n:Number,pi:parseInt,pf:parseFloat,w:window,d:document
 },b={
-	t:true,
-	f:false,
-	n:null,
-	u:undefined
+	t:true,f:false,n:null,u:undefined
 },restrict={
-	up:b.f,
-	down:b.f,
-	left:b.f,
-	right:b.f
+	up:b.f,down:b.f,left:b.f,right:b.f
 },js_cd={
-	eat:b.t,
-	move:b.t
+	eat:b.t,move:b.t
 },js_to={
-	eat:b.u,
-	move:b.u
-},
-	{floor}=m.m,
-	{round}=m.m,
-	{random}=m.m,
-	{log}=console,
-	{sqrt}=m.m,
-	{pow}=m.m,
-	ls=localStorage;
-var score=0,
-	status=b.f,
-	direction,
-	od,
-	speed=350,
-	memory_table=[],
-	_=true,
-	size="25px";
+	eat:b.u,move:b.u
+},{floor}=m.m,{round}=m.m,{random}=m.m,{log}=console,{sqrt}=m.m,{pow}=m.m,ls=localStorage;
+var score=0,status=b.f,direction,od,speed=350,memory_table=[],_=b.t,size="25px";
 function $(id){
 	return m.d.getElementById(id)
 }
@@ -128,103 +101,52 @@ function coords(elem){
 }
 function spawn(){
 	let x={},y={}
-	for(let i=1;(x[i-1]?x[i-1]:0)<m.w.innerWidth-m.w.innerWidth%m.pf(size);i++){
-		x[i]=i*m.pf(size)
-	}
-	for(let i=1;(y[i-1]?y[i-1]:0)<m.w.innerHeight-m.w.innerHeight%m.pf(size);i++){
-		y[i]=i*m.pf(size)
-	}
-	let h=m.d.createElement("div"),
-		hs=h.style;
-	h.id="head"
-	hs.width=size;
-	hs.height=size;
-	hs.backgroundColor="blue";
-	hs.borderRadius=m.pf(size)*0.2+"px";
-	hs.top=y[floor(random()*(y.len()-1)+1)]+"px";
-	hs.left=x[floor(random()*(x.len()-1)+1)]+"px";
-	hs.zIndex="1";
+	for(let i=1;(x[i-1]?x[i-1]:0)<m.w.innerWidth-m.w.innerWidth%m.pf(size);i++){x[i]=i*m.pf(size)}
+	for(let i=1;(y[i-1]?y[i-1]:0)<m.w.innerHeight-m.w.innerHeight%m.pf(size);i++){y[i]=i*m.pf(size)}
+	let h=m.d.createElement("div"),hs=h.style;
+	h.id="head";hs.width=size;hs.height=size;hs.backgroundColor="blue";hs.borderRadius=m.pf(size)*0.2+"px";hs.top=y[floor(random()*(y.len()-1)+1)]+"px";hs.left=x[floor(random()*(x.len()-1)+1)]+"px";hs.zIndex="1";
 	m.d.body.appendChild(h);
 }
 function apple(){
 	let x={},y={}
-	for(let i=1;(x[i-1]?x[i-1]:0)<m.w.innerWidth-m.w.innerWidth%m.pf(size);i++){
-		x[i]=i*m.pf(size)
-	}
-	for(let i=1;(y[i-1]?y[i-1]:0)<m.w.innerHeight-m.w.innerHeight%m.pf(size);i++){
-		y[i]=i*m.pf(size)
-	}
-	let h=m.d.createElement("div"),
-		hs=h.style;
-	h.id="apple"
-	hs.width=size;
-	hs.height=size;
-	hs.backgroundColor="#f00";
-	hs.borderRadius=m.pf(size)*0.4+"px";
-	for(let i=0;i<20;i++){
+	for(let i=1;(x[i-1]?x[i-1]:0)<m.w.innerWidth-m.w.innerWidth%m.pf(size);i++){x[i]=i*m.pf(size)}
+	for(let i=1;(y[i-1]?y[i-1]:0)<m.w.innerHeight-m.w.innerHeight%m.pf(size);i++){y[i]=i*m.pf(size)}
+	let h=m.d.createElement("div"),hs=h.style;
+	h.id="apple";hs.width=size;hs.height=size;hs.backgroundColor="#f00";hs.borderRadius=m.pf(size)*0.4+"px";hs.zIndex="-1";hs.opacity="0";hs.WebkitTransitionDuration=speed/2+"ms";
+	for(let i=0;i<30;i++){
 		let chosen_x=x[floor(random()*x.len())],chosen_y=y[floor(random()*y.len())];
-		if(chosen_y!=coords($("head")).y){
-			hs.top=chosen_y+"px";
-		}
-		if(chosen_x!=coords($("head")).x){
-			hs.left=chosen_x+"px";
-		}
+		if(chosen_y!=coords($("head")).y){hs.top=chosen_y+"px";}
+		if(chosen_x!=coords($("head")).x){hs.left=chosen_x+"px";}
 	}
-	hs.zIndex="-1";
-	hs.opacity="0";
-	hs.WebkitTransitionDuration=speed/2+"ms"
 	m.d.body.appendChild(h);
-	setTimeout(()=>{
-		hs.opacity="1";
-	},speed/2);
+	setTimeout(()=>{hs.opacity="1";},speed/2);
 }
 function die(){
-	status=b.f
-	$("apple").remove()
-	$("head").remove()
-	m.d.title="v2";
-	if(score>0){
-		Array.from(m.d.getElementsByClassName("cell_w")).forEach(e=>{
-			e.remove()
-		})
-	}
-	clearTimeout(js_to["eat"])
-	clearTimeout(js_to["move"])
-	score=0
-	direction=b.u
-	restrict["left"]=b.f
-	restrict["right"]=b.f
-	restrict["up"]=b.f
-	restrict["down"]=b.f
-	spawn();apple()
-	js_cd["eat"]=b.t
-	js_cd["move"]=b.t
+	status=b.f;$("apple").remove();$("head").remove();m.d.title="\x76\x32";
+	if(score>0){Array.from(m.d.getElementsByClassName("cell_w")).forEach(e=>{e.remove()})}
+	clearTimeout(js_to["eat"]);clearTimeout(js_to["move"]);score=0;direction=b.u;restrict["left"]=b.f;restrict["right"]=b.f;restrict["up"]=b.f;restrict["down"]=b.f;
+	spawn();apple();js_cd["eat"]=b.t;js_cd["move"]=b.t;
 }
 function make_cell(){
 	if(score>0){
-		let h=m.d.createElement("div"),
-			hs=h.style;
-		h.id=""
-		h.className="cell_w"
-		hs.width=size;
-		hs.height=size;
+		let h=m.d.createElement("div"),hs=h.style;
+		h.id="";h.className="cell_w";
+		hs.width=size;hs.height=size;
 		if($("randomc").checked){
 			hs.backgroundColor="rgb("+randomV2({min:0,max:255})+","+randomV2({min:0,max:255})+","+randomV2({min:0,max:255})+")";
 		}else{
 			hs.backgroundColor='rgb('+$('r').value+','+$('g').value+','+$('b').value+')'||"#fff";
 		}
-		hs.borderRadius=m.pf(size)*0.2+"px";
-		hs.top="0px";
-		hs.left="0px";
-		hs.zIndex="0"
+		hs.borderRadius=m.pf(size)*0.2+"px";hs.top="0px";hs.left="0px";hs.zIndex="0";
 		m.d.body.appendChild(h);
 	}
 }
 function move(dir){
-	if(!restrict[dir]){
-		direction=dir;
-	}
-	status=b.t
+	restrict[dir]?b.n:direction=dir;_=b.f;status=b.t;
+	["up","down","left","right"].forEach(e=>{
+		restrict[e]=b.f
+	})
+	dir==="up"?restrict["down"]=b.t:b.n;dir==="down"?restrict["up"]=b.t:b.n;dir==="left"?restrict["right"]=b.t:b.n;dir==="right"?restrict["left"]=b.t:b.n;
 }
 function log_path(newMemory){
 	memory_table.reverse()
@@ -238,80 +160,40 @@ function ss(elem,string){
 	}catch(e){}
 }
 function HMS(s){
-	var sec=s;
-	var hrs=m.pi(sec/3600);
-	sec=sec%3600;
-	var min=m.pi(sec/60);
-	sec=sec%60;
+	var sec=s;var hrs=m.pi(sec/3600);sec=sec%3600;var min=m.pi(sec/60);sec=sec%60;
 	return(hrs<10?"0"+hrs:hrs)+" : "+(min<10?"0"+min:min)+" : "+(m.pi(sec)<10?"0"+m.pi(sec):m.pi(sec));
 }
-$("blur").set("display","none")
-if(!ls.getItem("hs")){
-	ls.setItem("hs",0)
-}
-if(!ls.getItem("total_time")){
-	ls.setItem("total_time",1)
-}
+$("blur").set("display","none");
+if(!ls.getItem("hs")){ls.setItem("hs",0)}
+if(!ls.getItem("total_time")){ls.setItem("total_time",1)}
 ls.setItem("run_time",date())
-$("sd").innerHTML="Highest Score: "+ls.getItem("hs")
+$("sd").innerHTML="\x48\x69\x67\x68\x65\x73\x74\x20\x53\x63o\x72\x65:\x20"+ls.getItem("hs")
 m.d.addEventListener("keydown",e=>{
-	if(status&&_){
+	if(_){
 		switch(e.keyCode){
 			case 87:
 				move("up")
-				_=false
-				restrict["down"]=b.t
-				restrict["left"]=b.f
-				restrict["right"]=b.f
 				break;
 			case 65:
 				move("left")
-				_=false
-				restrict["down"]=b.f
-				restrict["up"]=b.f
-				restrict["right"]=b.t
 				break;
 			case 83:
 				move("down")
-				_=false
-				restrict["left"]=b.f
-				restrict["up"]=b.t
-				restrict["right"]=b.f
 				break;
 			case 68:
 				move("right")
-				_=false
-				restrict["left"]=b.t
-				restrict["up"]=b.f
-				restrict["down"]=b.f
 				break;
 			case 38:
 				move("up")
-				_=false
-				restrict["down"]=b.t
-				restrict["left"]=b.f
-				restrict["right"]=b.f
 				break;
 			case 37:
 				move("left")
-				_=false
-				restrict["down"]=b.f
-				restrict["up"]=b.f
-				restrict["right"]=b.t
 				break;
 			case 40:
 				move("down")
-				_=false
-				restrict["left"]=b.f
-				restrict["up"]=b.t
-				restrict["right"]=b.f
 				break;
 			case 39:
 				move("right")
-				_=false
-				restrict["left"]=b.t
-				restrict["up"]=b.f
-				restrict["down"]=b.f
 				break;
 		}
 	}
@@ -399,15 +281,12 @@ setInterval(()=>{
 	}
 	if(status){
 		$("head").style.WebkitTransitionDuration=speed+"ms"
-		$("tptd").innerHTML="\x50laytime\x20total:\x20"+HMS(m.pf(ls.getItem("total_time"))+m.pf(date()-ls.getItem("run_time")))
-		$("sptd").innerHTML="\x50laytime\x20session:\x20"+HMS(date()-ls.getItem("run_time"))
+		$("tptd").innerHTML="\x50l\x61\x79\x74\x69m\x65\x20\x74o\x74\x61l:\x20"+HMS(m.pf(ls.getItem("total_time"))+m.pf(date()-ls.getItem("run_time")))
+		$("sptd").innerHTML="\x50l\x61\x79\x74\x69m\x65\x20\x73\x65\x73\x73\x69on:\x20"+HMS(date()-ls.getItem("run_time"))
 	}
 },0);
 document.body.onblur=()=>{
-	$("blur").set("display","flex")
-	od=direction
-	direction=null
-	_=false
+	$("blur").set("display","flex");od=direction;direction=null;_=false;
 }
 spawn();apple()
 		</script>
