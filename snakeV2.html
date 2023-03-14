@@ -122,10 +122,10 @@ function apple(){
 	setTimeout(()=>{hs.opacity="1";},speed/2);
 }
 function die(){
-	status=b.f;$("apple").remove();$("head").remove();m.d.title="\x76\x32";
+	status=b.f;$("apple").remove();$("head").remove();m.d.title="\x76\x32";speed=350;
 	if(score>0){Array.from(m.d.getElementsByClassName("cell_w")).forEach(e=>{e.remove()})}
 	clearTimeout(js_to["eat"]);clearTimeout(js_to["move"]);score=0;direction=b.u;restrict["left"]=b.f;restrict["right"]=b.f;restrict["up"]=b.f;restrict["down"]=b.f;
-	spawn();apple();js_cd["eat"]=b.t;js_cd["move"]=b.t;
+	js_cd["eat"]=b.t;js_cd["move"]=b.t;spawn();apple();
 }
 function make_cell(){
 	if(score>0){
@@ -224,7 +224,7 @@ setInterval(()=>{
 	}
 	if(magnitude($("head"),$("apple"))<1&&js_cd["eat"]&&status){
 		js_cd["eat"]=b.f
-		m.d.title="v2 - "+(score+1);
+		m.d.title="\x76\x32\x20-\x20"+(score+1);
 		$("apple").set("opacity",0);
 		js_to["eat"]=setTimeout(()=>{
 			if(status){
