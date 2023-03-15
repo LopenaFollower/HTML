@@ -2,310 +2,102 @@
 <html>
 	<head>
 		<title>
-			an original title
+			calcu v2
 		</title>
 		<style>
-			#textbox {
-				height: 44.39px;
-				width: 191px;
-				background-color: #d4efd8;
-				font-size: 17.5px;
+			table{
+				border-color:black;
+				border-collapse:collapse;
 			}
-			#o9p {
-				height: 44.39px;
-				user-select: none;
-			}
-			table {
-				table-layout: fixed;
-			}
-			tr {
-				table-layout: fixed;
-				width: 190px;
-				height: 47.5px;
-				border: 1;
-			}
-			td {
-				table-layout: fixed;
-				border: 1;
-				width: 44.39px;
-				height: 44.39px;
-				text-align: center;
-				font-size: 35px;
-				user-select: none;
-				text-size-adjust: inherit;
-				word-wrap: normal;
-				table-layout: fixed;
+			td{
+				text-align:center;
+				font-family:monopoly;
+				font-weight:900;
+				font-size:200%;
+				width:40px;
+				height:40px;
 			}
 		</style>
 	</head>
-	
-	<body bgcolor="#d4efd8">
-		<br>
-		    <input readonly type="text" id="textbox" onkeydown="define()" onkeyup="define()">
-			<button id="o9p" onclick='document.querySelector("#textbox").value=document.querySelector("#textbox").value.substring(0,document.querySelector("#textbox").value.length-1)'>BCKSPC</button>
-			<table border="1" style='border-collapse:collapse'>
-				<tr id="o">
-					<td id="divide" onclick='input(this.id)'>
-						÷
-					</td>
-					<td id="seven" onclick='input(this.id)'>
-						7
-					</td>
-					<td id="eight" onclick='input(this.id)'>
-						8
-					</td>
-					<td id="nine" onclick='input(this.id)'>
-						9
-					</td>
-				</td>
-				<tr id="o">
-					<td id="times" onclick='input(this.id)'>
-						×
-					</td>
-					<td id="four" onclick='input(this.id)'>
-						4
-					</td>
-					<td id="five" onclick='input(this.id)'>
-						5
-					</td>
-					<td id="six" onclick='input(this.id)'>
-						6
-					</td>
-				</td>
-				<tr id="o">
-					<td id="minus" onclick='input(this.id)'>
-						–
-					</td>
-					<td id="one" onclick='input(this.id)'>
-						1
-					</td>
-					<td id="two" onclick='input(this.id)'>
-						2
-					</td>
-					<td id="three" onclick='input(this.id)'>
-						3
-					</td>
-				</td>
-				<tr id="o">
-					<td id="add" onclick='input(this.id)'>
-						+
-					</td>
-					<td id="zero" onclick='input(this.id)'>
-						0
-					</td>
-					<td id="decimal" onclick='input(this.id)'>
-						.
-					</td>
-					<td id="equals" onclick='input(this.id)'>
-						=
-					</td>
-				</td>
-			</table>
-				Additional Features:
-			<table border="1" style='border-collapse:collapse'>
-				<tr id="o">
-					<td id="root" onclick='input(this.id)'>
-						√
-					</td>
-					<td id="factorial" onclick='input(this.id)'>
-						!
-					</td>
-					<td id="percent" onclick='input(this.id)'>
-						%
-					</td>
-					<td id="pi" onclick='input(this.id)'>
-						π
-					</td>
-				</tr>
-				<tr id="o">
-					<td id="square" onclick='input(this.id)'>
-						²
-					</td>
-					<td id="pow" onclick='input(this.id)'>
-						^
-					</td>
-					<td id="random" colspan="2" onclick='input(this.id)'>
-						Rnd#
-					</td>
-				</tr>
-			</table>
-		    <p id="a"></p>
+	<body>
+		<input readonly id="disp">
+		<table border="1">
+			<tr>
+				<td>7</td><td>8</td><td>9</td><td>÷</td>
+			</tr>
+			<tr>
+				<td>4</td><td>5</td><td>6</td><td>×</td>
+			</tr>
+			<tr>
+				<td>1</td><td>2</td><td>3</td><td>-</td>
+			</tr>
+			<tr>
+				<td>0</td><td>.</td><td>e</td><td>+</td>
+			</tr>
+		</table>
 		<script>
-const text=document.querySelector("#textbox")
-var returned_text;
-var answer=document.querySelector("#a")
-function last(any){let string=any.toString();if(isNaN(any)==true){return string.substring(string.length-1)}else{return parseInt(string.substring(string.length-1))}};
-function factorial(num){
-	var num=parseInt(num)
-	var answer=1;
-    for(let i=1;i<=num;i++){
-	    answer=answer*i
-    }
-    return answer
+const{floor}=Math,{round}=Math,{random}=Math,{ceil}=Math,{log}=console,{sqrt}=Math,{pow}=Math,{isInteger}=Number;
+var can_input=true;
+function $(id){
+	return document.getElementById(id)
 }
-function root(num){
-	return Math.sqrt(parseInt(num));
+function err(a){
+	$("disp").value=a;
+	can_input=false
+	setTimeout(()=>{
+			$("disp").value="";
+			can_input=true
+	},1000);
 }
-function pow(num,power){
-	return (parseInt(num)**parseInt(power));
-}
-function input(id){
-	document.getElementById(id).style.backgroundColor="grey";setTimeout(()=>{document.getElementById(id).style.backgroundColor="initial";},75);
-	switch(id){
-		case "equals":
-		    if(text.value.search("!")>=0){
-			    text.value=factorial(parseInt(text.value.substring(0,text.value.length-1)));
-			}else if(text.value.search("%")>=0){
-				text.value=text.value.substring(0,text.value.length-1)/100
-			}else if(text.value.search("√")>=0){
-				text.value=root(text.value.substring(1,text.value.length));
-			}else if(text.value.search("²")>=0){
-				text.value=Math.pow(parseInt(text.value.substring(0,text.value.length-1)),2);
-			}else if(text.value.search("^")>=0){
-				try {text.value=(Math.round(eval(text.value.replace("^","**"))*1000000))/1000000;}catch(e){text.value=(e.message);console.log(e.name+": "+e.message);setTimeout(()=>{text.value=""},1250);}
-			}else{
-		    try {
-			   text.value=eval(Math.round(text.value*1000000)/1000000);
-			}catch(e){text.value=(e.message);console.log(e.name+": "+e.message);setTimeout(()=>{text.value=""},1250);}
-			}
-		break;
-		case "decimal":
-		    if(last(text.value)=="\*"||last(text.value)=="\/"||last(text.value)=="+"||last(text.value)=="-"||last(text.value)=="\."){
-			}else{
-				text.value+="\."
-			}
-		break;
-		case "pi":
-		    if(text.value==Math.PI){
-			}else{
-				text.value+=Math.PI;
-			}
-		break;
-		case "factorial":
-		    if(text.value.search("\\+")>=0){
-			    var a=text.value.substring(text.value.search("\\+")+1)
-			    var b=factorial(parseInt(a.substring(a.length-1)));
-			    text.value=text.value.substring(0,text.value.search("\\+")+1)+b;
-			}else if(text.value.search("\\-")>=0){
-				var a=text.value.substring(text.value.search("\\-")+1)
-			    var b=factorial(parseInt(a.substring(a.length-1)));
-			    text.value=text.value.substring(0,text.value.search("\\-")+1)+b;
-			}else if(text.value.search("\\*")>=0){
-				var a=text.value.substring(text.value.search("\\*")+1)
-			    var b=factorial(parseInt(a.substring(a.length-1)));
-			    text.value=text.value.substring(0,text.value.search("\\*")+1)+b;
-			}else if(text.value.search("\\/")>=0){
-				var a=text.value.substring(text.value.search("\\/")+1)
-			    var b=factorial(parseInt(a.substring(a.length-1)));
-			    text.value=text.value.substring(0,text.value.search("\\/")+1)+b;
-			}else{
-				text.value+="!";
-			}
-		break;
-		case "zero":
-		    text.value+="0"
-		break;
-		case "one":
-		    text.value+="1"
-		break;
-		case "two":
-		    text.value+="2"
-		break;
-		case "three":
-		    text.value+="3"
-		break;
-		case "four":
-		    text.value+="4"
-		break;
-		case "five":
-		    text.value+="5"
-		break;
-		case "six":
-		    text.value+="6"
-		break;
-		case "seven":
-		    text.value+="7"
-		break;
-		case "eight":
-		    text.value+="8"
-		break;
-		case "nine":
-		    text.value+="9"
-		break;
-		case "divide":
-		    if(last(text.value)==""||last(text.value)=="\*"||last(text.value)=="/"||last(text.value)=="+"||last(text.value)=="-"||last(text.value)=="\."){
-			    text.value=text.value.substring(0,text.value.length-1)+"\/"
-			}else{
-				text.value+="\/"
-			}
-		break;
-		case "times":
-		    if(last(text.value)==""||last(text.value)=="\*"||last(text.value)=="\/"||last(text.value)=="+"||last(text.value)=="-"||last(text.value)=="\."){
-			    text.value=text.value.substring(0,text.value.length-1)+"\*"
-			}else{
-				text.value+="\*"
-			}
-		break;
-		case "add":
-		    if(last(text.value)==""||last(text.value)=="\*"||last(text.value)=="/"||last(text.value)=="+"||last(text.value)=="-"||last(text.value)=="\."){
-			    text.value=text.value.substring(0,text.value.length-1)+"+"
-			}else{
-				text.value+="+"
-			}
-		break;
-		case "minus":
-		    if(last(text.value)==""||last(text.value)=="\*"||last(text.value)=="\/"||last(text.value)=="+"||last(text.value)=="-"||last(text.value)=="\."){
-			    text.value=text.value.substring(0,text.value.length-1)+"-"
-			}else{
-				text.value+="-"
-			}
-		break;
-		case "percent":
-		    if(text.value.search("\\+")>=0){
-			    var a=text.value.substring(text.value.search("\\+")+1)
-			    var b=(parseInt(a.substring(a.length-2)))/100;
-			    text.value=text.value.substring(0,text.value.search("\\+")+1)+b;
-			}else if(text.value.search("\\-")>=0){
-				var a=text.value.substring(text.value.search("\\-")+1)
-			    var b=(parseInt(a.substring(a.length-2)))/100;
-			    text.value=text.value.substring(0,text.value.search("\\-")+1)+b;
-			}else if(text.value.search("\\*")>=0){
-				var a=text.value.substring(text.value.search("\\*")+1)
-			    var b=(parseInt(a.substring(a.length-2)))/100;
-			    text.value=text.value.substring(0,text.value.search("\\*")+1)+b;
-			}else if(text.value.search("\\/")>=0){
-				var a=text.value.substring(text.value.search("\\/")+1)
-			    var b=(parseInt(a.substring(a.length-2)))/100;
-			    text.value=text.value.substring(0,text.value.search("\\/")+1)+b;
-			}else{
-				text.value+="%";
-			}
-		break;
-		case "root":
-		    if(last(text.value)==""||last(text.value)=="\*"||last(text.value)=="\/"||last(text.value)=="+"||last(text.value)=="-"||last(text.value)=="\."||last(text.value)=="%"){
-			    text.value=text.value
-			}else{
-				text.value+="√"
-			}
-		break;
-		case "square":
-		    if(last(text.value)=="²"||last(text.value)=="\*"||last(text.value)=="\/"||last(text.value)=="+"||last(text.value)=="-"||last(text.value)=="\."||last(text.value)=="%"){
-			    text.value=text.value
-			}else{
-				text.value+="²"
-			}
-		break;
-		case "pow":
-		    if(last(text.value)=="^"||last(text.value)=="²"||last(text.value)=="\*"||last(text.value)=="\/"||last(text.value)=="+"||last(text.value)=="-"||last(text.value)=="\."||last(text.value)=="%"){
-			    text.value=text.value
-			}else{
-				text.value+="^"
-			}
-		break;
-		case "random":
-		    text.value=Math.random()*101
-		break;
+function RanInt(a,b,c){
+	let min,max;
+	if(a>b){
+		min=b;
+		max=a;
+	}else{
+		min=a;
+		max=b;
 	}
+	if(c||(a===undefined)){
+		err("Argument Error");
+	}
+	return random()*(max-min)+min
+}
+function factor(n,m){
+    let res=[];
+    let s=[...Array(n+1).keys()].filter(i=>n%i===0)
+    for(let i=0;i<s.length;i++){
+        if(m=="all"||m===undefined){
+            res[res.length]=s[i]+","+s[s.length-1-i]
+        }else if(m=="perf"){
+            if((isInteger(sqrt(s[i]))&&i>1)||(isInteger(sqrt(s[s.length-1-i]))&&i>1)){
+                res[res.length]=s[i]+","+s[s.length-1-i]
+            }
+        }
+    }
+    return res
+}
+function proper_sqrt(e){
+    if(!isInteger(sqrt(e))){
+        let le_pair=factor(e,"perf");
+        return(sqrt(le_pair[0].split(",")[0])+"√"+le_pair[0].split(",")[1])
+    }else{
+        return sqrt(e)
+    }
+}
+function prep(from,symbol,replace,additional){
+	let res="";
+	from.split(" ").forEach(e=>{
+		if(e.includes(symbol)){
+			res+=e.replace(symbol,replace)+additional+" ";
+		}else{
+			res+=e+" "
+		}
+	})
+	return res.trim()
+}
+function prf_sqr(range){
+	return pow(ceil(random()*(range||10)),2)
 }
 		</script>
 	</body>
