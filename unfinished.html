@@ -2,95 +2,63 @@
 <html>
 	<head>
 		<title>
-			decompiler v3
+			calcu v2
 		</title>
 		<style>
-			#main{
-				color:white;
-			}
-			.keyword{
-				color:#f92672;
-			}
-			.string{
-				color:#e6db74;
-			}
-			.number,.bool{
-				color:#ae81ff;
-			}
+
 		</style>
 	</head>
-	<body bgcolor=#111>
-		<div id="main"onkeyup="highlight()"contenteditable>alert(<span class=number>234</span>)</div>
+	<body>
+		<input readonly id="disp">
 		<script>
+const{floor}=Math,{round}=Math,{random}=Math,{ceil}=Math,{log}=console,{sqrt}=Math,{pow}=Math;
+var can_input=true;
 function $(id){
-	return document.getElementById(id);
+	return document.getElementById(id)
 }
-Element.prototype.get=function(css){
-	return this.style[css];
+function err(a){
+	$("disp").value=a;
+	can_input=false
+	setTimeout(()=>{
+			$("disp").value="";
+			can_input=true
+	},1000);
 }
-Element.prototype.set=function(css,v){
-	return this.style[css]=v;
+function RanInt(a,b,c){
+	let min,max;
+	if(a>b){
+		min=b;
+		max=a;
+	}else{
+		min=a;
+		max=b;
+	}
+	if(c||(a===undefined)){
+		err("Argument Error");
+	}
+	return random()*(max-min)+min
 }
-Element.prototype.text=function(){
-	return this.innerText;
+function factor(n){
+    let res=[];
+    let s=[...Array(n+1).keys()].filter(i=>n%i===0)
+    for(let i=0;i<s.length;i++){
+        res[res.length]=s[i]+","+s[s.length-1-i]
+    }
+    return res
 }
-Object.prototype.len=function(){
-	return Object.keys(this).length;
-}
-String.prototype.insert=function(s,i){
-    return this.slice(0,i)+s+this.slice(i);
-};
-const{log}=console;
-var str_index={},pbb_index={},def=[]
-function index(str,s,w){
-	str_index={}
-	pbb_index={}
-	def=[]
-	let pair=0,
-		next="start";	
-	for(let i=0;i<str.length-s.length+1;i++){
-		if(str.substring(i,s.length+i)==s){
-			switch(w){
-				case"str":
-					if(next=="start"){
-						str_index[pair]={
-							start:i
-						}
-						next="end"
-					}else if(next=="end"){
-						str_index[pair]={
-							start:str_index[pair].start,
-							end:i+1
-						}
-						pair++
-						next="start";
-					}
-					break;
-				case"pbb":
-				
-					break;
-				default:
-					def[def.length]=i
-					break;
-			}
+function prep(from,symbol,replace,additional){
+	let res="";
+	from.split(" ").forEach(e=>{
+		if(e.includes(symbol)){
+			res+=e.replace(symbol,replace)+additional+" ";
+		}else{
+			res+=e+" "
 		}
-	}
+	})
+	return res.trim()
 }
-function highlight(){
-	var main=$("main"),
-		res=main.innerHTML
-		,	semi=main.text()
-	index(main.innerText,"\"","str")
-	for(let i=str_index.len();i>0;i--){
-		index(main.innerText,"\"","str")
-		
-		log(semi)
-		log(str_index[i-1].end)
-		main.innerHTML=semi.insert("</span>",str_index[i-1].end)
-		main.innerHTML=semi.insert("<span class=string>",str_index[i-1].start)
-		
-	}
-	//main.innerHTML=res
+function prf_sqr(range){
+	return pow(ceil(random()*(range||10)),2)
 }
 		</script>
 	</body>
