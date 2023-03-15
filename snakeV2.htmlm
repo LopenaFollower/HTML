@@ -16,7 +16,7 @@
 				height:100%;
 				width:100%;
 				position:fixed;
-				z-index:100;
+				z-index:2;
 				transition-timing-function:linear;
 				display:none;
 				align-content:center;
@@ -41,6 +41,27 @@
 			#speed_mult{
 				width:40px;
 			}
+			#mobile_ui{
+				position:fixed;
+				bottom:0px;
+				width:fit-content;
+				height:auto;
+				opacity:.5;
+				padding:10px;
+				margin:5px;
+				border-radius:20%;
+				display:none;
+			}
+			.mobile_btn{
+				position:relative;
+			}
+			.exit{
+				right:15%;
+				top:15%;
+				position:fixed;
+				border-radius:50%;
+				background-color:red;
+			}
 		</style>
 	</head>
 	<body bgcolor=#111 onbeforeunload='return ls.setItem("total_time",m.pf(ls.getItem("total_time"))+m.pf(date()-ls.getItem("run_time")))'>
@@ -56,7 +77,15 @@
 					random color?<input type=checkbox id=randomc /><br>
 					Speed mult <input type=number value=5 id=speed_mult min=1 max=50 />
 				</div>
+				<button class="exit"onclick='if($("blur").get("display")=="none"){$("blur").set("display","flex");od=direction;direction=null;_=false}else{$("blur").set("display","none");_=true;direction=od}'> X </button>
 			</div>
+		</div>
+		<div id=mobile_ui>
+			<button class="mobile_btn"onclick='if(_){move("left")}'> ← </button>
+			<button class="mobile_btn"onclick='if(_){move("up")}'> ↑ </button>
+			<button class="mobile_btn"onclick='if(_){move("down")}'> ↓ </button>
+			<button class="mobile_btn"onclick='if(_){move("right")}'> → </button>
+			<button class="mobile_btn"onclick='if($("blur").get("display")=="none"){$("blur").set("display","flex");od=direction;direction=null;_=false}else{$("blur").set("display","none");_=true;direction=od}'> Tab </button>
 		</div>
 		<script>
 const m={
@@ -73,6 +102,13 @@ const m={
 var score=0,status=b.f,direction,od,speed=350,memory_table=[],_=b.t,size="25px";
 function $(id){
 	return m.d.getElementById(id)
+}
+function mobile(b){
+	if(b){
+		$("mobile_ui").set("display","block");
+	}else{
+		$("mobile_ui").set("display","none");
+	}
 }
 function func(n,fc){
 	window[n]=fc
@@ -142,11 +178,13 @@ function make_cell(){
 	}
 }
 function move(dir){
-	restrict[dir]?b.n:direction=dir;_=b.f;status=b.t;
-	["up","down","left","right"].forEach(e=>{
-		restrict[e]=b.f
-	})
-	dir==="up"?restrict["down"]=b.t:b.n;dir==="down"?restrict["up"]=b.t:b.n;dir==="left"?restrict["right"]=b.t:b.n;dir==="right"?restrict["left"]=b.t:b.n;
+	if(!restrict[dir]){
+		direction=dir;_=b.f;status=b.t;
+		["up","down","left","right"].forEach(e=>{
+			restrict[e]=b.f
+		})
+		dir==="up"?restrict["down"]=b.t:b.n;dir==="down"?restrict["up"]=b.t:b.n;dir==="left"?restrict["right"]=b.t:b.n;dir==="right"?restrict["left"]=b.t:b.n;
+	}
 }
 function log_path(newMemory){
 	memory_table.reverse()
