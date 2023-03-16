@@ -83,7 +83,7 @@ Element.prototype.clear=function(val){
 	this.value="";
 }
 String.prototype.last=function(n=1){
-	return this.substr(this.length-n,this.length-1)
+	return this.substr(this.length-n,this.length)
 }
 String.prototype.removeEnd=function(len){
 	return this.substring(0,this.length-len);
@@ -127,6 +127,13 @@ function factor(n,m){
 	}
 	return res
 }
+function factorial(n){
+    var r=1;
+    for(var i=2;i<=n;i++){
+        r*=i;
+	}
+    return r;
+}
 function proper_sqrt(e){
 	if(!isInteger(sqrt(e))){
 		let le_pair=factor(e,"perf");
@@ -166,7 +173,12 @@ Array.from(document.getElementsByTagName("td")).forEach(e=>{
 })
 document.addEventListener("keydown",e=>{
 	if(e.keyCode==8){
-		$("equation").value=$("equation").value.removeEnd(1)
+		var disp=$("equation")
+		if(arith_ops[disp.value.last(3)]||disp.value.last(3)=="Ans"){
+			disp.value=disp.value.removeEnd(3)
+		}else{
+			disp.value=disp.value.removeEnd(1)
+		}
 	}
 })
 function validate_input(i,c){
@@ -188,7 +200,8 @@ function validate_input(i,c){
 		}else if(c=="equals"){
 			var Ans=ans.value.length>0?parseFloat(ans.value):"";
 			try{
-				ans.value=eval(disp.value)
+				let final_eq=disp.value
+				ans.value=eval(final_eq)
 			}catch(e){
 				err(e)
 			}
