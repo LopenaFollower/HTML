@@ -61,6 +61,13 @@
 				<td class=equals>=</td>
 				<td class=arith_op data-value=" + ">+</td>
 			</tr>
+			<tr><td colspan=4 class=ignore></td></tr>
+			<tr>
+				<td class=pref_op data-value="√">√</td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
 		</table>
 		<script>
 const{floor}=Math,{round}=Math,{random}=Math,{ceil}=Math,{log}=console,{sqrt}=Math,{pow}=Math,{isInteger}=Number;
@@ -87,6 +94,17 @@ String.prototype.last=function(n=1){
 }
 String.prototype.removeEnd=function(len){
 	return this.substring(0,this.length-len);
+}
+String.prototype.prep=function(symbol,replace,additional){
+	let res="";
+	this.split(" ").forEach(e=>{
+		if(e.includes(symbol)){
+			res+=e.replace(symbol,replace)+additional+" ";
+		}else{
+			res+=e+" "
+		}
+	})
+	return res.trim()
 }
 function $(id){
 	return document.getElementById(id)
@@ -129,34 +147,48 @@ function factor(n,m){
 }
 function factorial(n){
     var r=1;
-    for(var i=2;i<=n;i++){
-        r*=i;
+	if(n>=0){
+		for(var i=1;i<=n;i++){
+			r*=i;
+		}
+	}else{
+		for(var i=-1;i>=n;i--){
+			r*=i;
+		}
 	}
     return r;
 }
 function proper_sqrt(e){
-	if(!isInteger(sqrt(e))){
-		let le_pair=factor(e,"perf");
-		return(sqrt(le_pair[0].split(",")[0])+"√"+le_pair[0].split(",")[1])
+	if(e>0&&0>e){
+		return"0"
 	}else{
-		return sqrt(e)
-	}
-}
-function prep(from,symbol,replace,additional){
-	let res="";
-	from.split(" ").forEach(e=>{
-		if(e.includes(symbol)){
-			res+=e.replace(symbol,replace)+additional+" ";
+		if(!isInteger(sqrt(e))){
+			let le_pair=factor(e,"perf"),le_index=0;
+			if(le_pair.length>1){
+				if(isInteger(sqrt(le_pair[le_index].split(",")[0]))){
+					return sqrt(le_pair[le_index].split(",")[0])+"√"+le_pair[le_index].split(",")[1];
+				}else{
+					le_index++
+					return sqrt(le_pair[le_index].split(",")[0])+"√"+le_pair[le_index].split(",")[1];
+				}
+			}
+			if(le_pair.length==1){
+				return"√"+le_pair[0].split(",")[0]
+			}
+			if(le_pair.length==0){
+				le_pair=factor(e)
+				return"√"+le_pair[1].split(",")[0]
+			}
 		}else{
-			res+=e+" "
+			return sqrt(e)
 		}
-	})
-	return res.trim()
+	}
 }
 function prf_sqr(range){
 	return pow(ceil(random()*(range||10)),2)
 }
 Array.from(document.getElementsByTagName("td")).forEach(e=>{
+	if(e.className=="ignore")return;
 	e.onmousedown=()=>{
 		validate_input(e.dataset.value,e.className)
 		e.set("background-color","gray");
@@ -200,7 +232,7 @@ function validate_input(i,c){
 		}else if(c=="equals"){
 			var Ans=ans.value.length>0?parseFloat(ans.value):"";
 			try{
-				let final_eq=disp.value
+				let final_eq=disp.value.prep("√","proper_sqrt(",")")
 				ans.value=eval(final_eq)
 			}catch(e){
 				err(e)
