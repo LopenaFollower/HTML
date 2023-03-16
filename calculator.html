@@ -14,40 +14,90 @@
 				font-family:monopoly;
 				font-weight:900;
 				font-size:200%;
-				width:40px;
+				width:max(40px);
 				height:40px;
+				user-select:none;
+				overflow:hidden;
+				
+			}
+			#equation,#ans{
+				width:170px;
+				font-size:100%;
+				resize:none;
+				overflow-y:hidden;
 			}
 		</style>
 	</head>
 	<body>
-		<input readonly id="disp">
+		<textarea onkeydown="return false"id="equation"></textarea><br>
+		<textarea readonly id="ans"></textarea>
 		<table border="1">
 			<tr>
-				<td>7</td><td>8</td><td>9</td><td>÷</td>
+				<td class=number data-value="Ans" colspan=2>Ans</td>
+				<td class=clear data-value="eq">C</td>
+				<td class=clear data-value="all">CA</td>
 			</tr>
 			<tr>
-				<td>4</td><td>5</td><td>6</td><td>×</td>
+				<td class=number data-value=7>7</td>
+				<td class=number data-value=8>8</td>
+				<td class=number data-value=9>9</td>
+				<td class=arith_op data-value=" / ">÷</td>
 			</tr>
 			<tr>
-				<td>1</td><td>2</td><td>3</td><td>-</td>
+				<td class=number data-value=4>4</td>
+				<td class=number data-value=5>5</td>
+				<td class=number data-value=6>6</td>
+				<td class=arith_op data-value=" * ">×</td>
 			</tr>
 			<tr>
-				<td>0</td><td>.</td><td>e</td><td>+</td>
+				<td class=number data-value=1>1</td>
+				<td class=number data-value=2>2</td>
+				<td class=number data-value=3>3</td>
+				<td class=arith_op data-value=" - ">-</td>
+			</tr>
+			<tr>
+				<td class=number data-value=0>0</td>
+				<td class=decimal data-value=".">.</td>
+				<td class=equals>=</td>
+				<td class=arith_op data-value=" + ">+</td>
 			</tr>
 		</table>
 		<script>
 const{floor}=Math,{round}=Math,{random}=Math,{ceil}=Math,{log}=console,{sqrt}=Math,{pow}=Math,{isInteger}=Number;
-var can_input=true;
+var can_input=true,arith_ops={
+	" + ":true,
+	" - ":true,
+	" * ":true,
+	" / ":true
+};
+Element.prototype.get=function(css){
+	return this.style[css]
+}
+Element.prototype.set=function(css,v){
+	return this.style[css]=v;
+}
+Element.prototype.add=function(val){
+	this.value+=val
+}
+Element.prototype.clear=function(val){
+	this.value="";
+}
+String.prototype.last=function(n=1){
+	return this.substr(this.length-n,this.length-1)
+}
+String.prototype.removeEnd=function(len){
+	return this.substring(0,this.length-len);
+}
 function $(id){
 	return document.getElementById(id)
 }
 function err(a){
-	$("disp").value=a;
-	can_input=false
+	$("ans").value=a;
+	can_input=false;
 	setTimeout(()=>{
-			$("disp").value="";
-			can_input=true
-	},1000);
+			$("ans").value="";
+			can_input=true;
+	},2000);
 }
 function RanInt(a,b,c){
 	let min,max;
@@ -64,26 +114,26 @@ function RanInt(a,b,c){
 	return random()*(max-min)+min
 }
 function factor(n,m){
-    let res=[];
-    let s=[...Array(n+1).keys()].filter(i=>n%i===0)
-    for(let i=0;i<s.length;i++){
-        if(m=="all"||m===undefined){
-            res[res.length]=s[i]+","+s[s.length-1-i]
-        }else if(m=="perf"){
-            if((isInteger(sqrt(s[i]))&&i>1)||(isInteger(sqrt(s[s.length-1-i]))&&i>1)){
-                res[res.length]=s[i]+","+s[s.length-1-i]
-            }
-        }
-    }
-    return res
+	let res=[],
+		s=[...Array(n+1).keys()].filter(i=>n%i===0)
+	for(let i=0;i<s.length;i++){
+		if(m=="all"||m===undefined){
+			res[res.length]=s[i]+","+s[s.length-1-i]
+		}else if(m=="perf"){
+			if((isInteger(sqrt(s[i]))&&i>1)||(isInteger(sqrt(s[s.length-1-i]))&&i>1)){
+				res[res.length]=s[i]+","+s[s.length-1-i]
+			}
+		}
+	}
+	return res
 }
 function proper_sqrt(e){
-    if(!isInteger(sqrt(e))){
-        let le_pair=factor(e,"perf");
-        return(sqrt(le_pair[0].split(",")[0])+"√"+le_pair[0].split(",")[1])
-    }else{
-        return sqrt(e)
-    }
+	if(!isInteger(sqrt(e))){
+		let le_pair=factor(e,"perf");
+		return(sqrt(le_pair[0].split(",")[0])+"√"+le_pair[0].split(",")[1])
+	}else{
+		return sqrt(e)
+	}
 }
 function prep(from,symbol,replace,additional){
 	let res="";
@@ -98,6 +148,63 @@ function prep(from,symbol,replace,additional){
 }
 function prf_sqr(range){
 	return pow(ceil(random()*(range||10)),2)
+}
+Array.from(document.getElementsByTagName("td")).forEach(e=>{
+	e.onmousedown=()=>{
+		validate_input(e.dataset.value,e.className)
+		e.set("background-color","gray");
+	}
+	e.onmouseup=()=>{
+		e.set("background-color","lightgray");
+	}
+	e.onmouseenter=()=>{
+		e.set("background-color","lightgray");
+	}
+	e.onmouseleave=()=>{
+		e.set("background-color","initial");
+	}
+})
+document.addEventListener("keydown",e=>{
+	if(e.keyCode==8){
+		$("equation").value=$("equation").value.removeEnd(1)
+	}
+})
+function validate_input(i,c){
+	var disp=$("equation");
+	var ans=$("ans");
+	if(can_input){
+		if(c=="number"){
+			disp.add(i);
+		}else if(c=="arith_op"&&disp.value.length>0){
+			if(!arith_ops[disp.value.last(3)]){
+				disp.add(i);
+			}else{
+				disp.value=disp.value.removeEnd(3)+i
+			}
+		}else if(c=="decimal"){
+			if(disp.value.last(1)!="."){
+				disp.add(i);
+			}
+		}else if(c=="equals"){
+			var Ans=ans.value.length>0?parseFloat(ans.value):"";
+			try{
+				ans.value=eval(disp.value)
+			}catch(e){
+				err(e)
+			}
+		}else if(c=="clear"){
+			if(i=="eq"){
+				disp.clear()
+			}else{
+				disp.clear()
+				ans.clear()
+			}
+		}
+	}
+	disp.style.height=0;
+	disp.style.height=(disp.scrollHeight)+"px";
+	ans.style.height=0;
+	ans.style.height=(ans.scrollHeight)+"px";
 }
 		</script>
 	</body>
