@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+
+<html>
+
+	<head>		<title>JS Tutorial</title>
+
+		<style>
+
+			#lsn_cont{
+
+				display:flex;
+
+			}
+
+			.lesson{
+
+				color:#111;
+
+				background-color:#8387A7;
+
+				height:25px;
+
+				width:150px;
+
+				position:relative;
+
+				line-height:25px;
+
+				padding:10px;
+
+				border-radius:10px;
+
+				z-index:1;
+
+			}
+
+			.about{
+
+				opacity:0;
+
+				background-color:#D9D9D9;
+
+				height:fit-content;
+
+				width:150px;
+
+				position:relative;
+
+				padding:10px;
+
+				border-radius:10px;
+
+				z-index:0;
+
+				transition-timing-function:linear;
+
+			}
+
+		</style>
+
+	</head>
+
+	<body bgcolor=#000>
+
+		<div id=lsn_cont>
+
+			<span>
+
+				<div class=lesson>Chap 1</div>
+
+				<div class=about id=Chap1>
+
+					• Declaring variables<br>
+
+					• Declaration rules<br>
+
+					• Naming rules<br>
+
+					• Data types<br>
+
+					• Data use
+
+				</div>
+
+			</span>
+
+			<span>
+
+				<div class=lesson>Chap 2</div>
+
+				<div class=about id=Chap2>
+
+					• If statement<br>
+
+					• If-else statements<br>
+
+					• Conditions<br>
+
+					• Comparing operators<br>
+
+					• Switch-case statement
+
+				</div>
+
+			</span>
+
+			<span>
+
+				<div class=lesson>Chap 3</div>
+
+				<div class=about id=Chap3>
+
+					• Function declaration<br>
+
+					• Function params<br>
+
+					• Built-in functions<br>
+
+					• Calling functions
+
+				</div>
+
+			</span>
+
+			<span>
+
+				<div class=lesson>Chap 4</div>
+
+				<div class=about id=Chap4>
+
+					• String manipulation
+
+					• 
+
+				</div>
+
+			</span>
+
+		</div>
+
+		<script>
+
+const{log}=console
+
+function reveal(id){
+
+	let el=document.getElementById(id),st=el.style
+
+	st.webkitTransitionDuration="2s";
+
+	st.opacity=1;
+
+}
+
+function hide(id){
+
+	let el=document.getElementById(id),st=el.style
+
+	st.webkitTransitionDuration="2s";
+
+	st.opacity=0;
+
+}
+
+Array.from(document.getElementsByClassName("lesson")).forEach(e=>{
+
+	e.onmouseenter=()=>{
+
+		reveal("Chap"+e.innerText.slice(-e.innerText.length+5))
+
+	}
+
+	e.onmouseleave=()=>{
+
+		hide("Chap"+e.innerText.slice(-e.innerText.length+5))
+
+	}
+
+})
+
+		</script>
+
+	</body>
+
+</html>
