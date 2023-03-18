@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+
+<html>
+
+	<head>		<title>string encrypt</title>
+
+		<style>
+
+			#res{
+
+				width:50%;
+
+				word-break:break-word;
+
+				position:fixed;
+
+			}
+
+		</style>
+
+	</head>
+
+	<body bgcolor=#d4efd8>
+
+		<input id=a1 oninput='b2.value=hxed(this.value,yum,muy)'/>
+
+		=
+
+		<input id=b2 oninput='a1.value=hxed(this.value,muy,yum)'/>
+
+		<script>
+
+var seeds=[FIRST_SEED,SECND_SEE]
+
+function random(seed1,seed2){
+
+	return parseFloat("0."+(Math.abs(new Date(seed2).getMilliseconds()*Math.cos(seed1))*Math.pow(seed1,seed1%43===0?seed1:seed1%11)).toString().replace(".",""))
+
+}
+
+function shuffle(array) {
+
+  var a = array.split("")
+
+  var m = a.length,
+
+    t, i;
+
+  while (m) {
+
+    i = Math.floor(random(seeds[0],seeds[1])*m--);
+
+    console.log(Math.floor(random(seeds[0],seeds[1])*m))
+
+    t = a[m];
+
+    a[m] = a[i];
+
+    a[i] = t;
+
+  }
+
+  return a;
+
+}
+
+let chars="1234567890qwertyuiopasdfghjklzxcvbnm,.@#$_&-+()/*\"':;!?~`|^={}%[] QWERTYPOIUASDFGHLKJZXCVBMN§ΩπμΠ"
+
+const yum=shuffle(chars),
+
+	muy=shuffle(yum.join(""))
+
+function hxed(str,tb,tb2){
+
+	let res="";
+
+	for(let i in str){
+
+		res+=tb2.join("")[tb.join("").indexOf(str[i])]
+
+	}
+
+	return res;
+
+};
+
+		</script>
+
+	</body>
+
+</html>
