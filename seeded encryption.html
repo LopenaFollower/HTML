@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+
+<html>
+
+	<head>		<title>string encrypt</title>
+
+		<style>
+
+			#a1,#b2{
+
+				width:90%;
+
+			}
+
+		</style>
+
+	</head>
+
+	<body bgcolor=#d4efd8>
+
+		<input type=number placeholder="seed"id=s oninput="p=5;a();"/><br><br>
+
+		<textarea placeholder="input"id=a1 oninput='b2.value=fix(hxed(mix(this.value),yum))'></textarea><br>
+
+		<textarea placeholder="output"id=b2 oninput='a1.value=hxed(fix(this.value),yum)'></textarea>
+
+		<script>
+
+var p=5;
+
+const $=(id)=>{return document.getElementById(id)},
+
+	random=(s1)=>{let res=0;if(p){res=(s1*31)*p*(1-p)}else{res=(s1*51)*492015*(1-492015)}res=res.toString().replace("-","").replace("e+","").replace(".","");p=parseInt(res);return parseFloat("0."+res);},
+
+	shuffle=(array)=>{let a=array.split(""),m=a.length,t,i;while(m){i=Math.floor(random($("s").value.length>0?$("s").value:2959201)*m--);t=a[m];a[m]=a[i];a[i]=t;};return a;},
+
+	a=()=>{yum=shuffle("1234567890qwertyuiopasdfghjklzxcvbnm,.@#$_&-+()/*\"':;!?~`|^={}%[] QWERTYPOIUASDFGHLKJZXCVBMN")},
+
+	hxed=(str,t)=>{let res="";for(let i in str){res+=t.join("")[t.reverse().join("").indexOf(str[i])]};return res;},
+
+	mix=(t)=>{t=t.split("");let r="",l=t.length;for(let i=0; i< l; i++){r+=t[i%2==0?"pop":"shift"]();};return r;},
+
+	fix=(t)=>{let r1="",r2="",l=t.length;for(let i=0;i<=l;i++){if(i%2==0){r2=t.charAt(i)+r2;}else{r1+=t.charAt(i);}};return r1+r2;}
+
+var yum=shuffle("1234567890qwertyuiopasdfghjklzxcvbnm,.@#$_&-+()/*\"':;!?~`|^={}%[] QWERTYPOIUASDFGHLKJZXCVBMN")
+
+		</script>
+
+	</body>
+
+</html>
