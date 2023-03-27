@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Math</title>
+		<style>
+			body{
+				display:flex;
+				font-family:monospace;
+				font-size:125%;
+			}
+			fieldset{
+				width:fit-content;
+			}
+			#fx_result,#ssr_result{
+				font-size:30px;
+			}
+			.hint{
+				color:grey;
+				font-style:italic;
+			}
+		</style>
+	</head>
+	<body bgcolor=#d4efd8>
+		<fieldset>
+			<legend>Find X</legend>
+			<select id=fx_mode>
+				<option value=0>Congruent</option>
+				<option value=1>Consecutive</option>
+			</select><br>How to use:
+			<ul><li><b><u>space properly.</u></b><br>ex: 2x + 15</li><li>always use variable x</li></ul>
+			<input id=a1 /><br>
+			<input id=b1 />
+			<button onclick='$("fx_result").innerText="x = "+solve($("a1").value,$("b1").value)[1]'>Solve</button>
+			<div id=fx_result></div>
+			<div id=fx_substitute></div>
+		</fieldset>
+		<fieldset>
+			<legend>Simplify Square Roots</legend>
+			<select id=ssr_mode>
+				<option value=0>Default</option>
+				<option value=1>Decimal</option>
+			</select><br>
+			<div class=hint>ignores decimals</div>
+			√<input id=a2 type=number />
+			<button onclick='if($("ssr_mode").value=="0"){$("ssr_result").innerText=proper_sqrt(parseInt($("a2").value))}else if($("ssr_mode").value=="1"){$("ssr_result").innerText=eval("sqrt("+$("a2").value+")")}'>Solve</button>
+			<div id=ssr_result></div>
+		</fieldset>
+		<script>
+function $(id){
+	return document.getElementById(id)
+}
+const{floor}=Math,{round}=Math,{random}=Math,{ceil}=Math,{log}=console,{sqrt}=Math,{pow}=Math,{isInteger}=Number;
+function solve(t1,t2){
+	t1=t1.split(" ");
+	t2=t2.split(" ");
+	if($("fx_mode").value=="0"){
+		let trL="",rR="",rL="",r="";
+		for(let i=0;i<t1.length;i++){
+			if(t1[i].match("x")){	
+				trL+=t1[i]
+			}else{
+				if(i>0&&t1[i-1]=="+"){
+					rR+=" -"+t1[i]
+				}else if(i>0&&t1[i-1]=="-"){
+					rR+=" + "+t1[i]
+				}
+			}
+		}
+		for(let i=0;i<t2.length;i++){
+			if(t2[i].match("x")){
+				if(i>0&&t2[i-1]=="+"){
+					trL+=" - "+t2[i]
+				}else if(i>0&&t2[i-1]=="-"){
+					trL+=" + "+t2[i]
+				}else{
+					trL+=" - "+t2[i]
+				}
+			}else{
+				rR+=t2[i]
+			}
+		}
+		for(let i=0;i<trL.length;i++){
+			if(trL[i]=="x"){
+				if(isInteger(parseInt(trL[i-1]))){
+					rL+=trL[i].replace("x","")
+				}else{
+					rL+=trL[i].replace("x","1")
+				}
+			}else{
+				rL+=trL[i]
+			}
+		}
+		if(eval(rR)<1){
+			r=solve(t2.join(" "),t1.join(" "))
+			if(eval(r[0])>1){
+				r[1]=r[1]/eval(r[0])
+				r[0]/=eval(r[0])
+			}
+			return r
+		}
+		if(eval(rL)>1){
+			rR=eval(rR)/eval(rL)
+			rL=eval(rL)/eval(rL)
+		}
+		let left=t1;
+		let right=t2;
+		for(let i=0;i<t1.length;i++){
+			if(t1[i].match("x")){
+				left[i]=t1[i].replace(/[0-9]x/,t1[i].match(/[0-9]/)+"*("+eval(rR)+")")
+			}
+		}
+		for(let i=0;i<t2.length;i++){
+			if(t2[i].match("x")){
+				right[i]=t2[i].replace(/[0-9]x/,t2[i].match(/[0-9]/)+"*("+eval(rR)+")")
+			}
+		}
+		let pre_l=left.join(" ");
+		let pre_r=right.join(" ");
+		for(let i=0;i<t1.length;i++){
+			if(t1[i].match(/[0-9]/)){
+				left[i]=eval(t1[i])
+			}
+		}
+		for(let i=0;i<t2.length;i++){
+			if(t2[i].match(/[0-9]/)){
+				right[i]=eval(t2[i])
+			}
+		}
+		$("fx_substitute").innerHTML="Formula: A = B<br>Substitution of x<br>"+pre_l.replaceAll("*","").replace("x","("+eval(rR)+")")+" = "+pre_r.replaceAll("*","").replace("x","("+eval(rR)+")")+"<br>"+left.join(" ").replace("x","("+eval(rR)+")")+" = "+right.join(" ").replace("x","("+eval(rR)+")")+"<br>"+eval(left.join(" ").replace("x","("+eval(rR)+")"))+" = "+eval(right.join(" ").replace("x","("+eval(rR)+")"));
+		return[rL,eval(rR)]
+	}else if($("fx_mode").value=="1"){
+		let t=(t1.join(" ")+" + "+t2.join(" ")).split(" ")
+		let trL="",rR="180",rL="",r="";
+		for(let i=0;i<t.length;i++){
+			if(t[i].match("x")){	
+				trL+=t[i]
+			}else{
+				if(i>0&&t[i-1]=="+"){
+					rR+=" -"+t[i]
+				}else if(i>0&&t[i-1]=="-"){
+					rR+=" + "+t[i]
+				}else{
+					trL+=t[i]+0
+				}
+			}
+		}
+		for(let i=0;i<trL.length;i++){
+			if(trL[i]=="x"){
+				if(isInteger(parseInt(trL[i-1]))){
+					rL+=trL[i].replace("x","")
+				}else{
+					rL+=trL[i].replace("x","1")
+				}
+			}else{
+				rL+=trL[i]
+			}
+		}
+		if(eval(rR)<1){
+			r=solve(t2,t1)
+			if(eval(r[0])>1){
+				r[1]=r[1]/eval(r[0])
+				r[0]/=eval(r[0])
+			}
+			return r
+		}
+		if(eval(rL)>1){
+			rR=eval(rR)/eval(rL)
+			rL=eval(rL)/eval(rL)
+		}
+		let left=t;
+		for(let i=0;i<t.length;i++){
+			if(t[i].match("x")){
+				left[i]=t[i].replace(/[0-9]x/,t[i].match(/[0-9]/)+"*("+eval(rR)+")")
+			}
+		}
+		let pre=left.join(" ");
+		for(let i=0;i<t.length;i++){
+			if(t[i].match(/[0-9]/)){
+				left[i]=eval(t[i])
+			}
+		}
+		$("fx_substitute").innerHTML="Formula: A + B = 180.<br>Substitution of x:<br>"+pre.replaceAll("*","").replace("x","("+eval(rR)+")")+" = 180<br>"+left.join(" ").replace("x","("+eval(rR)+")")+" = 180<br>"+eval(left.join(" ").replace("x","("+eval(rR)+")"))+" = 180"
+		return[rL,eval(rR)]
+	}
+}
+function factor(n,m){
+	let res=[],
+		s=[...Array(n+1).keys()].filter(i=>n%i===0)
+	for(let i=0;i<s.length;i++){
+		if(m=="all"||m===undefined){
+			res[res.length]=s[i]+","+s[s.length-1-i]
+		}else if(m=="perf"){
+			if((isInteger(sqrt(s[i]))&&i>1)||(isInteger(sqrt(s[s.length-1-i]))&&i>1)){
+				res[res.length]=s[i]+","+s[s.length-1-i]
+			}
+		}
+	}
+	return res
+}
+function proper_sqrt(e){
+	if(e>0&&0>e){
+		return"0"
+	}else{
+		if(!isInteger(sqrt(e))){
+			let pair=factor(e,"perf"),le_index=0;
+			if(pair.length>1){
+				if(isInteger(sqrt(pair[le_index].split(",")[0]))){
+					return sqrt(pair[le_index].split(",")[0])+"√"+pair[le_index].split(",")[1];
+				}else{
+					le_index++
+					return sqrt(pair[le_index].split(",")[0])+"√"+pair[le_index].split(",")[1];
+				}
+			}
+			if(pair.length==1){
+				return"√"+pair[0].split(",")[0]
+			}
+			if(pair.length==0){
+				pair=factor(e)
+				return"√"+pair[1].split(",")[0]
+			}
+		}else{
+			return sqrt(e)
+		}
+	}
+}
+		</script>
+	</body>
+</html>
