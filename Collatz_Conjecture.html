@@ -30,7 +30,7 @@
 		</div>
 		<table id=container>
 			<tr>
-				<td id="data">a</td>
+				<td id="data"></td>
 				<td rowspan=1000 style="width:9%">
 					<div class="percentage2"id=1g></div>
 				</td>
@@ -61,15 +61,20 @@
 			</tr>
 			<tr>
 				<td>
-					<input id="run_collatz" style="width:100px"></input><button id="run_collatzB"onclick='if(!still_going){clear_graph();collatzConjecture(getElem("run_collatz").value)}'>Run</button><br>
+					<input id="run_collatz" type=number style="width:100px"></input><button id="run_collatzB"onclick='if(!still_going){clear_graph();collatzConjecture(getElem("run_collatz").value)}'>Run</button><br>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<input id="scale" style="width:100px"></input><button id="scaleB"onclick='if(!still_going){update_display(getElem("scale").value)}'>Scale</button>
+					<input id="scale" type=number style="width:100px"></input><button id="scaleB"onclick='if(!still_going){update_display(getElem("scale").value)}'>Scale</button>
 				</td>
 			</tr>
-			<tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr>
+			<tr>
+				<td>
+					reset graph?<input type=checkbox id="res_graph"/>
+				</td>
+			</tr>
+			<tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr>
 			</table>
 		<script>
 const{log}=console,
@@ -122,22 +127,22 @@ function getElem(id){
     return document.getElementById(id);
 }
 function create_elem(id,color,br,top,left,x,z,pos,zindex,value){
-    var a=document.createElement("div"),b;
+    var a=document.createElement("div"),b=a.style;
     a.id=id;
-    a.style.backgroundColor=color;
-    a.style.top=top;
-    a.style.left=left;
-    a.style.width=x;
-    a.style.height=z;
-    a.style.borderRadius=br;
-    a.style.zIndex=zindex;
-    a.style.position=pos;
+    b.backgroundColor=color;
+    b.top=top;
+    b.left=left;
+    b.width=x;
+    b.height=z;
+    b.borderRadius=br;
+    b.zIndex=zindex;
+    b.position=pos;
     a.innerText=(value?value.toLocaleString():value)||""
     a.dataset.value=value||0;
-    a.style.color="white";
-    a.style.textAlign="center";
-    a.style.padding=z/2+"px 0";
-    //a.style.WebkitTransitionDuration='0.35s
+    b.color="white";
+    b.textAlign="center";
+    b.padding=z/2+"px 0";
+    //a.style.WebkitTransitionDuration='0.35s'
     getElem("mainbg").appendChild(a);
     return a;
 }
@@ -204,6 +209,7 @@ function format_table(tbl,key,rkey){
 		tbl[i.toString()][rkey]=Math.round(tbl[i.toString()][key]/res*10000)/100+"%"
 		getElem(i+"g").innerHTML=tbl[i.toString()][rkey]
 		getElem(i+"g").style.height=tbl[i.toString()][key]/res*100+"%"
+		getElem(i+"g").style.WebkitTransitionDuration='1s'
 	}
 }
 function update_display(h){
@@ -270,9 +276,12 @@ function collatzConjecture(num,prev,peak,b){
                     update_display(highest);
                 },delay);
             }
+			getElem("mainbg").scrollBy(1000,0)
             getElem("data").innerHTML=("Iterations: "+step.toLocaleString()+"<br>Highest: "+highest.toLocaleString()+"<br>Base: "+base.toLocaleString());
         }else{
-			graph={"1":{t:0,p:0},"2":{t:0,p:0},"3":{t:0,p:0},"4":{t:0,p:0},"5":{t:0,p:0},"6":{t:0,p:0},"7":{t:0,p:0},"8":{t:0,p:0},"9":{t:0,p:0}};
+			if(getElem("res_graph").checked){
+				graph={"1":{t:0,p:0},"2":{t:0,p:0},"3":{t:0,p:0},"4":{t:0,p:0},"5":{t:0,p:0},"6":{t:0,p:0},"7":{t:0,p:0},"8":{t:0,p:0},"9":{t:0,p:0}};
+			}
 			getElem("data").innerHTML=("Iterations: "+step.toLocaleString()+"<br>Highest: "+highest.toLocaleString()+"<br>Base: "+base.toLocaleString());
 			still_going=false;
 			update_display(highest);
