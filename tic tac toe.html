@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>tic tac toe</title>
+		<style>
+			td,table{
+				width:110px;
+				height:110px;
+				text-align:center;
+				font-size:88px;
+				/*80% of width*/
+				table-layout:fixed;
+				border-collapse:collapse;
+			}
+        </style>
+	</head>
+	<body>
+		Impossible Mode:<input type="checkbox"id="mode"oninput="reset()"/><br>
+		<input type=button onclick="reset()"value="reset"/><br>
+		<table border=3>
+			<tr>
+				<td id="top_L"onclick="check(this.id)"></td>
+                <td id="top_M"onclick="check(this.id)"></td>
+                <td id="top_R"onclick="check(this.id)"></td>
+			</tr>
+			<tr>
+				<td id="L"onclick="check(this.id)"></td>
+                <td id="M"onclick="check(this.id)"></td>
+                <td id="R"onclick="check(this.id)"></td>
+			</tr>
+			<tr>
+				<td id="low_L"onclick="check(this.id)"></td>
+                <td id="low_M"onclick="check(this.id)"></td>
+                <td id="low_R"onclick="check(this.id)"></td>
+			</tr>
+		</table>
+		<div id=win onclick="reset();this.innerText=''"></div>
+		<script>
+const{log}=console,{stringify}=JSON,{max}=Math,{random}=Math,{floor}=Math,grid_ids=["top_L","top_M","top_R","L","M","R","low_L","low_M","low_R"];
+var grid=[],
+	density={x:0,o:0,s:0},
+	score={x:0,o:0},
+	më="X",
+	nø="O",
+	pg=false,
+	cc=true;
+Array.prototype.shuffle=function(){
+	let ë=this.length,t,i;
+	while(ë){
+		i=floor(random()*ë--);
+		t=this[ë];
+		this[ë]=this[i];
+		this[i]=t;
+	}
+}
+function $(ñ){
+	return document.getElementById(ñ);
+}
+function check(ç){
+	if(pg||!cc)return;
+	if($(ç).innerText==""){
+		place(ç,më)
+	}
+	cc=false
+	setTimeout(circle,100);
+	
+}
+function place(ã,_){
+	$(ã).innerText=_
+}
+function co(å,ā,â){
+	if(!â){
+		for(let à=0;à<ā.length;à++){
+			if(å[à]!==ā[à]){
+				return false
+			}
+		}
+	}else{
+		for(let à=0;à<å.length;à++){
+			if(ā[à]==â&&å[à]!==ā[à]){
+				return false
+			}
+		}
+	}
+	return true
+}
+function ai(griddy,id,s){
+	if(co(grid,griddy)){
+		place(id,s)
+	}
+}
+function win(ø){
+	if(ø==më){
+		if(!pg)score.x++;
+		pg=true
+	};
+	if(ø==nø){
+		if(!pg)score.o++;
+		pg=true
+	}
+	cc=true
+	$("win").innerText=ø+" wins!\nScore: "+score.x+" - "+score.o+"\n\nrestart?";
+}
+function reset(){
+	grid_ids.forEach(e=>{
+		$(e).innerText="";
+	})
+	$("win").click()
+	pg=false
+	cc=true
+}
+function circle(){
+	if(pg)return;
+	if(!$("mode").checked){
+		let rplace=()=>{
+			let rid=grid_ids[floor(random()*grid_ids.length)]
+			if($(rid).innerText==""){
+				place(rid,nø)
+			}else{
+				rplace()
+			}
+		}
+		rplace()
+	}else{
+		//impossible mode ai
+		ai([më,"","","","","","","",""],"",nø)
+		ai(["",më,"","","","","","",""],"",nø)
+		ai(["","",më,"","","","","",""],"",nø)
+		ai(["","","",më,"","","","",""],"",nø)
+		ai(["","","","",më,"","","",""],"",nø)
+		ai(["","","","","",më,"","",""],"",nø)
+		ai(["","","","","","",më,"",""],"",nø)
+		ai(["","","","","","","",më,""],"",nø)
+		ai(["","","","","","","","",më],"",nø)
+		/*
+		dont do this unless you have 2-3 hours of time
+		because the patterns are derived from google's tic tac toe ai,
+		every time the tab is refreshed it will have a different pattern
+		*/
+		ai(["","","",
+			"","","",
+			"","",""],"",nø)
+	}
+	setTimeout(()=>{
+		cc=true
+	},250);
+}
+setInterval(()=>{
+	grid=[$("top_L").innerText,$("top_M").innerText,$("top_R").innerText,$("L").innerText,$("M").innerText,$("R").innerText,$("low_L").innerText,$("low_M").innerText,$("low_R").innerText]
+	density={x:0,o:0,s:0};grid_ids.forEach(e=>{if($(e).innerText.length>0){if($(e).innerText==më){density.x++}else{density.o++}}else{density.s++}});
+	if(co(grid,[më,"","",më,"","",më,"",""],më)){win(më)}
+	if(co(grid,["",më,"","",më,"","",më,""],më)){win(më)}
+	if(co(grid,["","",më,"","",më,"","",më],më)){win(më)}
+	if(co(grid,[më,më,më,"","","","","",""],më)){win(më)}
+	if(co(grid,["","","",më,më,më,"","",""],më)){win(më)}
+	if(co(grid,["","","","","","",më,më,më],më)){win(më)}
+	if(co(grid,[më,"","","",më,"","","",më],më)){win(më)}
+	if(co(grid,["","",më,"",më,"",më,"",""],më)){win(më)}
+	if(co(grid,[nø,"","",nø,"","",nø,"",""],nø)){win(nø)}
+	if(co(grid,["",nø,"","",nø,"","",nø,""],nø)){win(nø)}
+	if(co(grid,["","",nø,"","",nø,"","",nø],nø)){win(nø)}
+	if(co(grid,[nø,nø,nø,"","","","","",""],nø)){win(nø)}
+	if(co(grid,["","","",nø,nø,nø,"","",""],nø)){win(nø)}
+	if(co(grid,["","","","","","",nø,nø,nø],nø)){win(nø)}
+	if(co(grid,[nø,"","","",nø,"","","",nø],nø)){win(nø)}
+	if(co(grid,["","",nø,"",nø,"",nø,"",""],nø)){win(nø)}
+	if(!density.s){setTimeout(()=>{reset()},300);}
+});
+		</script>
+	</body>
+</html>
