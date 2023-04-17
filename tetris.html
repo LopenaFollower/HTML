@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>tetris</title>
+		<style>
+			*{
+				margin:0;
+				user-select:none;
+			}
+			body{
+				background:#333;
+			}
+			canvas{
+				background:#000;
+			}
+			td{
+				width:60px;
+				height:60px;
+				font-size:60px;
+				line-height:5px;
+				border:thick solid #000;
+				border-radius:10px;
+				text-align:center;
+			}
+		</style>
+	</head>
+	<body>
+		<center>
+			<h1>Score: <span id=score>€</span></h1>
+			<canvas width=275 height=550 id=game></canvas>
+			<table>
+				<tr>
+					<td id=left>←</td>
+					<td id=drop>↓</td>
+					<td id=right>→</td>
+					<td id=rotate>↻</td>
+				</tr>
+			</table>
+		</center>
+		<script>
+!(function(floor,random,ceil,canvas,tsq,grid,colors,count,rAF,mpl,gameOver,$,score){
+	let ctx=canvas.getContext("2d"),
+		csz=canvas.width/10;
+	for(let r=-2;r<20;r++){
+		grid[r]=[];
+		for(let c=0;c<10;c++){
+			grid[r][c]=0;
+		}
+	}
+	if(!localStorage.getItem("hs"))localStorage.setItem("hs",0);
+	function next(){
+		if(tsq.length===0){
+			let shape=["I","J","L","O","S","T","Z"];
+			while(shape.length){
+				let r=floor(random()*shape.length);
+				let n=shape.splice(r,1)[0];
+				tsq.push(n);
+			}
+		}
+		let n=tsq.pop();
+		return{name:n,rot:mpl[n],row:name==="I"?-1:-2,col:grid[0].length/2-ceil(mpl[n][0].length/2)}
+	}
+	let ttr=next();
+	function rotate(r){
+		return r.map((row,i)=>row.map((val,j)=>r[r.length-1-j][i]));
+	}
+	function valid(rot,cr,cc){
+		for(let x=0;x<rot.length;x++){
+			for(let y=0;y<rot[x].length;y++){
+				if(rot[x][y]&&(cc+y<0||cc+y>=grid[0].length||cr+x>=grid.length||grid[cr+x][cc+y])){
+					return ![];
+				}
+			}
+		}
+		return true;
+	}
+	function place(){
+		for(let r=0;r<ttr.rot.length;r++){
+			for(let c=0;c<ttr.rot[r].length;c++){
+				if(ttr.rot[r][c]){
+					if(ttr.row+r<0){
+						score=0;
+						for(let o=grid.length-1;o>=0;){
+							for(let v=o;v>=0;v--){
+								for(let n=0;n<grid[v].length;n++){
+									grid[v][n]="";
+								}
+							}
+							o--;
+						}
+						return;
+					}
+					grid[ttr.row+r][ttr.col+c]=ttr.name;
+				}
+			}
+		}
+		for(let r=grid.length-1;r>=0;){
+			if(grid[r].every(cell=>!!cell)){
+				score+=250
+				for(let v=r;v>=0;v--){
+					for(let c=0;c<grid[v].length;c++){
+						grid[v][c]=grid[v-1][c];
+					}
+				}
+			}else r--;
+		}
+		score+=50
+		ttr=next();
+	}
+	function loop(){
+		rAF=requestAnimationFrame(loop);
+		ctx.clearRect(0,0,csz*10,csz*20);
+		for(let r=0;r<20;r++){
+			for(let c=0;c<10;c++){
+				if(grid[r][c]){
+					ctx.fillStyle=colors[grid[r][c]];
+					ctx.fillRect(c*csz,r*csz,csz-1,csz-1);
+				}
+			}
+		}
+		if(ttr){
+			if(++count>50){
+				ttr.row++;
+				count=0;
+				if(!valid(ttr.rot,ttr.row,ttr.col)){
+					ttr.row--;
+					place();
+				}
+			}
+			ctx.fillStyle=colors[ttr.name];
+			for(let r=0;r<ttr.rot.length;r++){
+				for(let c=0;c<ttr.rot[r].length;c++){
+					if(ttr.rot[r][c]){
+						let fi=1
+						ctx.fillRect((ttr.col+c)*csz,(ttr.row+r)*csz,csz-fi,csz-fi);
+					}
+				}
+			}
+		}
+		$("score").innerText=score;
+		if(score>localStorage.getItem("hs")){
+			localStorage.setItem("hs",score)
+		}
+	}
+	function move(d){
+		if(gameOver)return;
+		if(valid(ttr.rot,ttr.row,d)){
+			ttr.col=d;
+		}
+	}
+	function rrot(r){
+		if(gameOver)return;
+		if(valid(r,ttr.row,ttr.col)){
+			ttr.rot=r;
+		}
+	}
+	function drop(v){
+		if(gameOver)return;
+		if(!valid(ttr.rot,v,ttr.col)){
+			ttr.row=v-1;
+			place();
+			return;
+		}
+		ttr.row=v;
+	}
+	function hold(e,f,c){
+		var i=null;
+		e.addEventListener("touchstart",v=>{
+			e.style.backgroundColor="#555";
+			f()
+			i=setInterval(f,c)
+		});
+		e.addEventListener("touchend",v=>{
+			e.style.backgroundColor="initial";
+			clearInterval(i)
+			i=null
+		});
+	}
+	hold($("left"),()=>move(ttr.col-1),100)
+	hold($("right"),()=>move(ttr.col+1),100)
+	hold($("drop"),()=>drop(ttr.row+1),100)
+	hold($("rotate"),()=>rrot(rotate(ttr.rot)),200)
+	document.addEventListener("keydown",e=>{
+		if(gameOver)return;
+		if(e.which===37||e.which===39){
+			move(e.which===37?ttr.col-1:ttr.col+1);
+		}
+		if(e.which===38){
+			rrot(rotate(ttr.rot));
+		}
+		if(e.which===40){
+			drop(ttr.row+1)
+		}
+	});
+	rAF=requestAnimationFrame(loop);
+})(Math.floor,Math.random,Math.ceil,document.getElementById("game"),[],[],{"I":"#0ff","O":"#ff0","T":"#808","S":"#0f0","Z":"red","J":"#00f","L":"#f70"},0,null,{"I":[[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]],"J":[[1,0,0],[1,1,1],[0,0,0]],"L":[[0,0,1],[1,1,1],[0,0,0]],"O":[[1,1],[1,1]],"S":[[0,1,1],[1,1,0],[0,0,0]],"Z":[[1,1,0],[0,1,1],[0,0,0]],"T":[[0,1,0],[1,1,1],[0,0,0]]},![],(_)=>document.getElementById(_),0)
+		</script>
+	</body>
+</html>
