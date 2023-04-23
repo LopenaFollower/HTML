@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>v2</title>
+		<style>
+			body{
+				overflow:hidden;
+				margin:0 auto;
+			}
+			#head,#apple,.cell_w{
+				transition-timing-function:linear;
+				position:fixed;
+			}
+			#blur{
+				backdrop-filter:blur(15px);
+				height:100%;
+				width:100%;
+				position:fixed;
+				z-index:2;
+				transition-timing-function:linear;
+				display:none;
+				align-content:center;
+				align-items:center;
+				justify-content:center;
+			}
+			#menu{
+				background-color:#000;
+				margin:2.5px auto;
+				width:70%;
+				height:70%;
+				color:#fff;
+			}
+			#sd,#tptd,#sptd{
+				width:fit-content;
+				overflow:visible;
+				margin:5px;
+			}
+			#cell_color{
+				width:fit-content;
+			}
+			#speed_mult{
+				width:40px;
+			}
+			#mobile_ui{
+				position:fixed;
+				bottom:0px;
+				width:fit-content;
+				height:auto;
+				opacity:.5;
+				padding:10px;
+				margin:5px;
+				border-radius:20%;
+				display:none;
+				z-index:2;
+			}
+			.mobile_btn{
+				position:relative;
+				width:50px;
+				height:50px;
+				font-size:50px;
+				line-height:0;
+				border-radius:10px;
+				text-align:center;
+				color:#000;
+			}
+			.exit{
+				right:15%;
+				top:15%;
+				position:fixed;
+				border-radius:50%;
+				background-color:red;
+			}
+		</style>
+	</head>
+	<body bgcolor=#111 onbeforeunload='return ls.setItem("total_time",m.pf(ls.getItem("total_time"))+m.pf(date()-ls.getItem("run_time")))'>
+		<div id="blur">
+			<div id="menu">
+				<p id=sd>Highest Score:</p>
+				<p id=tptd>Playtime total:</p>
+				<p id=sptd>Playtime session:</p>
+				<div id=cell_color>
+					<input id=r type=range min=0 max=255 oninput="this.style.accentColor='rgb('+this.value+',0,0)';$('rval').innerText=this.value;$('rval').set('color','rgb('+$('r').value+','+$('g').value+','+$('b').value+')');$('gval').set('color','rgb('+$('r').value+','+$('g').value+','+$('b').value+')');$('bval').set('color','rgb('+$('r').value+','+$('g').value+','+$('b').value+')')"/><span id=rval></span><br>
+					<input id=g type=range min=0 max=255 oninput="this.style.accentColor='rgb(0,'+this.value+',0)';$('gval').innerText=this.value;$('rval').set('color','rgb('+$('r').value+','+$('g').value+','+$('b').value+')');$('gval').set('color','rgb('+$('r').value+','+$('g').value+','+$('b').value+')');$('bval').set('color','rgb('+$('r').value+','+$('g').value+','+$('b').value+')')"/><span id=gval></span><br>
+					<input id=b type=range min=0 max=255 oninput="this.style.accentColor='rgb(0,0,'+this.value+')';$('bval').innerText=this.value;$('rval').set('color','rgb('+$('r').value+','+$('g').value+','+$('b').value+')');$('gval').set('color','rgb('+$('r').value+','+$('g').value+','+$('b').value+')');$('bval').set('color','rgb('+$('r').value+','+$('g').value+','+$('b').value+')')"/><span id=bval></span><br>
+					random color?<input type=checkbox id=randomc /><br>
+					Speed mult <input type=number value=5 id=speed_mult min=1 max=50 />
+				</div>
+				<button class="exit"onclick='if($("blur").get("display")=="none"){$("blur").set("display","flex");od=direction;direction=null;_=false}else{$("blur").set("display","none");_=true;direction=od}'> X </button>
+			</div>
+		</div>
+		<div id=mobile_ui>
+			<button class="mobile_btn"onclick='if(_){move("left")}'> ← </button>
+			<button class="mobile_btn"onclick='if(_){move("up")}'> ↑ </button>
+			<button class="mobile_btn"onclick='if(_){move("down")}'> ↓ </button>
+			<button class="mobile_btn"onclick='if(_){move("right")}'> → </button>
+			<button class="mobile_btn"onclick='if($("blur").get("display")=="none"){$("blur").set("display","flex");od=direction;direction=null;_=false}else{$("blur").set("display","none");_=true;direction=od}'>s</button>
+		</div>
+		<script>
+const m={
+	m:Math,n:Number,pi:parseInt,pf:parseFloat,w:window,d:document
+},b={
+	t:true,f:false,n:null,u:undefined
+},restrict={
+	up:b.f,down:b.f,left:b.f,right:b.f
+},js_cd={
+	eat:b.t,move:b.t
+},js_to={
+	eat:b.u,move:b.u
+},{floor}=m.m,{round}=m.m,{random}=m.m,{log}=console,{sqrt}=m.m,{pow}=m.m,ls=localStorage;
+var score=0,status=b.f,direction,od,speed=350,memory_table=[],_=b.t,size="18px";
+function $(id){
+	return m.d.getElementById(id)
+}
+function mobile(b){
+	if(b){
+		$("mobile_ui").set("display","block");
+	}else{
+		$("mobile_ui").set("display","none");
+	}
+}
+function func(n,fc){
+	window[n]=fc
+}
+function randomV2(range){
+	return random()*(range.max-range.min)+range.min
+}
+func("date",()=>{return floor(Date.now()/1000)})
+Element.prototype.get=function(css){
+	return this.style[css]
+}
+Element.prototype.set=function(css,v){
+	return this.style[css]=v;
+}
+Element.prototype.add=function(css,v){
+	return this.style[css]=m.pf(this.get(css))+v+"px";
+}
+function magnitude(one,two){
+	return sqrt(pow(m.pf(one.style.left)-m.pf(two.style.left),2)+pow(m.pf(one.style.top)-m.pf(two.style.top),2))/m.pf(size);
+}
+Object.prototype.len=function(){
+	return Object.keys(this).length
+}
+function coords(elem){
+	return{x:elem.left,y:elem.top}
+}
+function spawn(){
+	let x={},y={}
+	for(let i=1;(x[i-1]?x[i-1]:0)<m.w.innerWidth-m.w.innerWidth%m.pf(size);i++){x[i]=i*m.pf(size)}
+	for(let i=1;(y[i-1]?y[i-1]:0)<m.w.innerHeight-m.w.innerHeight%m.pf(size);i++){y[i]=i*m.pf(size)}
+	let h=m.d.createElement("div"),hs=h.style;
+	h.id="head";hs.width=size;hs.height=size;hs.backgroundColor="blue";hs.borderRadius=m.pf(size)*0.2+"px";hs.top=y[floor(random()*(y.len()-1)+1)]+"px";hs.left=x[floor(random()*(x.len()-1)+1)]+"px";hs.zIndex="1";
+	m.d.body.appendChild(h);
+}
+function apple(){
+	let x={},y={}
+	for(let i=1;(x[i-1]?x[i-1]:0)<m.w.innerWidth-m.w.innerWidth%m.pf(size);i++){x[i]=i*m.pf(size)}
+	for(let i=1;(y[i-1]?y[i-1]:0)<m.w.innerHeight-m.w.innerHeight%m.pf(size);i++){y[i]=i*m.pf(size)}
+	let h=m.d.createElement("div"),hs=h.style;
+	h.id="apple";hs.width=size;hs.height=size;hs.backgroundColor="#f00";hs.borderRadius=m.pf(size)*0.4+"px";hs.zIndex="-1";hs.opacity="0";hs.WebkitTransitionDuration=speed/2+"ms";
+	for(let i=0;i<30;i++){
+		let chosen_x=x[floor(random()*x.len())],chosen_y=y[floor(random()*y.len())];
+		if(chosen_y!=coords($("head")).y){hs.top=chosen_y+"px";}
+		if(chosen_x!=coords($("head")).x){hs.left=chosen_x+"px";}
+	}
+	m.d.body.appendChild(h);
+	setTimeout(()=>{hs.opacity="1";},speed/2);
+}
+function die(){
+	status=b.f;$("apple").remove();$("head").remove();m.d.title="\x76\x32";speed=350;
+	if(score>0){Array.from(m.d.getElementsByClassName("cell_w")).forEach(e=>{e.remove()})}
+	clearTimeout(js_to["eat"]);clearTimeout(js_to["move"]);score=0;direction=b.u;restrict["left"]=b.f;restrict["right"]=b.f;restrict["up"]=b.f;restrict["down"]=b.f;
+	js_cd["eat"]=b.t;js_cd["move"]=b.t;spawn();apple();
+}
+function make_cell(){
+	if(score>0){
+		let h=m.d.createElement("div"),hs=h.style;
+		h.id="";h.className="cell_w";
+		hs.width=size;hs.height=size;
+		if($("randomc").checked){
+			hs.backgroundColor="rgb("+randomV2({min:0,max:255})+","+randomV2({min:0,max:255})+","+randomV2({min:0,max:255})+")";
+		}else{
+			hs.backgroundColor='rgb('+$('r').value+','+$('g').value+','+$('b').value+')'||"#fff";
+		}
+		hs.borderRadius=m.pf(size)*0.2+"px";hs.top="0px";hs.left="0px";hs.zIndex="0";
+		m.d.body.appendChild(h);
+	}
+}
+function move(dir){
+	if(!restrict[dir]){
+		direction=dir;_=b.f;status=b.t;
+		["up","down","left","right"].forEach(e=>{
+			restrict[e]=b.f
+		})
+		dir==="up"?restrict["down"]=b.t:b.n;dir==="down"?restrict["up"]=b.t:b.n;dir==="left"?restrict["right"]=b.t:b.n;dir==="right"?restrict["left"]=b.t:b.n;
+	}
+}
+function log_path(newMemory){
+	memory_table.reverse()
+	memory_table[memory_table.length]=newMemory
+	return memory_table.reverse();
+}
+function ss(elem,string){
+	try{
+		elem.set("top",string.split(",")[0])
+		elem.set("left",string.split(",")[1])
+	}catch(e){}
+}
+function HMS(s){
+	var sec=s;var hrs=m.pi(sec/3600);sec=sec%3600;var min=m.pi(sec/60);sec=sec%60;
+	return(hrs<10?"0"+hrs:hrs)+" : "+(min<10?"0"+min:min)+" : "+(m.pi(sec)<10?"0"+m.pi(sec):m.pi(sec));
+}
+$("blur").set("display","none");
+if(!ls.getItem("hs")){ls.setItem("hs",0)}
+if(!ls.getItem("total_time")){ls.setItem("total_time",1)}
+ls.setItem("run_time",date())
+$("sd").innerHTML="\x48\x69\x67\x68\x65\x73\x74\x20\x53\x63o\x72\x65:\x20"+ls.getItem("hs")
+m.d.addEventListener("keydown",e=>{
+	if(_){
+		switch(e.keyCode){
+			case 87:
+				move("up")
+				break;
+			case 65:
+				move("left")
+				break;
+			case 83:
+				move("down")
+				break;
+			case 68:
+				move("right")
+				break;
+			case 38:
+				move("up")
+				break;
+			case 37:
+				move("left")
+				break;
+			case 40:
+				move("down")
+				break;
+			case 39:
+				move("right")
+				break;
+		}
+	}
+	if(e.keyCode==9){
+		e.preventDefault();
+		if($("blur").get("display")=="none"){
+			$("blur").set("display","flex")
+			od=direction
+			direction=null
+			_=false
+		}else{
+			$("blur").set("display","none")
+			_=true
+			direction=od
+		}
+	}
+	if(e.shiftKey||e.altKey||e.ctrlKey)e.preventDefault();
+})
+setInterval(()=>{
+	if(m.pi($("speed_mult").max)<m.pi($("speed_mult").value)){
+		$("speed_mult").value=50
+	}else if(m.pi($("speed_mult").min)>m.pi($("speed_mult").value)){
+		$("speed_mult").value=1
+	}
+	speed=350-((score>=50?50:score)*$("speed_mult").value)
+	if(m.pf($("head").get("top"))<0||m.pf($("head").get("left"))<0||m.pf($("head").get("left"))>m.w.innerWidth-m.w.innerWidth%m.pf(size)||m.pf($("head").get("top"))>m.w.innerHeight-m.w.innerHeight%m.pf(size)){
+		die()
+	}
+	if(magnitude($("head"),$("apple"))<1&&js_cd["eat"]&&status){
+		js_cd["eat"]=b.f
+		m.d.title="\x76\x32\x20-\x20"+(score+1);
+		$("apple").set("opacity",0);
+		js_to["eat"]=setTimeout(()=>{
+			if(status){
+				$("apple").remove()
+				score++
+				js_cd["eat"]=b.t
+				apple()
+			}
+		},speed/2);
+	}
+	if(js_cd["move"]&&status&&direction){
+		js_cd["move"]=b.f
+		make_cell()
+		switch(direction){
+			case"up":
+				$("head").add("top",-m.pf(size));
+				break;
+			case"down":
+				$("head").add("top",m.pf(size));
+				break;
+			case"left":
+				$("head").add("left",-m.pf(size));
+				break;
+			case"right":
+				$("head").add("left",m.pf(size));
+				break;
+		}
+		log_path($("head").get("top")+","+$("head").get("left"))
+		if(score>0){
+			let id=1;
+			Array.from(m.d.getElementsByClassName("cell_w")).forEach(e=>{
+				e.id=id
+				e.style.WebkitTransitionDuration=speed+"ms"
+				id++
+				ss(e,memory_table[e.id])
+				if(magnitude($("head"),e)<0.5){
+					die()
+				}
+				if(e.id>score){
+					e.remove()
+				}
+			})
+		}
+		_=true;
+		js_to["move"]=setTimeout(()=>{
+			if(status){
+				js_cd["move"]=b.t
+			}
+		},speed);
+	}
+	if(score>ls.getItem("hs")){
+		ls.setItem("hs",score)
+		$("sd").innerHTML="\x48\x69\x67\x68\x65\x73\x74\x20\x53\x63o\x73e:\x20"+ls.getItem("hs")
+	}
+	if(status){
+		$("head").style.WebkitTransitionDuration=speed+"ms"
+		$("tptd").innerHTML="\x50l\x61\x79\x74\x69m\x65\x20\x74o\x74\x61l:\x20"+HMS(m.pf(ls.getItem("total_time"))+m.pf(date()-ls.getItem("run_time")))
+		$("sptd").innerHTML="\x50l\x61\x79\x74\x69m\x65\x20\x73\x65\x73\x73\x69on:\x20"+HMS(date()-ls.getItem("run_time"))
+	}
+},0);
+document.body.onblur=()=>{
+	$("blur").set("display","flex");od=direction;direction=null;_=false;
+}
+spawn();apple()
+		</script>
+	</body>
+</html>
