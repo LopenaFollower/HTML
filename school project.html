@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>
+			calcu v2
+		</title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+			table{
+				border-collapse:collapse;
+				font:bold 30px monopoly;
+				text-align:center;
+				user-select:none;
+			}
+			td{
+				overflow:hidden;
+				height:50px;
+				width:50px;
+			}
+			#display{
+				transition-timing-function:linear;
+				transition-duration:.25s;
+				overflow-y:hidden;
+				font-size:150%;
+				resize:none;
+				width:212px;
+			}
+		</style>
+	</head>
+	<body>
+		<textarea readonly id=display></textarea><br>
+		<table border=1>
+			<tr>
+				<td class=ignore colspan=2>v1</td>
+				<td class=suffix data-value="%">%</td>
+				<td class=clear>CA</td>
+			</tr>
+			<tr>
+				<td class=num data-value=7>7</td>
+				<td class=num data-value=8>8</td>
+				<td class=num data-value=9>9</td>
+				<td class=arithmetic data-value=" / ">÷</td>
+			</tr>
+			<tr>
+				<td class=num data-value=4>4</td>
+				<td class=num data-value=5>5</td>
+				<td class=num data-value=6>6</td>
+				<td class=arithmetic data-value=" * ">×</td>
+			</tr>
+			<tr>
+				<td class=num data-value=1>1</td>
+				<td class=num data-value=2>2</td>
+				<td class=num data-value=3>3</td>
+				<td class=arithmetic data-value=" - ">-</td>
+			</tr>
+			<tr>
+				<td class=num data-value=0>0</td>
+				<td class=suffix data-value=".">.</td>
+				<td class=equals>=</td>
+				<td class=arithmetic data-value=" + ">+</td>
+			</tr>
+		</table>
+		<script>
+const disp=document.getElementById("display");
+const arithmetics = {
+	" + " : true,
+	" - " : true,
+	" * " : true,
+	" / " : true
+};
+const suffixes = {
+	".":true,
+	"%":true
+};
+var canInput = true;
+Element.prototype.css = function(css, v) {
+	if(!v) {
+		return this.style[css];
+	} else {
+		this.style[css] = v;
+	}
+};
+Element.prototype.add = function(v) {
+	this.value += v;
+};
+Element.prototype.clear = function() {
+	this.value = "";
+};
+String.prototype.last = function(n = 1) {
+	return this.substr(this.length - n,this.length);
+};
+String.prototype.removeEnd = function(n = 1) {
+	return this.substring(0, this.length - n);
+};
+String.prototype.prep = function(str, r, suffix, prefix) {
+	let res = "";
+	this.split(" ").forEach(e => {
+		if(e.includes(str)) {
+			res += prefix + e.replaceAll(str, r) + suffix + " ";
+		} else {
+			res += e + " ";
+		}
+	});
+	return res.trim();
+};
+function err(s) {
+	disp.value = s;
+	canInput = false;
+	setTimeout(() => {
+			disp.clear();
+			canInput = true;
+	}, 1500);
+};
+function validateInput(i, c) {
+	if(!canInput)return;
+	switch(c) {
+		case "num":
+			disp.add(i);
+			break;
+		case "arithmetic":
+			if(disp.value.length > 0) {
+				if(!arithmetics[disp.value.last(3)]) {
+					disp.add(i);
+				} else {
+					disp.value = disp.value.removeEnd(3) + i;
+				}
+			}
+			break;
+		case "suffix":
+			if(!suffixes[disp.value.last(1)] && !arithmetics[disp.value.last(3)]) {
+				disp.add(i);
+			}
+			break;
+		case "equals":
+			if(disp.value.length > 0) {
+				try {
+					disp.value = eval(disp.value.prep("%", "", "/100)", "("));
+				} catch(e) {
+					err(e);
+				}
+			}
+			break;
+		case "clear":
+			disp.clear();
+			break;
+	}
+};
+Array.from(document.getElementsByTagName("td")).forEach(e => {
+	if(e.className == "ignore")return;
+	e.onmousedown = () => {
+		validateInput(e.dataset.value, e.className);
+		e.css("background-color", "gray");
+	}
+	e.onmouseup = () => {
+		e.css("background-color", "lightgray");
+	}
+	e.onmouseenter = () => {
+		e.css("background-color","lightgray");
+	}
+	e.onmouseleave = () => {
+		e.css("background-color", "initial");
+	}
+});
+document.addEventListener("keydown",e => {
+	if(e.which === 8 && canInput) {
+		if(arithmetics[disp.value.last(3)]) {
+			disp.value = disp.value.removeEnd(3);
+		} else {
+			disp.value = disp.value.removeEnd();
+		}
+	}
+});
+setInterval(function(){
+	disp.css("height", disp.scrollHeight + "px");
+});
+		</script>
+	</body>
+</html>
