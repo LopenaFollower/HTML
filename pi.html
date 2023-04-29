@@ -19,7 +19,7 @@
 		</style>
 	</head>
 	<body bgcolor=#222>
-		type pi from memory<br><textarea id=input onpaste='for(;;){}'oncopy='for(;;){}'oncut='for(;;){}'oninput='$("cpi").innerText="";$("ypi").innerText="";$("result").innerText=""'></textarea><br>
+		type pi from memory<br><textarea id=input onpaste='crash()'oncopy='crash()'oncut='crash()'oninput='$("cpi").innerText="";$("ypi").innerText="";$("result").innerText=""'></textarea><br>
 		<button onclick='$("result").innerText=getAcc(dp,$("input")[_])'>Check</button>
 		<p id=cpi></p>
 		<p id=ypi></p>
@@ -59,7 +59,10 @@ $=(n)=>{
 		while(t){t--}
 	}
 	return"You got "+ac+" out of "+t+" decimal places of pi"
-},dp=""
+},dp="",
+crash=()=>{
+	for(;;){}
+};
 loop((z=$("input"))=>{
 	dp=getChar(pi,z[_].length)
 	z[_]=z[_].replace(/[^\d.]/g,"")

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>string encrypt</title>
+		<style>
+			#actual,#display{
+				font-family:monospace;
+				word-wrap:break-word;
+				width:100%;
+				font-size:15px;
+				top:0;
+				left:0;
+				position:fixed;
+				border-style:1px;
+			}
+			#actual{
+				resize:none;
+				height:80%;
+				color:rgba(0,0,0,0);
+				caret-color:black;
+				opacity:.3;
+			}
+			button{
+				position:fixed;
+				top:80%;
+			}
+			#display{
+				margin-top:2px;
+				margin-left:2px;
+				z-index:-1;
+				font-weight:900;
+			}
+			.str{
+				color:brown;
+			}
+			.num{
+				color:red;
+			}
+			.keywords{
+				color:blue;
+			}
+			.bool{
+				color:purple;
+			}
+		</style>
+	</head>
+	<body>
+		<textarea id=actual>alert("Hello world")</textarea>
+		<div id=display></div>
+		<button onclick="try{eval(display.innerText)}catch(e){console.log(e.stack)}">Run</button>
+		<p id=err></p>
+		<script>
+setInterval(()=>{
+	Element.prototype.remove=function(){alert("we can't allow you")}
+	debugger;
+});
+//prevents access to internal functions from the terminal
+(function(loop,delay,log,$){
+	let keywords=/(arguments|break|case|continue|debugger|default|delete|do|enum|eval|export|extends|finally|implements|import|in|instanceof|interface|new|package|private|protected|public|static|super|switch|throw|typeof|void|while|with|yield|var|let|this|const|function|await|async|for|return|if|else|try|catch)(?!"(?:(?:[^"]*"){2})*[^"]*)/g;
+	let bool=/(NaN|true|false|null)(?!"(?:(?:[^"]*"){2})*[^"]*)/g;
+	loop(()=>{
+		$("display").innerHTML=
+			$("actual").value
+			.replaceAll(/\n/g,"<br/>")//newline
+			.replaceAll(/"([^"]*)"/g,'<span class=str>"$1"</span>')
+			.replaceAll(/'([^']*)'/g,"<span class=str>'$1'</span>")
+			.replaceAll(/\d+/g,m=>`<span class=num>${m}</span>`)
+			.replaceAll(keywords,"<span class=keywords>$1</span>")
+			.replaceAll(bool,"<span class=bool>$1</span>");
+		$("display").style.fontSize=window.getComputedStyle($("actual")).getPropertyValue("font-size");
+	})
+})(setInterval,setTimeout,console.log,n=>document.getElementById(n))
+		</script>
+	</body>
+</html>

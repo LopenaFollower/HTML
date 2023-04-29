@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>string encrypt</title>
+		<style>
+		</style>
+	</head>
+	<body bgcolor=#d4efd8>
+		encrypt<input type=checkbox id=s /><br><br>
+		<textarea oninput='res.innerText=dealwith(this.value)'></textarea>
+		<div id=res></div>
+		<p id="req"style="display:none;">\</p>
+		<script>
+let الحجة = 5;
+var seed=6942069
+var yum=((a,t,i)=>{let m=a.length;while(m){i=Math.floor((random=(s,r=0)=>{r=(s*31)*الحجة*(1-الحجة);r=r.toString().replace("-","").replace("e+","").replace(".","");الحجة=parseInt(r);return parseFloat("0."+r)})(6942069)*m--);t=a[m];a[m]=a[i];a[i]=t}return a})("1234567890qwertyuiopasdfghjklzxcvbnm,.@#$_&-+()/*\"':;!?~`|^={}%[] QWERTYPOIUASDFGHLKJZXCVBMN".split(""))
+function dealwith(t){
+	let res="";
+	if(document.getElementById("s").checked){
+		res=((str,t=yum,res="")=>{for(let i in str){res+=t.join("")[t.reverse().join("").indexOf(str[i])]}return res})(((t1,r="")=>{t1=t1.split("");let l=t1.length;for(let i=0;i<l;i++){r+=t1[i%2==0?"pop":"shift"]();}return r})(btoa(t)))
+	}else{
+		res=atob(((t,r1="",r2="")=>{let l=t.length;for(let i=0;i<=l;i++){i%2==0?r2=t.charAt(i)+r2:r1+=t.charAt(i)}return r1+r2})(((str,t=yum,res="")=>{for(let i in str){res+=t.join("")[t.reverse().join("").indexOf(str[i])]}return res})(t)))
+	}
+	return res
+}
+		</script>
+	</body>
+</html>

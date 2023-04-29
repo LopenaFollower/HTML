@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>simplify fractions</title>
+		<style>
+			.frac{
+				display:inline-block;
+				position:relative;
+				vertical-align:middle;
+				letter-spacing:0.001em;
+				text-align:center;
+			}
+			.numerator{
+				display:block;
+				padding:0.1em;
+			}
+			.denominator{
+				border-top:2px solid black;
+			}
+			span{
+				display: block;
+				padding: 0.1em;
+			}
+        </style>
+	</head>
+	<body>
+		numerator / denominator
+		<input id=f oninput="display(this.value)"/><br>
+		<table>
+			<tr>
+				<td>Mixed</td>
+				<td id=mix></td>
+			</tr>
+				<td>Improper</td>
+				<td>
+					<div class="frac">
+						<span class=numerator id=ni></span>
+						<span class=denominator id=di></span>
+    				</div>
+				</td>
+			<tr>
+				<td>Decimal</td>
+				<td>
+					<span id=dec></span>
+				</td>
+			</tr>
+		</table>
+		<script>
+function $(ñ){
+	return document.getElementById(ñ);
+}
+Element.prototype.css=function(css,v){
+	if(!v)return window.getComputedStyle(this).getPropertyValue(css);
+	this.style[css]=v;
+}
+function simplify(f,t){
+	f=f.replace(" ","")
+	var numerator=parseFloat(f.split("/")[0]),
+		denominator=parseFloat(f.split("/")[1]),
+		gcd=(a,b)=>b?gcd(b,a%b):a,
+		res=gcd(numerator,denominator),
+		nn=numerator/res,
+		nd=denominator/res;
+	if(t=="m"){
+		let w=0;
+		if(nn>nd&&nd>1){
+			while(nn>nd){
+				w++
+				nn-=nd
+			}
+			return[w,nn,nd]
+		}else{
+			return["",nn,nd]
+		}
+	}
+	return[nn,nd]
+}
+function display(v){
+	try{
+		$("mix").innerHTML=`${simplify(v,"m")[0]}<span class="frac"><span class=numerator>${simplify(v,"m")[1]}</span><span class=denominator>${simplify(v,"m")[2]}</span></span>`;
+		$("ni").innerText=simplify(v)[0];
+		$("di").innerText=simplify(v)[1];
+		$('dec').innerText=eval(v)
+	}catch(e){}
+}
+		</script>
+	</body>
+</html>

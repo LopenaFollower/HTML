@@ -61,7 +61,7 @@
 			</tr>
 		</table>
 		<script>
-const disp=document.getElementById("display");
+const אבגדהוז=document.getElementById("display");
 const arithmetics = {
 	" + " : true,
 	" - " : true,
@@ -73,105 +73,105 @@ const suffixes = {
 	"%":true
 };
 var canInput = true;
-Element.prototype.css = function(css, v) {
-	if(!v) {
-		return this.style[css];
+Element.prototype.css = function(טכך, תםףץן) {
+	if(!תםףץן) {
+		return this.style[טכך];
 	} else {
-		this.style[css] = v;
+		this.style[css] = תםףץן;
 	}
 };
-Element.prototype.add = function(v) {
-	this.value += v;
+Element.prototype.add = function(תםףץן) {
+	this.value += תםףץן;
 };
 Element.prototype.clear = function() {
 	this.value = "";
 };
-String.prototype.last = function(n = 1) {
-	return this.substr(this.length - n,this.length);
+String.prototype.last = function(תםףץן = 1) {
+	return this.substr(this.length - תםףץן,this.length);
 };
-String.prototype.removeEnd = function(n = 1) {
-	return this.substring(0, this.length - n);
+String.prototype.removeEnd = function(תםףץן = 1) {
+	return this.substring(0, this.length - תםףץן);
 };
 String.prototype.prep = function(str, r, suffix, prefix) {
 	let res = "";
-	this.split(" ").forEach(e => {
-		if(e.includes(str)) {
-			res += prefix + e.replaceAll(str, r) + suffix + " ";
+	this.split(" ").forEach(שתםףץ => {
+		if(שתםףץ.includes(str)) {
+			res += prefix + שתםףץ.replaceAll(str, r) + suffix + " ";
 		} else {
-			res += e + " ";
+			res += שתםףץ + " ";
 		}
 	});
 	return res.trim();
 };
 function err(s) {
-	disp.value = s;
+	אבגדהוז.value = s;
 	canInput = false;
 	setTimeout(() => {
-			disp.clear();
+			אבגדהוז.clear();
 			canInput = true;
 	}, 1500);
 };
-function validateInput(i, c) {
+function validateInput(i, טכך) {
 	if(!canInput)return;
-	switch(c) {
+	switch(טכך) {
 		case "num":
-			disp.add(i);
+			אבגדהוז.add(i);
 			break;
 		case "arithmetic":
-			if(disp.value.length > 0) {
-				if(!arithmetics[disp.value.last(3)]) {
-					disp.add(i);
+			if(אבגדהוז.value.length > 0) {
+				if(!arithmetics[אבגדהוז.value.last(3)]) {
+					אבגדהוז.add(i);
 				} else {
-					disp.value = disp.value.removeEnd(3) + i;
+					אבגדהוז.value = אבגדהוז.value.removeEnd(3) + i;
 				}
 			}
 			break;
 		case "suffix":
-			if(!suffixes[disp.value.last(1)] && !arithmetics[disp.value.last(3)]) {
-				disp.add(i);
+			if(!suffixes[אבגדהוז.value.last(1)] && !arithmetics[אבגדהוז.value.last(3)]) {
+				אבגדהוז.add(i);
 			}
 			break;
 		case "equals":
-			if(disp.value.length > 0) {
+			if(אבגדהוז.value.length > 0) {
 				try {
-					disp.value = eval(disp.value.prep("%", "", "/100)", "("));
-				} catch(e) {
-					err(e);
+					אבגדהוז.value = eval(אבגדהוז.value.prep("%", "", "/100)", "("));
+				} catch(שתםףץ) {
+					err(שתםףץ);
 				}
 			}
 			break;
 		case "clear":
-			disp.clear();
+			אבגדהוז.clear();
 			break;
 	}
 };
-Array.from(document.getElementsByTagName("td")).forEach(e => {
-	if(e.className == "ignore")return;
-	e.onmousedown = () => {
-		validateInput(e.dataset.value, e.className);
-		e.css("background-color", "gray");
+Array.from(document.getElementsByTagName("td")).forEach(שתםףץ => {
+	if(שתםףץ.className == "ignore")return;
+	שתםףץ.onmousedown = () => {
+		validateInput(שתםףץ.dataset.value, שתםףץ.className);
+		שתםףץ.css("background-color", "gray");
 	}
-	e.onmouseup = () => {
-		e.css("background-color", "lightgray");
+	שתםףץ.onmouseup = () => {
+		שתםףץ.css("background-color", "lightgray");
 	}
-	e.onmouseenter = () => {
-		e.css("background-color","lightgray");
+	שתםףץ.onmouseenter = () => {
+		שתםףץ.css("background-color","lightgray");
 	}
-	e.onmouseleave = () => {
-		e.css("background-color", "initial");
+	שתםףץ.onmouseleave = () => {
+		שתםףץ.css("background-color", "initial");
 	}
 });
-document.addEventListener("keydown",e => {
-	if(e.which === 8 && canInput) {
-		if(arithmetics[disp.value.last(3)]) {
-			disp.value = disp.value.removeEnd(3);
+document.addEventListener("keydown",שתםףץ => {
+	if(שתםףץ.which === 8 && canInput) {
+		if(arithmetics[אבגדהוז.value.last(3)]) {
+			אבגדהוז.value = אבגדהוז.value.removeEnd(3);
 		} else {
-			disp.value = disp.value.removeEnd();
+			אבגדהוז.value = אבגדהוז.value.removeEnd();
 		}
 	}
 });
 setInterval(function(){
-	disp.css("height", disp.scrollHeight + "px");
+	אבגדהוז.css("height", אבגדהוז.scrollHeight + "px");
 });
 		</script>
 	</body>

@@ -140,9 +140,6 @@ function magnitude(one,two){
 Object.prototype.len=function(){
 	return Object.keys(this).length
 }
-function coords(elem){
-	return{x:elem.left,y:elem.top}
-}
 function spawn(){
 	let x={},y={}
 	for(let i=1;(x[i-1]?x[i-1]:0)<m.w.innerWidth-m.w.innerWidth%m.pf(size);i++){x[i]=i*m.pf(size)}
@@ -157,11 +154,9 @@ function apple(){
 	for(let i=1;(y[i-1]?y[i-1]:0)<m.w.innerHeight-m.w.innerHeight%m.pf(size);i++){y[i]=i*m.pf(size)}
 	let h=m.d.createElement("div"),hs=h.style;
 	h.id="apple";hs.width=size;hs.height=size;hs.backgroundColor="#f00";hs.borderRadius=m.pf(size)*0.4+"px";hs.zIndex="-1";hs.opacity="0";hs.WebkitTransitionDuration=speed/2+"ms";
-	for(let i=0;i<30;i++){
 		let chosen_x=x[floor(random()*x.len())],chosen_y=y[floor(random()*y.len())];
-		if(chosen_y!=coords($("head")).y){hs.top=chosen_y+"px";}
-		if(chosen_x!=coords($("head")).x){hs.left=chosen_x+"px";}
-	}
+		hs.top=chosen_y+"px";
+		hs.left=chosen_x+"px";
 	m.d.body.appendChild(h);
 	setTimeout(()=>{hs.opacity="1";},speed/2);
 }
@@ -267,6 +262,7 @@ setInterval(()=>{
 	speed=350-((score>=50?50:score)*$("speed_mult").value)
 	if(m.pf($("head").get("top"))<0||m.pf($("head").get("left"))<0||m.pf($("head").get("left"))>m.w.innerWidth-m.w.innerWidth%m.pf(size)||m.pf($("head").get("top"))>m.w.innerHeight-m.w.innerHeight%m.pf(size)){
 		die()
+		die()
 	}
 	if(magnitude($("head"),$("apple"))<1&&js_cd["eat"]&&status){
 		js_cd["eat"]=b.f
@@ -312,6 +308,10 @@ setInterval(()=>{
 				if(e.id>score){
 					e.remove()
 				}
+				if(magnitude(e,$("apple"))<0.5){
+					$("apple").remove()
+					apple()
+				}
 			})
 		}
 		_=true;
@@ -334,7 +334,7 @@ setInterval(()=>{
 document.body.onblur=()=>{
 	$("blur").set("display","flex");od=direction;direction=null;_=false;
 }
-spawn();apple()
+spawn();apple();mobile(1);
 		</script>
 	</body>
 </html>

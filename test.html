@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<style>
+			.frac{
+				display:inline-block;
+				position:relative;
+				vertical-align:middle;
+				letter-spacing:0.001em;
+				text-align:center;
+			}
+			#numerator,#speed_c{
+				color:#0d0;
+				display:block;
+				padding:0.1em;
+			}
+			#denominator,#speed_it{
+				color:#f00;
+				border-top:2px solid black;
+			}
+			#visual{
+				border:1px solid black;
+				background-color:#fff;
+			}
+			#update_rate{
+				width:40px;
+			}
+		</style>
+	</head>
+	<body>
+		<sup id=fps></sup>
+		<br><br>
+		<div class="frac">
+			<span id=numerator></span>
+			<span id=denominator></span>
+		</div><br><br>
+		<div class="frac">
+			<span id=speed_c></span>
+			<span id=speed_it></span>
+		</div><br><br>
+		<p id=res></p>
+		<input id=update_rate value=5 placeholder="frames per second"oninput='if(!isNaN(this.value)&&this.value>0){re(this.value)}'/><br><br>
+		<canvas id=visual width=350 height=350></canvas>
+		<script>
+var ls=localStorage,
+	c=ls.getItem("c")||0,
+	its=ls.getItem("its")||0,
+	ps=0,
+	sqrt=Math.sqrt,
+	pow=Math.pow,
+	scale=349,
+	ctx=visual.getContext("2d"),
+	_re=null,
+	rgb={
+		step:1,
+		r:255,
+		g:0,
+		b:0,
+		rg:false,
+		gg:true,
+		bg:false,
+		rl:false,
+		gl:false,
+		bl:false,
+		fetch:function(f){
+			if(!f)return"rgb("+this.r+","+this.g+","+this.b+")";
+			if(f.length==3){
+				return"rgb("+this[f[0]]+","+this[f[1]]+","+this[f[2]]+")";
+			}
+		}
+	}
+if(!ls.getItem("c"))ls.setItem("c",0);
+if(!ls.getItem("its"))ls.setItem("its",0);
+function it(is=50000){
+	for(let i=0;i<=is;i++){
+		its++
+		let x=Math.random()*2,y=Math.random()*2;
+		if(i%75===0){
+			ctx.beginPath();
+			ctx.rect(x*scale-1,y*scale-1,2,2);
+			ctx.fillStyle=sqrt(pow(x,2)+pow(y,2))<=1?rgb.fetch():"rgba(200,0,0,.5)"
+			ctx.fill()
+		}
+		if(sqrt(pow(x,2)+pow(y,2))<=1){
+			c++
+		}
+	}
+}
+function re(rate){
+	clearInterval(_re)
+	_re=setInterval(()=>{
+		ctx.clearRect(0,0,1000,1000)
+		ctx.beginPath();
+		ctx.arc(0,0,scale,0,2*Math.PI);
+		ctx.stroke()
+		let o1=its
+		setTimeout(()=>{
+			speed_it.innerText=(its-o1).toLocaleString()+"/s"
+		},1e3)
+		let o2=c
+		setTimeout(()=>{
+			speed_c.innerText=(c-o2).toLocaleString()+"/s"
+		},1e3)
+		ls.setItem("c",c)
+		ls.setItem("its",its)
+		res.innerText=16*(c/its)
+		numerator.innerText=c.toLocaleString()
+		denominator.innerText=its.toLocaleString()
+	},1e3/rate)
+}
+setInterval((f=0xff)=>{
+	it()
+	rgb.r>f&&(rgb.rg=false,rgb.r=f)
+	rgb.g>f&&(rgb.gg=false,rgb.g=f)
+	rgb.b>f&&(rgb.bg=false,rgb.b=f)
+	rgb.r<0&&(rgb.rl=false,rgb.r=0)
+	rgb.g<0&&(rgb.gl=false,rgb.g=0)
+	rgb.b<0&&(rgb.bl=false,rgb.b=0)
+	rgb.r==f&&rgb.g==0&&rgb.b==0&&(rgb.gg=true)
+	rgb.r==f&&rgb.g==f&&rgb.b==0&&(rgb.rl=true)
+	rgb.r==0&&rgb.g==f&&rgb.b==0&&(rgb.bg=true)
+	rgb.r==0&&rgb.g==f&&rgb.b==f&&(rgb.gl=true)
+	rgb.r==0&&rgb.g==0&&rgb.b==f&&(rgb.rg=true)
+	rgb.r==f&&rgb.g==0&&rgb.b==f&&(rgb.bl=true)
+	rgb.rg&&(rgb.r+=rgb.step)
+	rgb.gg&&(rgb.g+=rgb.step)
+	rgb.bg&&(rgb.b+=rgb.step)
+	rgb.rl&&(rgb.r-=rgb.step)
+	rgb.gl&&(rgb.g-=rgb.step)
+	rgb.bl&&(rgb.b-=rgb.step)
+});
+(function(a){
+	let past=a,
+		frame=0,
+		update=()=>{
+			if(Date.now()-past<=1e3){
+				frame++
+			}else{
+				past=Date.now()
+				fps.innerText=frame+" fps"
+				frame=0
+			}
+			requestAnimationFrame(update)
+		}
+		requestAnimationFrame(update)
+})(Date.now())
+re(5)
+		</script>
+	</body>
+</html>

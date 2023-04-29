@@ -6,12 +6,8 @@
 			*{
 				color:#fff;
 			}
-			input[type=button]{
-				background-color:darkgrey;
-				border:none;
-			}
-			input[type=checkbox]{
-				background-color:#111;
+			input{
+				color:#000;
 				accent-color:grey;
 				border:none;
 			}
@@ -68,25 +64,22 @@ function $(ñ){
 	return document.getElementById(ñ);
 }
 function check(ç){
-	if(!(pg||!cc)&&$(ç).innerText==""){
-		place(ç,me)
-		cc=false
-		setTimeout(circle,200);
-	}
-	
+	!(pg||!cc)&&$(ç).innerText==""&&(place(ç,me),cc=false,setTimeout(circle,200))
 }
 function place(ã,_){
 	$(ã).innerText=_
 }
 function co(å,ā,â){
 	if(!â){
-		for(let à=0;à<ā.length;à++){
+		let ã=ā.length
+		for(let à=0;à<ã;à++){
 			if(å[à]!==ā[à]){
 				return false
 			}
 		}
 	}else{
-		for(let à=0;à<å.length;à++){
+		let ã=å.length
+		for(let à=0;à<ã;à++){
 			if(ā[à]==â&&å[à]!==ā[à]){
 				return false
 			}
@@ -95,24 +88,17 @@ function co(å,ā,â){
 	return true
 }
 function ai(griddy,id,s){
-	if(co(grid,griddy)){
-		place(id,s)
-		log(JSON.stringify(griddy).replaceAll('"O"',"no").replaceAll('"X"',"me")+" if sent twice, tell me, its a duplicate")
-	}
+	co(grid,griddy)&&place(id,s)
 }
 function win(ø){
-	if(ø==me){
-		if(!pg)score.x++;pg=true
-	};
-	if(ø==no){
-		if(!pg)score.o++;pg=true
-	}
+	ø==me&&!pg&&(score.x++,pg=true)
+	ø==no&&!pg&&(score.o++,pg=true)
 	cc=true
 	$("win").innerText=ø+" wins!\nScore: "+score.x+" - "+score.o+"\n\nrestart?";
 }
 function reset(){
 	grid_ids.forEach(e=>{
-		$(e).innerText="";
+		$(e).innerText=""
 	})
 	$("win").click()
 	pg=false
@@ -346,7 +332,6 @@ function circle(){
 		ai([me,no,me,"",no,me,no,me,""],"low_R",no)
 		ai([me,no,me,"",no,"",no,me,me],"R",no)
 		ai([me,no,me,me,no,me,no,"",""],"low_M",no)
-		ai([me,no,me,me,no,"",no,me,""],"R",no)
 		ai([me,no,me,me,no,"",no,"",me],"R",no)
 		ai([me,me,no,me,no,me,"",no,""],"low_L",no)
 		ai([me,me,no,"",no,me,me,no,""],"L",no)
@@ -451,29 +436,30 @@ function circle(){
 		ai([me,"",me,"",no,no,no,me,me],"L",no)
 		ai(["",me,me,"",no,no,no,me,me],"L",no)
 		ai(["","",me,me,no,no,no,me,me],"top_L",no)
+		//318 combinations
 	}
 	setTimeout(()=>{cc=true},50);
 }
 setInterval(()=>{
 	grid=[$("top_L").innerText,$("top_M").innerText,$("top_R").innerText,$("L").innerText,$("M").innerText,$("R").innerText,$("low_L").innerText,$("low_M").innerText,$("low_R").innerText]
 	density={x:0,o:0,s:0};grid_ids.forEach(e=>{if($(e).innerText.length>0){if($(e).innerText==me){density.x++}else{density.o++}}else{density.s++}});
-	if(co(grid,[me,"","",me,"","",me,"",""],me)){win(me)}
-	if(co(grid,["",me,"","",me,"","",me,""],me)){win(me)}
-	if(co(grid,["","",me,"","",me,"","",me],me)){win(me)}
-	if(co(grid,[me,me,me,"","","","","",""],me)){win(me)}
-	if(co(grid,["","","",me,me,me,"","",""],me)){win(me)}
-	if(co(grid,["","","","","","",me,me,me],me)){win(me)}
-	if(co(grid,[me,"","","",me,"","","",me],me)){win(me)}
-	if(co(grid,["","",me,"",me,"",me,"",""],me)){win(me)}
-	if(co(grid,[no,"","",no,"","",no,"",""],no)){win(no)}
-	if(co(grid,["",no,"","",no,"","",no,""],no)){win(no)}
-	if(co(grid,["","",no,"","",no,"","",no],no)){win(no)}
-	if(co(grid,[no,no,no,"","","","","",""],no)){win(no)}
-	if(co(grid,["","","",no,no,no,"","",""],no)){win(no)}
-	if(co(grid,["","","","","","",no,no,no],no)){win(no)}
-	if(co(grid,[no,"","","",no,"","","",no],no)){win(no)}
-	if(co(grid,["","",no,"",no,"",no,"",""],no)){win(no)}
-	if(!density.s){setTimeout(reset,300);}
+	co(grid,[me,"","",me,"","",me,"",""],me)&&win(me)
+	co(grid,["",me,"","",me,"","",me,""],me)&&win(me)
+	co(grid,["","",me,"","",me,"","",me],me)&&win(me)
+	co(grid,[me,me,me,"","","","","",""],me)&&win(me)
+	co(grid,["","","",me,me,me,"","",""],me)&&win(me)
+	co(grid,["","","","","","",me,me,me],me)&&win(me)
+	co(grid,[me,"","","",me,"","","",me],me)&&win(me)
+	co(grid,["","",me,"",me,"",me,"",""],me)&&win(me)
+	co(grid,[no,"","",no,"","",no,"",""],no)&&win(no)
+	co(grid,["",no,"","",no,"","",no,""],no)&&win(no)
+	co(grid,["","",no,"","",no,"","",no],no)&&win(no)
+	co(grid,[no,no,no,"","","","","",""],no)&&win(no)
+	co(grid,["","","",no,no,no,"","",""],no)&&win(no)
+	co(grid,["","","","","","",no,no,no],no)&&win(no)
+	co(grid,[no,"","","",no,"","","",no],no)&&win(no)
+	co(grid,["","",no,"",no,"",no,"",""],no)&&win(no)
+	!density.s&&setTimeout(reset,300)
 });
 		</script>
 	</body>
