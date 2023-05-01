@@ -154,9 +154,9 @@ function apple(){
 	for(let i=1;(y[i-1]?y[i-1]:0)<m.w.innerHeight-m.w.innerHeight%m.pf(size);i++){y[i]=i*m.pf(size)}
 	let h=m.d.createElement("div"),hs=h.style;
 	h.id="apple";hs.width=size;hs.height=size;hs.backgroundColor="#f00";hs.borderRadius=m.pf(size)*0.4+"px";hs.zIndex="-1";hs.opacity="0";hs.WebkitTransitionDuration=speed/2+"ms";
-		let chosen_x=x[floor(random()*x.len())],chosen_y=y[floor(random()*y.len())];
-		hs.top=chosen_y+"px";
-		hs.left=chosen_x+"px";
+	let chosen_x=x[floor(random()*x.len())],chosen_y=y[floor(random()*y.len())];
+	hs.top=chosen_y+"px";
+	hs.left=chosen_x+"px";
 	m.d.body.appendChild(h);
 	setTimeout(()=>{hs.opacity="1";},speed/2);
 }
@@ -302,14 +302,15 @@ setInterval(()=>{
 				e.style.WebkitTransitionDuration=speed+"ms"
 				id++
 				ss(e,memory_table[e.id])
-				if(magnitude($("head"),e)<0.5){
+				if(magnitude($("head"),e)<0.9){
 					die()
 				}
 				if(e.id>score){
 					e.remove()
 				}
-				if(magnitude(e,$("apple"))<0.5){
+				if(magnitude(e,$("apple"))<0.9){
 					$("apple").remove()
+					js_cd["eat"]=b.t
 					apple()
 				}
 			})

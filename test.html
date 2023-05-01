@@ -72,14 +72,14 @@ var ls=localStorage,
 	}
 if(!ls.getItem("c"))ls.setItem("c",0);
 if(!ls.getItem("its"))ls.setItem("its",0);
-function it(is=50000){
+function it(is=250000){
 	for(let i=0;i<=is;i++){
 		its++
 		let x=Math.random()*2,y=Math.random()*2;
-		if(i%75===0){
+		if(i%750===0){
 			ctx.beginPath();
 			ctx.rect(x*scale-1,y*scale-1,2,2);
-			ctx.fillStyle=sqrt(pow(x,2)+pow(y,2))<=1?rgb.fetch():"rgba(200,0,0,.5)"
+			ctx.fillStyle=sqrt(pow(x,2)+pow(y,2))<=1?"#0d0":"rgba(200,0,0,.5)"
 			ctx.fill()
 		}
 		if(sqrt(pow(x,2)+pow(y,2))<=1){
@@ -135,7 +135,7 @@ setInterval((f=0xff)=>{
 		frame=0,
 		update=()=>{
 			if(Date.now()-past<=1e3){
-				frame++
+				++frame
 			}else{
 				past=Date.now()
 				fps.innerText=frame+" fps"

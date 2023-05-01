@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>syllables</title>
+	</head>
+	<body>
+		<input type=number id=l oninput='generate(this.value)'/>
+		<button onclick="prompt('u sure?').toLowerCase()=='yes'?rs=[]:null">clear</button><br>
+		<input placeholder="has..."oninput='has.innerText=rs.indexOf(this.value)!==-1?true:false'/><span id=has></span><br>
+		#<span id=c>0</span><br>
+		ignored <span id=dupe>0</span>
+		<canvas id=canvas width=300 height=1></canvas>
+		<script>
+var cs=["b","c","d","f","g","h","j","k","l","m","n","p","q","r","s","t","v","w","x","y","z","sc","sh","sk","sl","sm","sn","sp","st","sw","th","bl","br","cl","fl","gl","pl","tr","dw","wh","str","spl","cr","fr","dr","pr","tw","shr","thr"],
+	vs=["a","e","i","o","u","ea","ai","ou","ie","ei","io","oi","oa","au","eu","ue","eau","iou"],
+	es=["ck","ll","l","ng","lm","nt","x","t","rc","rk","s","ct","r","n","lt","g","m","w","lf","p","h","lk","lp","rl","lth","mt","th","nd","rn"],
+	bs=["a","au","ab","e","ea","ex","i","in","en","o","oc","u","un"]
+	ss=[],
+	rs=[],
+	canvas=document.getElementById("canvas"),
+	ctx=canvas.getContext("2d"),
+	dupes=0;
+vs.forEach(v=>{
+	cs.forEach(c=>{
+		ss[ss.length]=c+v
+	})
+})
+Array.prototype.rand=function(){
+	return this[Math.floor(Math.random()*this.length)]
+};
+function generate(n){
+	let r="",i;
+	if(!n)return;
+	n=Math.ceil(n)
+	if(n>10000)n=10000;
+	Math.random()>=.5&&(r+=bs.rand());
+	for(i=0;i<n;i++){
+		r+=ss.rand()
+	}
+	Math.random()<=.5&&(r+=es.rand());
+	if(rs.indexOf(r)!==-1){
+		generate(n)
+		return dupes++
+	};
+	rs[rs.length]=r
+	rs.sort(function(a,b){return a.length-b.length||a.localeCompare(b)});//||
+	c.innerText=rs.length
+	dupe.innerText=dupes
+}
+setInterval(()=>{
+	for(let i=0;i<=5;i++){
+		if(rs.length>=4e4)return;
+		generate(l.value)
+	}
+})
+setInterval(()=>{
+	let fontsize=10,
+		extra=22,
+		spacing=70,
+		per=10
+	canvas.height=(rs.length-1)/per*fontsize+extra
+	canvas.width=spacing*per
+	ctx.clearRect(0,0,canvas.height,canvas.width);
+	ctx.font=fontsize+"px monospace";
+	let y=0
+	let x=0;
+	rs.forEach(e=>{
+		if(x<per){
+			ctx.fillText(e,x*spacing,extra+(y*fontsize))
+			x++
+		}else{
+			x=0
+			y++
+			ctx.fillText(e,0,extra+(y*fontsize))
+			x++
+		}
+	});
+	ctx.fillStyle="#000"
+	ctx.fill()
+},30000);
+		</script>
+	</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Math random</title>
+	</head>
+	<body>
+		#<span id=cc></span><br>
+		H <span id=hh></span><br>
+		L <span id=ll></span><br>
+		sort <select id=m>
+			<option value="value">value</option>
+			<option value=1>length</option>
+		</select>
+		<canvas id=canvas width=300 height=1></canvas>
+		<script>
+var rs=[],
+	canvas=document.getElementById("canvas"),
+	ctx=canvas.getContext("2d"),
+	ps=5
+Math.random2=function(s1){
+	s1++
+	let res=0;
+	res=(s1*31)*ps*(1-ps)
+	res=res.toString().replace("-","").replace("e+","").replace(".","");
+	ps=parseInt(res);
+	return parseFloat("0."+res);
+}
+function ss(){
+	let r=Math.random()
+	if(rs.indexOf(r)!==-1)return;
+	rs[rs.length]=r
+	if(m.value=="value"){
+		rs.sort((a,b)=>a-b)
+	}else{
+		rs.sort((a,b)=>a.toString().length-b.toString().length||a-b)
+	}
+	cc.innerText=rs.length
+	ll.innerText=rs[0];
+	hh.innerText=rs[rs.length-1]
+}
+setInterval(ss)
+setInterval(()=>{
+	let fontsize=10,
+		spacing=140,
+		per=10
+	canvas.height=(rs.length-1)/per*fontsize+22
+	canvas.width=spacing*per
+	ctx.clearRect(0,0,canvas.height,canvas.width);
+	ctx.font=fontsize+"px monospace";
+	let y=0
+	let x=0;
+	rs.forEach(e=>{
+		if(x<per){
+			ctx.fillText(e,x*spacing,22+(y*fontsize))
+			x++
+		}else{
+			x=0
+			y++
+			ctx.fillText(e,0,22+(y*fontsize))
+			x++
+		}
+	});
+	ctx.fillStyle="#000"
+	ctx.fill()
+},15000);
+		</script>
+	</body>
+</html>

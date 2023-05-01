@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>k</title>
+		<style>
+			#canvas{
+				position:fixed;
+				left:0;
+			}
+		</style>
+	</head>
+	<body>
+		pause<input type=checkbox id=pause />
+		<p id=s></p>
+		<canvas id="canvas"width="300"height="300"style="border:1px solid black"></canvas>
+		<script>
+function vector(x,y){
+	return{x:x,y:y}
+}
+function add(v1,v2){
+	v1.x+=v2.x;
+	v1.y+=v2.y;
+}
+function scale(v1,num){
+	v1.x*=num;
+	v1.y*=num;
+}
+function getMass(u,a){
+	return(u*a)/10;
+}
+function ca(force,mass){
+	return vector(force.x/mass,force.y/mass)
+}
+var canvas=document.getElementById("canvas"),
+	ctx=canvas.getContext("2d"),
+	v=vector(10,10),
+	velocity=vector(0,0),
+	force=vector(1,0),
+	gravity=vector(0,.1),
+	side=parseFloat(canvas.width),
+	size=vector(10,10),
+	midpoint=vector(side/2,side/2),
+	vm=Math.sqrt(Math.pow(velocity.x-velocity.y,2))
+setTimeout(()=>force=vector(0,0),500)
+setInterval(()=>{
+	vm=Math.sqrt(Math.pow(velocity.x-velocity.y,2))
+	side=parseFloat(this.innerWidth)-25;
+	midpoint=vector(side/2,side/2);
+	canvas.width=side;
+	canvas.height=side;
+	draw();
+	scale(velocity,.995);
+	if(Math.abs(velocity.x)<0.01){
+		velocity.x=0
+		gravity=vector(0,0);
+	}
+	if(Math.abs(velocity.y)<0.01){
+		velocity.y=0
+		gravity=vector(0,0);
+	}
+	s.innerText=get_sector(v);
+},1000/60);
+function get_sector(p){
+	if(p.x==midpoint.x&&p.y==midpoint.y){
+		gravity=vector(0,0);
+		return"mid"
+	}
+	if(p.x<midpoint.x&&p.y<midpoint.y){
+		gravity=vector(.1,.1);
+		return"A"
+	}else if(p.x>midpoint.x&&p.y<midpoint.y){
+		gravity=vector(-.1,.1);
+		return"B"
+	}else if(p.x<midpoint.x&&p.y>midpoint.y){
+		gravity=vector(.1,-.1);
+		return"C"
+	}else if(p.x>midpoint.x&&p.y>midpoint.y){
+		gravity=vector(-.1,-.1);
+		return"D"
+	}
+}
+function draw(...a){
+	ctx["clearRect"](0,0,side,side);
+	ctx["font"]=(2+1)*(1["toString"]()+0["toString"]())+"px monospace";
+	ctx["fillText"]("A",side*.25,side*.25);
+	ctx["fillText"]("B",side*.75,side*.25);
+	ctx["fillText"]("C",side*.25,side*.75);
+	ctx["fillText"]("D",side*.75,side*.75);
+	ctx["rect"](v["x"]-size["x"]/2,v["y"]-size["y"]/2,size["x"],size["y"]);
+	ctx["fillStyle"]="rgb("+0+","+0+","+0+")"
+	ctx["fill"]()
+	ctx["beginPath"]();
+	ctx["moveTo"](0,midpoint["x"]);
+	ctx["lineTo"](side,midpoint["x"]);
+	ctx["stroke"]();
+	ctx["beginPath"]();
+	ctx["moveTo"](midpoint["y"],0);
+	ctx["lineTo"](midpoint["y"],side);
+	ctx["stroke"]();
+	if(v["y"]>side-size["y"]||v["y"]<0){
+		velocity["y"]*=-1;
+	}
+	if(v["x"]>side||v["x"]<0){
+		velocity["x"]*=-1;
+	}
+	if(!pause["checked"]){
+		add(velocity,gravity);
+		add(velocity,ca(force,getMass(1,size["x"]*size["y"])));
+		add(v,velocity);
+	}
+}
+		</script>
+	</body>
+</html>
