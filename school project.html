@@ -19,159 +19,171 @@
 			}
 			#display{
 				transition-timing-function:linear;
+				border-color:rgba(0,0,0,0);
 				transition-duration:.25s;
 				overflow-y:hidden;
-				font-size:150%;
+				font-size:80%;
 				resize:none;
-				width:212px;
+				width:100%;
+				height:0;
 			}
 		</style>
 	</head>
 	<body>
-		<textarea readonly id=display></textarea><br>
 		<table border=1>
 			<tr>
-				<td class=ignore colspan=2>v1</td>
-				<td class=suffix data-value="%">%</td>
+				<td class=ignore colspan=4>
+					<textarea readonly id=display></textarea>
+				</td>
+			</tr>
+			<tr>
+				<td class=backspace colspan=2>&#9003;</td>
+				<td class=suffix data-value="%">&percnt;</td>
 				<td class=clear>CA</td>
 			</tr>
 			<tr>
 				<td class=num data-value=7>7</td>
 				<td class=num data-value=8>8</td>
 				<td class=num data-value=9>9</td>
-				<td class=arithmetic data-value=" / ">÷</td>
+				<td class=arithmetic data-value=" / ">&divide;</td>
 			</tr>
 			<tr>
 				<td class=num data-value=4>4</td>
 				<td class=num data-value=5>5</td>
 				<td class=num data-value=6>6</td>
-				<td class=arithmetic data-value=" * ">×</td>
+				<td class=arithmetic data-value=" * ">&times;</td>
 			</tr>
 			<tr>
 				<td class=num data-value=1>1</td>
 				<td class=num data-value=2>2</td>
 				<td class=num data-value=3>3</td>
-				<td class=arithmetic data-value=" - ">-</td>
+				<td class=arithmetic data-value=" - ">&minus;</td>
 			</tr>
 			<tr>
 				<td class=num data-value=0>0</td>
-				<td class=suffix data-value=".">.</td>
-				<td class=equals>=</td>
-				<td class=arithmetic data-value=" + ">+</td>
+				<td class=suffix data-value=".">&period;</td>
+				<td class=equals>&equals;</td>
+				<td class=arithmetic data-value=" + ">&plus;</td>
 			</tr>
 		</table>
 		<script>
-const אבגדהוז=document.getElementById("display");
+const display = document.getElementById("display");
 const arithmetics = {
-	" + " : true,
-	" - " : true,
-	" * " : true,
-	" / " : true
+	" + ": true,
+	" - ": true,
+	" * ": true,
+	" / ": true
 };
 const suffixes = {
-	".":true,
-	"%":true
+	".": true,
+	"%": true
 };
 var canInput = true;
-Element.prototype.css = function(טכך, תםףץן) {
-	if(!תםףץן) {
-		return this.style[טכך];
+Element.prototype.css = function(css, v) {
+	if(!v) {
+		return this.style[css];
 	} else {
-		this.style[css] = תםףץן;
+		this.style[css] = v;
 	}
 };
-Element.prototype.add = function(תםףץן) {
-	this.value += תםףץן;
+Element.prototype.add = function(v) {
+	this.value += v;
 };
-Element.prototype.clear = function() {
-	this.value = "";
+String.prototype.last = function(l = 1) {
+	return this.substr(this.length - l, this.length);
 };
-String.prototype.last = function(תםףץן = 1) {
-	return this.substr(this.length - תםףץן,this.length);
+String.prototype.removeEnd = function(c = 1) {
+	return this.substring(0, this.length - c);
 };
-String.prototype.removeEnd = function(תםףץן = 1) {
-	return this.substring(0, this.length - תםףץן);
-};
-String.prototype.prep = function(str, r, suffix, prefix) {
+String.prototype.prepare = function(string, replacement, suffix, prefix) {
 	let res = "";
-	this.split(" ").forEach(שתםףץ => {
-		if(שתםףץ.includes(str)) {
-			res += prefix + שתםףץ.replaceAll(str, r) + suffix + " ";
+	this.split(" ").forEach(e => {
+		if(e.includes(string)) {
+			res += prefix + e.replace(string, replacement) + suffix + " ";
 		} else {
-			res += שתםףץ + " ";
+			res += e + " ";
 		}
 	});
 	return res.trim();
 };
-function err(s) {
-	אבגדהוז.value = s;
+function showError(s) {
+	display.value = s;
 	canInput = false;
 	setTimeout(() => {
-			אבגדהוז.clear();
+			display.value = "";
 			canInput = true;
 	}, 1500);
 };
-function validateInput(i, טכך) {
-	if(!canInput)return;
-	switch(טכך) {
+function validateInput(i, e) {
+	if(!canInput){
+		return;
+	}
+	switch(e) {
 		case "num":
-			אבגדהוז.add(i);
+			display.add(i);
 			break;
 		case "arithmetic":
-			if(אבגדהוז.value.length > 0) {
-				if(!arithmetics[אבגדהוז.value.last(3)]) {
-					אבגדהוז.add(i);
+			if(display.value.length > 0) {
+				if(!arithmetics[display.value.last(3)]) {
+					display.add(i);
 				} else {
-					אבגדהוז.value = אבגדהוז.value.removeEnd(3) + i;
+					display.value = display.value.removeEnd(3) + i;
 				}
 			}
 			break;
 		case "suffix":
-			if(!suffixes[אבגדהוז.value.last(1)] && !arithmetics[אבגדהוז.value.last(3)]) {
-				אבגדהוז.add(i);
+			if(!suffixes[display.value.last()]) {
+				display.add(i);
 			}
 			break;
 		case "equals":
-			if(אבגדהוז.value.length > 0) {
+			if(display.value.length > 0) {
 				try {
-					אבגדהוז.value = eval(אבגדהוז.value.prep("%", "", "/100)", "("));
-				} catch(שתםףץ) {
-					err(שתםףץ);
+					display.value = eval(display.value.prepare("%", "", "/100)", "("));
+				} catch(e) {
+					showError(e.message);
 				}
 			}
 			break;
+		case "backspace":
+			if(arithmetics[display.value.last(3)]) {
+				display.value = display.value.removeEnd(3);
+			} else {
+				display.value = display.value.removeEnd();
+			}
+			break;
 		case "clear":
-			אבגדהוז.clear();
+			display.value = "";
 			break;
 	}
 };
-Array.from(document.getElementsByTagName("td")).forEach(שתםףץ => {
-	if(שתםףץ.className == "ignore")return;
-	שתםףץ.onmousedown = () => {
-		validateInput(שתםףץ.dataset.value, שתםףץ.className);
-		שתםףץ.css("background-color", "gray");
+Array.from(document.getElementsByTagName("td")).forEach(e => {
+	if(e.className == "ignore")return;
+	e.onmousedown = () => {
+		validateInput(e.dataset.value, e.className);
+		e.css("background-color", "gray");
 	}
-	שתםףץ.onmouseup = () => {
-		שתםףץ.css("background-color", "lightgray");
+	e.onmouseup = () => {
+		e.css("background-color", "lightgray");
 	}
-	שתםףץ.onmouseenter = () => {
-		שתםףץ.css("background-color","lightgray");
+	e.onmouseenter = () => {
+		e.css("background-color","lightgray");
 	}
-	שתםףץ.onmouseleave = () => {
-		שתםףץ.css("background-color", "initial");
+	e.onmouseleave = () => {
+		e.css("background-color", "initial");
 	}
 });
-document.addEventListener("keydown",שתםףץ => {
-	if(שתםףץ.which === 8 && canInput) {
-		if(arithmetics[אבגדהוז.value.last(3)]) {
-			אבגדהוז.value = אבגדהוז.value.removeEnd(3);
+document.addEventListener("keydown",e => {
+	if(e.which === 8 && canInput) {
+		if(arithmetics[display.value.last(3)]) {
+			display.value = display.value.removeEnd(3);
 		} else {
-			אבגדהוז.value = אבגדהוז.value.removeEnd();
+			display.value = display.value.removeEnd();
 		}
 	}
 });
-setInterval(function(){
-	אבגדהוז.css("height", אבגדהוז.scrollHeight + "px");
+setInterval(function() {
+	display.css("height", display.scrollHeight + "px");
 });
 		</script>
 	</body>
