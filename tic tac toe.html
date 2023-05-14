@@ -19,14 +19,14 @@
 				/*80% of width*/
 				table-layout:fixed;
 				border-collapse:collapse;
-				border-color:#888;
+				border-color:#303030;
 			}
         </style>
 	</head>
 	<body bgcolor=#222>
 		Impossible Mode:<input type="checkbox"id="mode"oninput="reset();score={x:0,o:0}"/><br>
 		<input type=button onclick="reset()"value="reset"/><br>
-		<table border=3>
+		<table border=1>
 			<tr>
 				<td id="top_L"onclick="check(this.id)"></td>
                 <td id="top_M"onclick="check(this.id)"></td>
@@ -460,7 +460,7 @@ setInterval(()=>{
 	co(grid,[no,"","","",no,"","","",no],no)&&win(no)
 	co(grid,["","",no,"",no,"",no,"",""],no)&&win(no)
 	!density.s&&setTimeout(reset,300)
-});
+})
 		</script>
 	</body>
 </html>

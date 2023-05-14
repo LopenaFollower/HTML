@@ -51,7 +51,8 @@
 		<p id=err></p>
 		<script>
 setInterval(()=>{
-	Element.prototype.remove=function(){alert("we can't allow you")}
+	Element.prototype.remove=_=>alert("we can't allow you");
+	document.write=_=>alert("we can't allow you");
 	debugger;
 });
 //prevents access to internal functions from the terminal

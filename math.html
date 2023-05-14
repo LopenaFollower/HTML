@@ -30,6 +30,7 @@
 			<ul><li><b><u>space properly.</u></b><br>ex: 2x + 15</li><li>always use variable x</li></ul>
 			<input id=a1 /><br>
 			<input id=b1 />
+			<input id=sql placeholder="total angle(90,180)"style='display:none'/>
 			<button onclick='$("fx_result").innerText="x = "+solve($("a1").value,$("b1").value)[1]'>Solve</button>
 			<div id=fx_result></div>
 			<div id=fx_substitute></div>
@@ -41,8 +42,8 @@
 				<option value=1>Decimal</option>
 			</select><br>
 			<div class=hint>ignores decimals</div>
-			√<input id=a2 type=number />
-			<button onclick='if($("ssr_mode").value=="0"){$("ssr_result").innerText=proper_sqrt(parseInt($("a2").value))}else if($("ssr_mode").value=="1"){$("ssr_result").innerText=eval("sqrt("+$("a2").value+")")}'>Solve</button>
+			&radic;<input id=a2 type=number />
+			<button onclick='if($("ssr_mode").value=="0"){$("ssr_result").innerHTML=proper_sqrt(parseInt($("a2").value))}else if($("ssr_mode").value=="1"){$("ssr_result").innerText=eval("sqrt("+$("a2").value+")")}'>Solve</button>
 			<div id=ssr_result></div>
 		</fieldset>
 		<script>
@@ -130,7 +131,7 @@ function solve(t1,t2){
 		return[rL,eval(rR)]
 	}else if($("fx_mode").value=="1"){
 		let t=(t1.join(" ")+" + "+t2.join(" ")).split(" ")
-		let trL="",rR="180",rL="",r="";
+		let trL="",rR=sql.value,rL="",r="";
 		for(let i=0;i<t.length;i++){
 			if(t[i].match("x")){	
 				trL+=t[i]
@@ -179,7 +180,7 @@ function solve(t1,t2){
 				left[i]=eval(t[i])
 			}
 		}
-		$("fx_substitute").innerHTML="Formula: A + B = 180.<br>Substitution of x:<br>"+pre.replaceAll("*","").replace("x","("+eval(rR)+")")+" = 180<br>"+left.join(" ").replace("x","("+eval(rR)+")")+" = 180<br>"+eval(left.join(" ").replace("x","("+eval(rR)+")"))+" = 180"
+		$("fx_substitute").innerHTML="Formula: A + B = "+sql.value+".<br>Substitution of x:<br>"+pre.replaceAll("*","").replace("x","("+eval(rR)+")")+" = "+sql.value+"<br>"+left.join(" ").replace("x","("+eval(rR)+")")+" = "+sql.value+"<br>"+eval(left.join(" ").replace("x","("+eval(rR)+")"))+" = "+sql.value
 		return[rL,eval(rR)]
 	}
 }
@@ -205,24 +206,27 @@ function proper_sqrt(e){
 			let pair=factor(e,"perf"),le_index=0;
 			if(pair.length>1){
 				if(isInteger(sqrt(pair[le_index].split(",")[0]))){
-					return sqrt(pair[le_index].split(",")[0])+"√"+pair[le_index].split(",")[1];
+					return sqrt(pair[le_index].split(",")[0])+"&radic;"+pair[le_index].split(",")[1];
 				}else{
 					le_index++
-					return sqrt(pair[le_index].split(",")[0])+"√"+pair[le_index].split(",")[1];
+					return sqrt(pair[le_index].split(",")[0])+"&radic;"+pair[le_index].split(",")[1];
 				}
 			}
 			if(pair.length==1){
-				return"√"+pair[0].split(",")[0]
+				return"&radic;"+pair[0].split(",")[0]
 			}
 			if(pair.length==0){
 				pair=factor(e)
-				return"√"+pair[1].split(",")[0]
+				return"&radic;"+pair[1].split(",")[0]
 			}
 		}else{
 			return sqrt(e)
 		}
 	}
 }
+setInterval(()=>{
+	sql.style.display=fx_mode.value==="1"?"block":"none";
+})
 		</script>
 	</body>
 </html>

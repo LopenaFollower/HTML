@@ -278,7 +278,7 @@ function next_p(forced){
 	if(forced&&validate_forced(forced)){
 		$("next")[IT]=forced
 	}else if(!$("next")[IT]){
-		$("next")[IT]=[16,64,128,32].random();
+		$("next")[IT]=[64,128,32].random();
 	}
 }
 function combine(row){

@@ -2,6 +2,7 @@
 <html>
 	<head>
 		<title>press e to start</title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
 		<style>
 			tbody{
 				display:flex;
@@ -125,6 +126,7 @@ document.addEventListener("keypress",e=>{
 })
 function ask(lvl){
 	answer=undefined;
+	total_qs++
 	$("fill").set("transition-duration","249ms")
 	$("fill").set("width","100%")
 	if(lvl===0){//basic addition/subtraction
@@ -441,39 +443,29 @@ async function start(){
 	correct_qs=0
 	total_qs=0
 	await ask(0)?correct_qs++:null
-	total_qs++
 	await ask(1)?correct_qs++:null
-	total_qs++
 	await ask(2)?correct_qs++:null
-	total_qs++
 	await ask(2)?correct_qs++:null
-	total_qs++
 	await ask(3)?correct_qs++:null
-	total_qs++
 	await ask(3)?correct_qs++:null
-	total_qs++
 	await ask(4)?correct_qs++:null
-	total_qs++
 	await ask(5)?correct_qs++:null
-	total_qs++
 	await ask(6)?correct_qs++:null
-	total_qs++
 	await ask(7)?correct_qs++:null
-	total_qs++
 	await ask(8)?correct_qs++:null
-	total_qs++
 	await ask(9)?correct_qs++:null
-	total_qs++
 	await ask(8)?correct_qs++:null
-	total_qs++
 	await ask(10)?correct_qs++:null
-	total_qs++
 	await ask(11)?correct_qs++:null
-	total_qs++
+	await ask(10)?correct_qs++:null
+	await ask(11)?correct_qs++:null
+	await ask(10)?correct_qs++:null
+	await ask(11)?correct_qs++:null
+	await ask(11)?correct_qs++:null
 	$("question").innerHTML="You got "+correct_qs+" out of "+total_qs;
 	on_going=false
-	
 }
+start()
 		</script>
 	</body>
 </html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>k</title>
+		<style>
+			
+		</style>
+	</head>
+	<body>
+		<select id=mode>
+			<option value=0>regular</option>
+			<option value=1>Not-terminating</option>
+			<option value=2>Not-terminating repeating</option>
+		</select><br>
+		<div id=sql style='display:none'>only enter first sequence<br>0.34 = 0.343434...<br>0.5 = 0.555...</div>
+		<input id=a />
+		<button onclick='yes(eval(a.value).toString(),mode.value);'>Calc</button>
+		<div id=res></div>
+		<div id=time></div>
+		<div id=cratio></div>
+		<script>
+var start,end,cur="",range=5e3;
+function simplify(f){
+	f=f.toString().replace(" ","")
+	var numerator=parseFloat(f.split("/")[0]),
+		denominator=parseFloat(f.split("/")[1]),
+		gcd=(a,b)=>b?gcd(b,a%b):a,
+		r=gcd(numerator,denominator),
+		nn=numerator/r,
+		nd=denominator/r;
+	if(nd===1)return[nn];
+	return[nn,nd]
+}
+function display(t){
+	end=(Date.now()-start)/1000+"s"
+	res.innerText=t
+}
+function yes(i,m){
+	res.innerText="";
+	start=Date.now()
+	end=""
+	switch(m){
+		case"0":
+			let l=i.length-2
+			let d0=(()=>{r0="1";for(let ñ=0;ñ<l;ñ++){r0+="0"};return parseInt(r0)})()
+			i=i*d0
+			display(simplify(i+"/"+d0).join("/"))
+			break;
+		case"1":
+			let d1=range,n1=0,interval1=
+			setInterval(()=>{
+				let d_Old=d1+50
+				for(d1=0;d1<=d_Old;d1++){
+					cur=n1+"/"+d1
+					if((n1/d1).toString()==i){
+						clearInterval(interval1)
+						return display(simplify(n1+"/"+d1).join("/"))
+					}else if((Date.now()-start)/1000>60){
+						clearInterval(interval1)
+						display("try regular")
+						return alert("timeout "+(Date.now()-start)/1000+"s")
+					}
+				}
+				n1++
+			})
+			break;
+		case"2":
+			let w=parseInt(i)
+			let sequence=i.substring(w.toString().length+1,i.length)
+			for(let ñ=0;ñ<5;ñ++){
+				sequence+=sequence;
+			}
+			i=eval(w+"."+sequence).toString()
+			let d2=range,n2=0,interval2=
+			setInterval(()=>{
+				let d_Old=d2+50
+				for(d2=0;d2<=d_Old;d2++){
+					cur=n2+"/"+d2
+					if((n2/d2).toString()==i){
+						clearInterval(interval2)
+						return display(simplify(n2+"/"+d2).join("/"))
+					}else if((Date.now()-start)/1000>60){
+						clearInterval(interval2)
+						display("try regular")
+						return alert("timeout "+(Date.now()-start)/1000+"s")
+					}
+				}
+				n2++
+			})
+			break;
+	}
+}
+setInterval(()=>{
+	sql.style.display=mode.value==="2"?"block":"none";
+	time.innerText=end
+	cratio.innerText=cur
+})
+		</script>
+	</body>
+</html>

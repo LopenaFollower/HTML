@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>k</title>
+		<style>
+			.frac{
+				display:inline-block;
+				position:relative;
+				vertical-align:middle;
+				letter-spacing:.001em;
+				text-align:center;
+				line-height:18.5px;
+			}
+			#sigma{
+				font-size:30px;
+			}
+			#num,#den{
+				display:block;
+				padding:.1em;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="frac">
+			<span contenteditable id=num>100</span>
+			<span id=sigma>&Sigma;</span>
+			<span contenteditable id=den>0</span>
+		</div>
+		<span contenteditable id=happen>i</span><br><br>
+		<button onclick='it()'>Iterate</button>
+		<script>
+var n=0,l=100;
+const
+{tan}=Math,
+{tanh}=Math,
+{atan}=Math,
+{atan2}=Math,
+{atanh}=Math,
+{cos}=Math,
+{cosh}=Math,
+{acos}=Math,
+{acosh}=Math,
+{sin}=Math,
+{sinh}=Math,
+{asin}=Math,
+{asinh}=Math,
+{sqrt}=Math,
+{pow}=Math,
+{cbrt}=Math,
+{abs}=Math,
+fact=function(a){
+	a=parseInt(eval(a))
+	let r=a;
+	if(a>0){
+		for(let i=a-1;i>0;i--){
+			r*=i
+		}
+	}else if(a<0){
+		for(let i=a+1;i<0;i++){
+			r*=i
+		}
+	}else{
+		return 1
+	}
+	return r
+}
+setInterval(()=>{
+	l=parseInt(num.innerText);
+	n=parseInt(den.innerText);
+})
+function it(){
+	let sum=0;
+	for(var i=parseInt(den.innerText);i<=parseInt(num.innerText);i++){
+		sum+=parseFloat(eval(happen.innerText))
+	}
+	console.log(sum)
+}
+		</script>
+	</body>
+</html>

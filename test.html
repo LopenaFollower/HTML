@@ -75,14 +75,15 @@ if(!ls.getItem("its"))ls.setItem("its",0);
 function it(is=250000){
 	for(let i=0;i<=is;i++){
 		its++
-		let x=Math.random()*2,y=Math.random()*2;
-		if(i%750===0){
+		let x=Math.random()*2-1,
+			y=Math.random()*2-1;
+		if(i%(is/100)===0){
 			ctx.beginPath();
 			ctx.rect(x*scale-1,y*scale-1,2,2);
 			ctx.fillStyle=sqrt(pow(x,2)+pow(y,2))<=1?"#0d0":"rgba(200,0,0,.5)"
 			ctx.fill()
 		}
-		if(sqrt(pow(x,2)+pow(y,2))<=1){
+		if(sqrt(pow(x,2)+pow(y,2))<1){
 			c++
 		}
 	}
@@ -104,7 +105,7 @@ function re(rate){
 		},1e3)
 		ls.setItem("c",c)
 		ls.setItem("its",its)
-		res.innerText=16*(c/its)
+		res.innerText=4*(c/its)
 		numerator.innerText=c.toLocaleString()
 		denominator.innerText=its.toLocaleString()
 	},1e3/rate)

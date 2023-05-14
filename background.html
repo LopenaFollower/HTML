@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>h4ck3r</title>
+		<style>
+			span{
+				transition-timing-function:linear;
+				transition-duration:1s;
+			}
+		</style>
+	</head>
+	<body bgcolor=#000>
+		<script>
+var chars="1234567890qwertyuiopasdfghjklzxcvbnm,.@#$_&-+()/*\"':;!?~`|^={}%[]QWERTYPOIUASDFGHLKJZXCVBMN".split("")
+Array.prototype.rand=function(){
+	return this[Math.floor(Math.random()*this.length)]
+};
+function create(){
+	let a=document.createElement("div");
+	let b=a.style;
+	b.height=window.innerHeight
+	b.width="5px"
+	let d=Math.random()*15+15+"px"
+	let e=setInterval(()=>{
+		let _a=document.createElement("span");
+		_a.innerText=chars.rand()
+		let _b=_a.style
+		let _c=1
+		_b.color="#0f0"
+		_b.fontSize=d
+		a.appendChild(_a);
+		a.appendChild(document.createElement("br"));
+		let _d=setInterval(()=>{
+			_b.opacity=_c
+			_c-=0.1;
+			if(_c<0){
+				clearInterval(_d)
+			}
+		},100)
+		if(a.childElementCount>=45){
+			clearInterval(e)
+			setTimeout(()=>{
+				a.remove()
+			},1e3)
+		}
+	},100+(Math.random()*100));
+	b.position="fixed";
+	b.left=Math.random()*window.innerWidth
+	b.top=0
+	document.body.appendChild(a)
+}
+setInterval(()=>{
+	create()
+},1)
+		</script>
+	</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>DVD</title>
+		<style>
+			*{
+				color:#fff;
+				background-color:#0e0e0e;
+			}
+		</style>
+	</head>
+	<body>
+		<script>
+function ends(s){
+	return[s[0],s[s.length-1]]
+}
+function shuffle(s){
+	if(s.length<4)return s;
+	let pre1=((str)=>{let _=str.split(""),m=_.length,t,i;while(m){i=Math.floor(Math.random()*m--);t=_[m];_[m]=_[i];_[i]=t;}return _})(s.substring(1,s.length-1)),
+		pre2=ends(s);
+	return(pre2[0]+pre1.join("")+pre2[1])
+}
+function display(t,suffix=""){
+	var p=document.createElement("span")
+	let ss=t
+	let res=[]
+	for(let x=0;x<ss.split(" ").length;x++){
+		res[res.length]=shuffle(ss.split(" ")[x])
+	}
+	p.innerText=res.join(" ")+suffix
+	document.body.appendChild(p)
+}
+display("if you can read this then your brain has a special ability","\n")
+display("According to a researcher at Cambridge University",", ")
+display("it doesnt matter in what order the letters in a word are",", ")
+display("the only important thing is that the first and last letter is at the right place","." )
+display("The rest can be a total mess and you can still read it without problem",". ")
+display("This is because the human mind does not read every letter by itself but the word as a whole",".\n")
+		</script>it is called "typoglycemia"
+	</body>
+</html>

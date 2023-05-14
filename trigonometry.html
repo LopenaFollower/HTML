@@ -120,7 +120,8 @@ const
 {pow}=Math,
 {cbrt}=Math,
 {abs}=Math
-Math.fact=function(a){
+const fact=function(a){
+	a=parseInt(eval(a))
 	let r=a;
 	if(a>0){
 		for(let i=a-1;i>0;i--){
@@ -135,24 +136,11 @@ Math.fact=function(a){
 	}
 	return r
 }
-const{fact}=Math
 function add(e,t,r=""){
-	switch(t){
-		case"num":
-			r=e;
-			break;
-		case"function":
-			r=e+"(";
-			break;
-		case"op":
-			r=e;
-			break;
-		case"reg":
-			r=e;
-			break;
-		case"variable":
-			r=e;
-			break;
+	if(t=="num"||t=="op"||t=="reg"||t=="variable"){
+		r=e;
+	}else if(t=="function"){
+		r=e+"(";
 	}
 	if(focused){
 		equation.focus()
