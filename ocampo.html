@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>canvas test</title>
+		<style>
+			
+		</style>
+	</head>
+	<body>
+		<input id=inp oninput='getDensity(this.value)'/>
+		<canvas id=canvas width=350 height=10000></canvas>
+		<script>
+let ctx=canvas.getContext("2d");
+var items={};
+function getDensity(str){
+	let len=str.length
+	items={}
+	let diameter=Math.max(canvas.width,canvas.height)
+	ctx.clearRect(0,0,diameter,diameter);
+	str.split("").forEach(e=>{
+		if(!items[e]){
+			items[e]=[1,"#"+Math.floor(Math.random()*256).toString(16)+Math.floor(Math.random()*256).toString(16)+Math.floor(Math.random()*256).toString(16)]
+		}else{
+			items[e][0]+=1
+		}
+	})
+	let total=Object.keys(items).reduce((s,k)=>s+parseFloat(items[k]||0),0);
+	let dist=25
+	let x=0;
+	let ca=0;
+	Object.keys(items).forEach(e=>{
+		items[e][2]=x*dist;
+		x++
+		let pa=(items[e][0]/total)*2*Math.PI;
+		ctx.beginPath();
+		ctx.arc(100,100,100,ca,ca+pa);
+		ca+=pa;
+		ctx.lineTo(100,100);
+		ctx.rect(220,items[e][2],dist/2,dist/2);
+		ctx.fillStyle="#000";
+		ctx.fill();
+		ctx.font="15px monospace";
+		ctx.fillText(e+" "+items[e][0]+"("+Math.round(items[e][0]/total*10000)/100+")%",235,items[e][2]+(25/2));
+		ctx.fillStyle=items[e][1];
+		ctx.fill();
+	})
+}
+		</script>
+	</body>
+</html>

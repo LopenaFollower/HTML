@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>unicodes -65520 to 65535</title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+		</style>
+	</head>
+	<body>
+		<canvas id=canvas width=300 height=1></canvas>
+		<script>
+var unicodes=[],
+	canvas=document.getElementById("canvas"),
+	ctx=canvas.getContext("2d");
+for(let i=-65520;i<65535;i++){
+	unicodes[unicodes.length]=String.fromCharCode(i)
+}
+setTimeout((fontsize=15,spacing=30,per=40)=>{
+	canvas.height=(unicodes.length-1)/per*fontsize+20
+	canvas.width=spacing*per
+	ctx.clearRect(0,0,canvas.height,canvas.width);
+	ctx.font=fontsize+"px monospace";
+	let y=0
+	let x=0;
+	unicodes.forEach(e=>{
+		if(x<per){
+			ctx.fillText(e,x*spacing,20+(y*fontsize))
+			x++
+		}else{
+			x=0
+			y++
+			ctx.fillText(e,0,20+(y*fontsize))
+			x++
+		}
+	});
+	ctx.fillStyle="#000"
+	ctx.fill()
+},2000);
+		</script>
+	</body>
+</html>

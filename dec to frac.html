@@ -39,6 +39,9 @@ function yes(i,m){
 	res.innerText="";
 	start=Date.now()
 	end=""
+	if(Number.isInteger(parseFloat(i))){
+		return display(i)
+	}
 	switch(m){
 		case"0":
 			let l=i.length-2

@@ -19,9 +19,9 @@
 	</head>
 	<body>
 		<input type=number id=decimals placeholder='# of decimals'oninput='display(Math.ceil(this.value))'/>
-		<button onclick='display(Math.ceil(decimals.value))'>Calc</button><br>
+		<button onclick='save()'>download</button><div id=len></div><br>
 		<div class=von>
-			automatic<input type=checkbox oninput='if(this.checked){pi=main();pi.next();res.innerText="3.";di=setInterval(()=>{d="";for(let i=0;i<10;i++){d+=pi.next().value};d+=" ";res.insertAdjacentHTML("beforeend",d)})}else{clearInterval(di);di=null}'/><br><
+			automatic<input type=checkbox oninput='if(this.checked){pi=main();pi.next();api="3.";di=setInterval(()=>{d="";for(let i=0;i<50;i++){d+=pi.next().value};api+=d})}else{clearInterval(di);di=null}'/><br>
 			scroll<input type=checkbox onfocus='setInterval(()=>{if(this.checked){if(di!=null){window.scrollBy(0,50)}}})'/>
 			<button onclick='let si=setInterval(()=>{if(di==null){window.scrollBy(0,-500)}});setTimeout(()=>{clearInterval(si)},750);'>Back up</button>
 		</div>
@@ -31,7 +31,7 @@
 calculated using the Spigot Algorithms
 http://www.cs.ox.ac.uk/jeremy.gibbons/publications/spigot.pdf
 */
-var pi,di;
+var pi,di,api="";
 function*main(){
 	let q=1n;
 	let r=180n;
@@ -49,7 +49,8 @@ function*main(){
 }
 function display(l){
 	pi=main();pi.next();
-	res.innerText="3."
+	//res.innerText="3."
+	api="3.1"
 	if(l>=10000){
 		let i=0,it=setInterval(()=>{
 			if(i>=l)return clearInterval(it);
@@ -62,6 +63,18 @@ function display(l){
 		}
 	}
 }
+function save() {
+	let data = api.replaceAll(" ","")
+	let link = document.createElement("a");
+	let file = new Blob([data],{ type: 'text/plain' });
+	link.href = URL.createObjectURL(file);
+	link.download = "file name.txt";
+	link.click();
+	URL.revokeObjectURL(link.href);
+}
+setInterval(()=>{
+	//len.innerText=api.length
+},100)
 		</script>
 	</body>
 </html>

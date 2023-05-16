@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>string encrypt</title>
+		<title>decompiler V2</title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
 		<style>
 			#actual,#display{
 				font-family:monospace;
@@ -11,24 +12,23 @@
 				top:0;
 				left:0;
 				position:fixed;
-				border-style:1px;
 			}
 			#actual{
 				resize:none;
 				height:80%;
 				color:rgba(0,0,0,0);
 				caret-color:black;
-				opacity:.3;
-			}
-			button{
-				position:fixed;
-				top:80%;
+				opacity:.2;
 			}
 			#display{
 				margin-top:2px;
 				margin-left:2px;
 				z-index:-1;
 				font-weight:900;
+			}
+			button{
+				position:fixed;
+				top:80%;
 			}
 			.str{
 				color:brown;
@@ -48,7 +48,6 @@
 		<textarea id=actual>alert("Hello world")</textarea>
 		<div id=display></div>
 		<button onclick="try{eval(display.innerText)}catch(e){console.log(e.stack)}">Run</button>
-		<p id=err></p>
 		<script>
 setInterval(()=>{
 	Element.prototype.remove=_=>alert("we can't allow you");
