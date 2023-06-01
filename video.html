@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>vid</title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+			*{
+				margin:0;
+			}
+			body{
+				color:#000;
+				background-color:#fff;
+			}
+			input{
+				font-size:18px;
+			}
+			pre{
+				font-family:"Courier New","monospace";
+				margin:1rem auto;
+				font-size:2px;
+				font-weight:900;
+				line-height:1;
+			}
+			video,canvas{
+				opacity:1;
+				z-index:-1;
+				
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="canvas"style="opacity:0;position:fixed;"></canvas>
+		<input type=file id=in /><br>
+		<input value=50 oninput="!isNaN(this.value)&&this.value>0&&setMax(parseInt(this.value).toFixed())"placeholder="display size"/><br>
+		<video width=200 height=200 id="video"src=""type="video/mp4"controls autoplay></video>
+		<center>
+			<pre id=out></pre>
+		</center>
+		<script>
+var canvas=document.getElementById("canvas"),
+	ctx=canvas.getContext("2d"),
+	video=document.querySelector("video"),
+	output=document.getElementById("out"),
+	input=document.getElementById("in"),
+	chars="$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/|()1{}[]?-_+~<>i!lI;:,\"^`'. ",
+	max=50;
+
+function setMax(v){return max=v}
+function capture(){
+	let[width,height]=resize(video.videoWidth,video.videoHeight)
+	canvas.width=width;
+	canvas.height=height;
+	ctx.drawImage(video,0,0,width,height);
+	try{
+		let data=ctx.getImageData(0,0,width,height),
+			gss=[];
+		for(let i=0;i<data.data.length;i+=4){
+			let gs=(data.data[i]+data.data[i+1]+data.data[i+2])/3;
+			data.data[i]=data.data[i+1]=data.data[i+2]=gs;
+			gss.push(gs);
+		}
+		ctx.putImageData(data,0,0);
+		output.textContent=gss.reduce((a,g,i)=>{
+			let c=chars[Math.ceil((chars.length-1)*g/255)];
+			if((i+1)%width===0){
+				c+="\n";
+			}
+			return a+c;
+		},"");
+	}catch(e){}
+}
+function resize(w,h){
+	let nw=Math.floor(fr*w);
+	if(h>max){
+		return[Math.floor(nw*max/h),max];
+	}
+	if(w>max){
+		return[max,Math.floor(h*max/nw)];
+	}
+	return[nw,h];
+};
+let fr=(()=>{
+	let pr=document.createElement("pre");
+	pr.style.display="inline";
+	pr.textContent=" ";
+	document.body.appendChild(pr);
+	let{width,height}=pr.getBoundingClientRect();
+	document.body.removeChild(pr);
+	return height/width;
+})()
+input.onchange=e=>{
+	video.load()
+	video.src=URL.createObjectURL(e.target.files[0])
+}
+setInterval(capture,1000/24)
+		</script>
+	</body>
+</html>

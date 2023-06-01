@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+			textarea{
+				background-color:#ddd;
+				font-family:monospace;
+				border:2px solid #000;
+				word-wrap:break-word;
+				border-radius:5px;
+				color:#040404;
+			}
+		</style>
+	</head>
+	<body>
+		encrypt<input type=checkbox id=s checked/><br><br>
+		<textarea id=input oninput="start(this.value)"></textarea><br><br>
+		<textarea id=output readonly></textarea>
+		<script>
+const[offset,binarySeparator]=[(Math.random()*1.3e5).toFixed()-6e4,String.fromCharCode(8294)],
+	[start,obf_1,deob_1,obf_2,deob_2,obf_3,deob_3]=[
+	str=>{
+		output.value=str.length?(e=>{
+			try{
+				return e?obf_3(obf_2(obf_1(btoa(str)))):atob(deob_1(deob_2(deob_3(str))));
+			}catch(r){
+				s.checked=false;
+				return atob(deob_1(deob_2(deob_3(str))));
+			}
+		})(s.checked):"";
+	},
+	str=>{
+		let out="",i;
+		for(i=0;i<str.length;i++){
+			out+=String.fromCharCode(str.charCodeAt(i)+offset);
+		}
+		return out;
+	},
+	str=>{
+		let out="",i;
+		for(i=0;i<str.length;i++){
+			out+=String.fromCharCode(str.charCodeAt(i)-offset);
+		}
+		return out;
+	},
+	str=>{
+		let[t,out,i]=[str.split(""),""];
+		for(i=0;i<str.length;i++){
+			out+=t[i%2==0?"pop":"shift"]();
+		}
+		return out;
+	},
+	str=>{
+		let out=["",""],i;
+		for(i=0;i<=str.length;i++){
+			i%2==0?out[1]=str.charAt(i)+out[1]:out[0]+=str.charAt(i);
+		}
+		return out.join("");
+	},
+	str=>{
+		let out="",i;
+		for(i=0;i<str.length;i++){
+			out+=str[i].charCodeAt(0).toString(2)+(i<str.length-1?binarySeparator:"");
+		}
+		return out;
+	},
+	str=>String.fromCharCode(...str.split(binarySeparator).map(n=>parseInt(n,2)))
+]
+setInterval(()=>[input.style.width,output.style.width,input.style.height,output.style.height]=["99%","99%",input.scrollHeight-.3+"px",output.scrollHeight-.3+"px"]);
+		</script>
+	</body>
+</html>

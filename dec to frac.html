@@ -19,7 +19,7 @@
 		<div id=time></div>
 		<div id=cratio></div>
 		<script>
-var start,end,cur="",range=5e3;
+var start,end,cur="",range=5e4;
 function simplify(f){
 	f=f.toString().replace(" ","")
 	var numerator=parseFloat(f.split("/")[0]),
@@ -50,7 +50,7 @@ function yes(i,m){
 			display(simplify(i+"/"+d0).join("/"))
 			break;
 		case"1":
-			let d1=range,n1=0,interval1=
+			let d1=range,n1=0,interval=
 			setInterval(()=>{
 				let d_Old=d1+50
 				for(d1=0;d1<=d_Old;d1++){

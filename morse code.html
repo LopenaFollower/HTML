@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+		</style>
+	</head>
+	<body>
+		<input oninput='toMorse(this.value.toLowerCase())'/>
+		<pre id=d></pre>
+		<pre id=e></pre>
+		<script>
+const list={
+	a:".-",
+	b:"-...",
+	c:"-.-.",
+	d:"-..",
+	e:".",
+	f:"..-.",
+	g:"--.",
+	h:"....",
+	i:"..",
+	j:".---",
+	k:"-.-",
+	l:".-..",
+	m:"--",
+	n:"-.",
+	o:"---",
+	p:".--.",
+	q:"--.-",
+	r:".-.",
+	s:"...",
+	t:"-",
+	u:"..-",
+	v:"...-",
+	w:".--",
+	x:"-..-",
+	y:"-.--",
+	z:"--.."
+};
+const reverseList=Object.fromEntries(Object.entries(list).map(([k,v])=>[v,k]))
+function toMorse(str){
+	str=str.split("");
+	let r1="";
+	let r2="";
+	for(let i=0;i<str.length;i++){
+		if(list[str[i]]){
+			r1+=list[str[i]]+" ";
+		}else if(str[i]===" "){
+			r1+=" / ";
+		}else{
+			r1+=str[i]+" ";
+		}
+	}
+	r1=r1.trim();
+	d.textContent=r1
+	str=r1.split("");
+}
+		</script>
+	</body>
+</html>
