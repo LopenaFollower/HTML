@@ -12,61 +12,113 @@
 				border-radius:5px;
 				color:#040404;
 			}
+			td{
+				border-style:dashed
+			}
 		</style>
 	</head>
 	<body>
-		encrypt<input type=checkbox id=s checked/><br><br>
-		<textarea id=input oninput="start(this.value)"></textarea><br><br>
+		<table>
+			<tr>
+				<td id=m0>
+					encrypt
+				</td>
+				<td>
+					<input type=checkbox oninput="start(input.value)"id=s checked/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Method 1
+				</td>
+				<td>
+					<input type=checkbox oninput="start(input.value)"id=m1 checked/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Method 2
+				</td>
+				<td>
+					<input type=checkbox oninput="start(input.value)"id=m2 checked/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Method 3
+				</td>
+				<td>
+					<input type=checkbox oninput="start(input.value)"id=m3 checked/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Method 4
+				</td>
+				<td>
+					<input type=checkbox oninput="start(input.value)"id=m4 checked/>
+				</td>
+			</tr>
+		</table>
+		<br>
+		<textarea id=input oninput="start(input.value)"></textarea><br><br>
 		<textarea id=output readonly></textarea>
 		<script>
 const[offset,binarySeparator]=[(Math.random()*1.3e5).toFixed()-6e4,String.fromCharCode(8294)],
-	[start,obf_1,deob_1,obf_2,deob_2,obf_3,deob_3]=[
+	[start,obf_1,deob_1,obf_2,deob_2,obf_3,deob_3,obf_4,deob_4]=[
 	str=>{
 		output.value=str.length?(e=>{
 			try{
-				return e?obf_3(obf_2(obf_1(btoa(str)))):atob(deob_1(deob_2(deob_3(str))));
+				return e?obf_4(obf_3(obf_2(obf_1(str)))):deob_1(deob_2(deob_3(deob_4(str))));
 			}catch(r){
 				s.checked=false;
-				return atob(deob_1(deob_2(deob_3(str))));
+				return deob_1(deob_2(deob_3(deob_4(str))));
 			}
 		})(s.checked):"";
+		m0.innerText=s.checked?"encrypt":"decrypt";
+	},
+	str=>{
+		return m1.checked?btoa(str):str
+	},
+	str=>{
+		return m1.checked?atob(str):str
 	},
 	str=>{
 		let out="",i;
 		for(i=0;i<str.length;i++){
 			out+=String.fromCharCode(str.charCodeAt(i)+offset);
 		}
-		return out;
+		return m2.checked?out:str;
 	},
 	str=>{
 		let out="",i;
 		for(i=0;i<str.length;i++){
 			out+=String.fromCharCode(str.charCodeAt(i)-offset);
 		}
-		return out;
+		return m2.checked?out:str;
 	},
 	str=>{
 		let[t,out,i]=[str.split(""),""];
 		for(i=0;i<str.length;i++){
 			out+=t[i%2==0?"pop":"shift"]();
 		}
-		return out;
+		return m3.checked?out:str;
 	},
 	str=>{
 		let out=["",""],i;
 		for(i=0;i<=str.length;i++){
 			i%2==0?out[1]=str.charAt(i)+out[1]:out[0]+=str.charAt(i);
 		}
-		return out.join("");
+		return m3.checked?out.join(""):str;
 	},
 	str=>{
 		let out="",i;
 		for(i=0;i<str.length;i++){
 			out+=str[i].charCodeAt(0).toString(2)+(i<str.length-1?binarySeparator:"");
 		}
-		return out;
+		return m4.checked?out:str;
 	},
-	str=>String.fromCharCode(...str.split(binarySeparator).map(n=>parseInt(n,2)))
+	str=>m4.checked?String.fromCharCode(...str.split(binarySeparator).map(n=>parseInt(n,2))):str
 ]
 setInterval(()=>[input.style.width,output.style.width,input.style.height,output.style.height]=["99%","99%",input.scrollHeight-.3+"px",output.scrollHeight-.3+"px"]);
 		</script>

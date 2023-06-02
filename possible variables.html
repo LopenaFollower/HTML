@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+			#display{
+				font-family:monospace;
+			}
+		</style>
+	</head>
+	<body>
+		<div id=explained>how it works:<br>a symbol will be evaluated to become a variable, if it doesnt throw an error then it is a valid variable, else it will be discarded</div><br>
+		<div id=explained>example:<br>var #; // this is an error, will be discarded<br>var a; // this is a valid variable, will be logged below</div><br>
+		<div id=display></div>
+		<script>
+function save(t){
+	let link=document.createElement("a"),
+		file=new Blob([t],{type:"text/plain"});
+	link.href=URL.createObjectURL(file)
+	link.download="variables.txt"
+	link.click();
+	URL.revokeObjectURL(link.href);
+}
+let contents="";
+let index=-65535,
+	interval=
+setInterval(()=>{
+	let symbol=String.fromCharCode(index)
+	if((function(){try{eval("var "+symbol);return true}catch(e){return false}})()){
+		//display.insertAdjacentHTML("beforeend","var "+symbol+";&nbsp;&nbsp;&nbsp;//&nbsp;&nbsp;&nbsp;charCode: "+index+"<br>");
+		contents+="var "+symbol+";\n";
+	}
+	if(index==65536){
+		clearInterval(interval)
+		alert("finished "+String.fromCharCode(55358)+String.fromCharCode(56623))
+		save(contents)
+	}
+	index++
+});
+		</script>
+	</body>
+</html>
