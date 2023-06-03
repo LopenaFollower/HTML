@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+		</style>
+	</head>
+	<body>
+		<canvas id=maze></canvas>
+		<script>
+var map=[],
+	canvas=document.querySelector("canvas"),
+	color={wall:"#222a33",path:"#fff"},
+	blockSize=7,
+	wall=3,
+	ctx=canvas.getContext("2d"),
+	off=blockSize/2+wall,
+	height=84,
+	width=44,
+	head=[0,0];
+function init(){
+	head=[0,0];
+	[canvas.width,canvas.height,ctx.fillStyle]=[wall*2+width*(blockSize+wall)-wall,wall*2+height*(blockSize+wall)-wall,color.wall];
+	ctx.fillRect(0,0,canvas.width,canvas.height);
+	[ctx.strokeStyle,ctx.lineCap,ctx.lineWidth]=[color.path,"square",blockSize];
+	ctx.beginPath();
+	for(let i=0;i<height*2;i++){map[i]=[];for(let j=0;j<width*2;j++)map[i][j]=![]};
+	map[head[1]*2][head[0]*2]=true,route=[head];
+	ctx.moveTo(head[0]*(blockSize+wall)+off,head[1]*(blockSize+wall)+off);
+	ctx.fillStyle="#fff";
+	Math.round(Math.random())?ctx.fillRect(0,wall,wall,blockSize):ctx.fillRect(wall,0,blockSize,wall);Math.round(Math.random())?ctx.fillRect((blockSize+wall)*(width-1)+wall,(blockSize+wall)*height,blockSize,wall):ctx.fillRect((blockSize+wall)*width,(blockSize+wall)*(height-1)+wall,wall,blockSize);
+}
+init();
+function loop(){
+	head=[route[route.length-1][0]|0,route[route.length-1][1]|0];
+	let dirs=[[1,0],[-1,0],[0,1],[0,-1]],adir=[];
+	for(let i=0;i<dirs.length;i++){
+		map[(dirs[i][1]+head[1])*2]!=undefined&&map[(dirs[i][1]+head[1])*2][(dirs[i][0]+head[0])*2]===false&&adir.push(dirs[i]);
+	}
+	if(adir.length===0){
+		route.pop()&&route.length>0&&(ctx.moveTo(route[route.length-1][0]*(blockSize+wall)+off,route[route.length-1][1]*(blockSize+wall)+off),setTimeout(loop));
+	}else{
+		dir=adir[Math.random()*adir.length|0];
+		route.push([dir[0]+head[0],dir[1]+head[1]]);
+		ctx.lineTo((dir[0]+head[0])*(blockSize+wall)+off,(dir[1]+head[1])*(blockSize+wall)+off);
+		map[(dir[1]+head[1])*2][(dir[0]+head[0])*2]=true;
+		map[dir[1]+head[1]*2][dir[0]+head[0]*2]=true;
+		ctx.stroke();
+		setTimeout(loop);
+	}
+}
+loop();
+		</script>
+	</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+			*{
+				color:#ddd;
+				user-select:none;
+				background-color:#222a33;
+				width:max-content;
+			}
+		</style>
+	</head>
+	<body>
+		valids: <span id=valid>0</span><br>
+		total: <span id=tot>0</span>
+		<div id=entries></div>
+		<script>
+((valids,total,logs)=>{
+	function gen(){
+		let xhr=new XMLHttpRequest();
+		let url="https://discordapp.com/api/v6/entitlements/gift-codes/"+((r)=>{for(let i=0;i<16;i++)r+="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[Math.floor(Math.random()*62)];return r})("");
+		xhr.onreadystatechange=function(){
+			if(this.readyState==4){
+				let r=this.responseText;
+				total++;
+				let rcd=1.1e4
+				if(r.match("Unknown")){
+					logs="\n"+r+logs;
+					setTimeout(()=>{
+						gen();
+					},rcd);
+				}else if(r.match("application_id")){
+					console.log(url);
+					valids++;
+					setTimeout(gen,rcd);
+				}else if(r.match("limited")){
+					total--;
+					logs="\n"+r+logs;
+					setTimeout(gen,JSON.parse(r).retry_after*1e3);
+				}
+			}
+		}
+		xhr.open("GET",url,true);
+		xhr.setRequestHeader("Content-type","application/json");
+		xhr.send();
+	}
+	setInterval(()=>{
+		valid.textContent=valids;
+		tot.textContent=total;
+		entries.innerText=logs.substr(0,1e4);
+	})
+	gen();
+})(0,0,"");
+		</script>
+	</body>
+</html>

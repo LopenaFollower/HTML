@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+		</style>
+	</head>
+	<body>
+		<input type="file"onchange="readImage(this)"/>
+		<canvas id="canvas"></canvas>
+		<script>
+function readImage(input){
+	let context = canvas.getContext("2d");
+	context.clearRect(0,0,canvas.width,canvas.height);
+	let img=new Image();
+	img.onload=function(){
+		canvas.width=img.width
+		canvas.height=img.height
+		context.drawImage(img,0,0);
+		console.log(canvas.toDataURL())
+		canvas.width=1
+		canvas.height=1
+		context.clearRect(0,0,canvas.width,canvas.height);
+	}
+	if(input.value!=="")img.src=window.URL.createObjectURL(input.files[0]);
+}
+		</script>
+	</body>
+</html>
