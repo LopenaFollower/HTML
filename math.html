@@ -107,23 +107,23 @@ function solve(t1,t2){
 		let right=t2;
 		for(let i=0;i<t1.length;i++){
 			if(t1[i].match("x")){
-				left[i]=t1[i].replace(/[0-9]x/,t1[i].match(/[0-9]/)+"*("+eval(rR)+")")
+				left[i]=t1[i].replace(/\d+x/,t1[i].match(/\d+/)+"*("+eval(rR)+")")
 			}
 		}
 		for(let i=0;i<t2.length;i++){
 			if(t2[i].match("x")){
-				right[i]=t2[i].replace(/[0-9]x/,t2[i].match(/[0-9]/)+"*("+eval(rR)+")")
+				right[i]=t2[i].replace(/\d+x/,t2[i].match(/\d+/)+"*("+eval(rR)+")")
 			}
 		}
 		let pre_l=left.join(" ");
 		let pre_r=right.join(" ");
 		for(let i=0;i<t1.length;i++){
-			if(t1[i].match(/[0-9]/)){
+			if(t1[i].match(/\d+/)){
 				left[i]=eval(t1[i])
 			}
 		}
 		for(let i=0;i<t2.length;i++){
-			if(t2[i].match(/[0-9]/)){
+			if(t2[i].match(/\d+/)){
 				right[i]=eval(t2[i])
 			}
 		}
@@ -171,12 +171,12 @@ function solve(t1,t2){
 		let left=t;
 		for(let i=0;i<t.length;i++){
 			if(t[i].match("x")){
-				left[i]=t[i].replace(/[0-9]x/,t[i].match(/[0-9]/)+"*("+eval(rR)+")")
+				left[i]=t[i].replace(/\d+x/,t[i].match(/\d+/)+"*("+eval(rR)+")")
 			}
 		}
 		let pre=left.join(" ");
 		for(let i=0;i<t.length;i++){
-			if(t[i].match(/[0-9]/)){
+			if(t[i].match(/\d+/)){
 				left[i]=eval(t[i])
 			}
 		}
@@ -199,8 +199,10 @@ function factor(n,m){
 	return res
 }
 function proper_sqrt(e){
-	if(e>0&&0>e){
+	if(!e){
 		return"0"
+	}else if(0>e){
+		return NaN
 	}else{
 		if(!isInteger(sqrt(e))){
 			let pair=factor(e,"perf"),le_index=0;

@@ -112,24 +112,7 @@
 		</div>
 		<script>
 //variables
-const rgb={
-	step:1,
-	r:255,
-	g:0,
-	b:0,
-	rg:false,
-	gg:true,
-	bg:false,
-	rl:false,
-	gl:false,
-	bl:false,
-	fetch:function(f){
-		if(!f)return"rgb("+this.r+","+this.g+","+this.b+")";
-		if(f.length==3){
-			return"rgb("+this[f[0]]+","+this[f[1]]+","+this[f[2]]+")";
-		}
-	}
-},
+const rgb=((r)=>{r={s:5,r:255,g:0,b:0,rg:![],gg:true,bg:![],rl:![],gl:![],bl:![],fetch:function(f="rgb"){return f.length==3?"rgb("+this[f[0]]+","+this[f[1]]+","+this[f[2]]+")":"rgb("+this.r+","+this.g+","+this.b+")"}};setInterval((m=0xff,f=![],t=[])=>{r.r>m&&(r.rg=f,r.r=m);r.g>m&&(r.gg=f,r.g=m);r.b>m&&(r.bg=f,r.b=m);r.r<0&&(r.rl=f,r.r=0);r.g<0&&(r.gl=f,r.g=0);r.b<0&&(r.bl=f,r.b=0);r.r==m&&r.g==0&&r.b==0&&(r.gg=t);r.r==m&&r.g==m&&r.b==0&&(r.rl=t);r.r==0&&r.g==m&&r.b==0&&(r.bg=t);r.r==0&&r.g==m&&r.b==m&&(r.gl=t);r.r==0&&r.g==0&&r.b==m&&(r.rg=t);r.r==m&&r.g==0&&r.b==m&&(r.bl=t);r.rg&&(r.r+=r.s);r.gg&&(r.g+=r.s);r.bg&&(r.b+=r.s);r.rl&&(r.r-=r.s);r.gl&&(r.g-=r.s);r.bl&&(r.b-=r.s)});return r})(),
 	{floor}=Math,
 	{abs}=Math,
 	rand=Math.random,
@@ -898,25 +881,7 @@ Element.prototype.bigInt=function(n){
 	score+=this[IT]/4*n
 }
 //repeating
-setInterval((f=0xff)=>{
-	rgb.r>f&&(rgb.rg=false,rgb.r=f)
-	rgb.g>f&&(rgb.gg=false,rgb.g=f)
-	rgb.b>f&&(rgb.bg=false,rgb.b=f)
-	rgb.r<0&&(rgb.rl=false,rgb.r=0)
-	rgb.g<0&&(rgb.gl=false,rgb.g=0)
-	rgb.b<0&&(rgb.bl=false,rgb.b=0)
-	rgb.r==f&&rgb.g==0&&rgb.b==0&&(rgb.gg=true)
-	rgb.r==f&&rgb.g==f&&rgb.b==0&&(rgb.rl=true)
-	rgb.r==0&&rgb.g==f&&rgb.b==0&&(rgb.bg=true)
-	rgb.r==0&&rgb.g==f&&rgb.b==f&&(rgb.gl=true)
-	rgb.r==0&&rgb.g==0&&rgb.b==f&&(rgb.rg=true)
-	rgb.r==f&&rgb.g==0&&rgb.b==f&&(rgb.bl=true)
-	rgb.rg&&(rgb.r+=rgb.step)
-	rgb.gg&&(rgb.g+=rgb.step)
-	rgb.bg&&(rgb.b+=rgb.step)
-	rgb.rl&&(rgb.r-=rgb.step)
-	rgb.gl&&(rgb.g-=rgb.step)
-	rgb.bl&&(rgb.b-=rgb.step)
+setInterval(()=>{
 	scheme["4503599627370496"]=rgb.fetch("rrr")
 	scheme["9007199254740992"]=rgb.fetch("ggg")
 	scheme["18014398509481984"]=rgb.fetch("bbb")
@@ -948,8 +913,6 @@ setInterval((f=0xff)=>{
 			((cbg[0]*0.299+cbg[1]*0.587+cbg[2]*0.114)>contrast)?($(e).style["color"]="#000"):($(e).style["color"]="#fff")
 		});
 	}
-});
-setInterval(()=>{
 	$("next").style[BGC]=scheme[$("next")[IT]]
 	let cbg=$("next").style[BGC].split("(")[1].split(")")[0].split(", ");
 	$("next").style["color"]=((cbg[0]*0.299+cbg[1]*0.587+cbg[2]*0.114)>contrast)?"#000":"#fff"

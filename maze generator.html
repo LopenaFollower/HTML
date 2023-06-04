@@ -7,50 +7,128 @@
 		</style>
 	</head>
 	<body>
-		<canvas id=maze></canvas>
+		<canvas id=maze></canvas><br><br>
+		<table>
+			<tr>
+				<td><button onclick="restart()">restart</button></td>
+			</tr>
+		</table>
+		
 		<script>
-var map=[],
-	canvas=document.querySelector("canvas"),
-	color={wall:"#222a33",path:"#fff"},
-	blockSize=7,
-	wall=3,
-	ctx=canvas.getContext("2d"),
-	off=blockSize/2+wall,
-	height=84,
-	width=44,
-	head=[0,0];
-function init(){
-	head=[0,0];
-	[canvas.width,canvas.height,ctx.fillStyle]=[wall*2+width*(blockSize+wall)-wall,wall*2+height*(blockSize+wall)-wall,color.wall];
-	ctx.fillRect(0,0,canvas.width,canvas.height);
-	[ctx.strokeStyle,ctx.lineCap,ctx.lineWidth]=[color.path,"square",blockSize];
-	ctx.beginPath();
-	for(let i=0;i<height*2;i++){map[i]=[];for(let j=0;j<width*2;j++)map[i][j]=![]};
-	map[head[1]*2][head[0]*2]=true,route=[head];
-	ctx.moveTo(head[0]*(blockSize+wall)+off,head[1]*(blockSize+wall)+off);
-	ctx.fillStyle="#fff";
-	Math.round(Math.random())?ctx.fillRect(0,wall,wall,blockSize):ctx.fillRect(wall,0,blockSize,wall);Math.round(Math.random())?ctx.fillRect((blockSize+wall)*(width-1)+wall,(blockSize+wall)*height,blockSize,wall):ctx.fillRect((blockSize+wall)*width,(blockSize+wall)*(height-1)+wall,wall,blockSize);
-}
-init();
-function loop(){
-	head=[route[route.length-1][0]|0,route[route.length-1][1]|0];
-	let dirs=[[1,0],[-1,0],[0,1],[0,-1]],adir=[];
-	for(let i=0;i<dirs.length;i++){
-		map[(dirs[i][1]+head[1])*2]!=undefined&&map[(dirs[i][1]+head[1])*2][(dirs[i][0]+head[0])*2]===false&&adir.push(dirs[i]);
+var{restart,settings}=(function(){
+	let map=[],
+		canvas=document.querySelector("canvas"),
+		color={wall:"#222a33",path:"#fff"},
+		pathSize=3,
+		wallSize=1,
+		ctx=canvas.getContext("2d"),
+		off=pathSize/2+wallSize,
+		height=136,
+		width=74,
+		head=[0,0],
+		loopTimeout;
+	function init(){
+		clearTimeout(loopTimeout);
+		head=[0,0];
+		[canvas.width,canvas.height,ctx.fillStyle]=[wallSize*2+width*(pathSize+wallSize)-wallSize,wallSize*2+height*(pathSize+wallSize)-wallSize,color.wall];
+		ctx.fillRect(0,0,canvas.width,canvas.height);
+		[ctx.strokeStyle,ctx.lineCap,ctx.lineWidth]=[color.path,"square",pathSize];
+		ctx.beginPath();
+		for(let i=0;i<height*2;i++){map[i]=[];for(let j=0;j<width*2;j++)map[i][j]=![]};
+		map[head[1]*2][head[0]*2]=true,route=[head];
+		ctx.moveTo(head[0]*(pathSize+wallSize)+off,head[1]*(pathSize+wallSize)+off);
+		ctx.fillStyle="#fff";
+		Math.round(Math.random())?ctx.fillRect(0,wallSize,wallSize,pathSize):ctx.fillRect(wallSize,0,pathSize,wallSize);Math.round(Math.random())?ctx.fillRect((pathSize+wallSize)*(width-1)+wallSize,(pathSize+wallSize)*height,pathSize,wallSize):ctx.fillRect((pathSize+wallSize)*width,(pathSize+wallSize)*(height-1)+wallSize,wallSize,pathSize);
 	}
-	if(adir.length===0){
-		route.pop()&&route.length>0&&(ctx.moveTo(route[route.length-1][0]*(blockSize+wall)+off,route[route.length-1][1]*(blockSize+wall)+off),setTimeout(loop));
-	}else{
-		dir=adir[Math.random()*adir.length|0];
-		route.push([dir[0]+head[0],dir[1]+head[1]]);
-		ctx.lineTo((dir[0]+head[0])*(blockSize+wall)+off,(dir[1]+head[1])*(blockSize+wall)+off);
-		map[(dir[1]+head[1])*2][(dir[0]+head[0])*2]=true;
-		map[dir[1]+head[1]*2][dir[0]+head[0]*2]=true;
-		ctx.stroke();
-		setTimeout(loop);
+	init();
+	function loop(){
+		head=[route[route.length-1][0]|0,route[route.length-1][1]|0];
+		let dirs=[[1,0],[-1,0],[0,1],[0,-1]],adir=[];
+		for(let i=0;i<dirs.length;i++){
+			map[(dirs[i][1]+head[1])*2]!=undefined&&map[(dirs[i][1]+head[1])*2][(dirs[i][0]+head[0])*2]===false&&adir.push(dirs[i]);
+		}
+		if(adir.length===0){
+			route.pop()&&route.length>0&&(ctx.moveTo(route[route.length-1][0]*(pathSize+wallSize)+off,route[route.length-1][1]*(pathSize+wallSize)+off),loopTimeout=setTimeout(loop));
+		}else{
+			dir=adir[Math.random()*adir.length|0];
+			route.push([dir[0]+head[0],dir[1]+head[1]]);
+			ctx.lineTo((dir[0]+head[0])*(pathSize+wallSize)+off,(dir[1]+head[1])*(pathSize+wallSize)+off);
+			map[(dir[1]+head[1])*2][(dir[0]+head[0])*2]=true;
+			map[dir[1]+head[1]*2][dir[0]+head[0]*2]=true;
+			ctx.stroke();
+			loopTimeout=setTimeout(loop);
+		}
 	}
-}
-loop();
+	loop();
+	return{
+		restart:(()=>{
+			init();
+			loop();
+		}),
+		settings:((id,val)=>{
+			if(!val)return eval(id.replaceAll(/[\[\]\{\}\(\)=<>|\\\/]+/g,""));
+			switch(id){
+				case"width":
+					if(!isNaN(val)&&val>0){
+						width=parseFloat(val);
+						init();
+						loop();
+					}else{
+						return"invalid val";
+					}
+					break;
+				case"height":
+					if(!isNaN(val)&&val>0){
+						height=parseFloat(val);
+						init();
+						loop();
+					}else{
+						return"invalid val";
+					}
+					break;
+				case"pathSize":
+					if(!isNaN(val)&&val>0){
+						pathSize=parseFloat(val);
+						init();
+						loop();
+					}else{
+						return"invalid val";
+					}
+					break;
+				case"wallSize":
+					if(!isNaN(val)&&val>0){
+						wallSize=parseFloat(val);
+						init();
+						loop();
+					}else{
+						return"invalid val";
+					}
+					break;
+				case"wallColor":
+					if(isNaN(val)){
+						color.wall=al;
+						init();
+						loop();
+					}else{
+						return"invalid val";
+					}
+					break;
+				case"pathColor":
+					if(isNaN(val)){
+						color.path=al;
+						init();
+						loop();
+					}else{
+						return"invalid val";
+					}
+					break;
+				default:
+					return"invalid args"
+			}
+		})
+	}
+	
+})();
 		</script>
 	</body>
 </html>

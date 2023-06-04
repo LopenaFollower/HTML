@@ -66,16 +66,16 @@ function get_sector(p){
 		return"mid"
 	}
 	if(p.x<midpoint.x&&p.y<midpoint.y){
-		gravity=vector(.1,.1);
+		gravity=vector(1,1);
 		return"A"
 	}else if(p.x>midpoint.x&&p.y<midpoint.y){
-		gravity=vector(-.1,.1);
+		gravity=vector(-1,1);
 		return"B"
 	}else if(p.x<midpoint.x&&p.y>midpoint.y){
-		gravity=vector(.1,-.1);
+		gravity=vector(1,-1);
 		return"C"
 	}else if(p.x>midpoint.x&&p.y>midpoint.y){
-		gravity=vector(-.1,-.1);
+		gravity=vector(-1,-1);
 		return"D"
 	}
 }
