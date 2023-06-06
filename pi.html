@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>1000 digits of pi</title>
+		<title>learn pi</title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
 		<style>
 			body{user-select:none;margin:0;color:#fff;}
 			#cpi,#ypi,#input{font-family:monospace;word-wrap:break-word;width:100%;}
@@ -9,15 +10,14 @@
 			table,td{border-collapse:collapse;table-layout:fixed;border-color:#eee;text-align:center;font-size:67.5px;height:90px;width:90px;}
 			#main_page,#pi_page{padding:10px;}
 			#tab1,#tab2{background-color:rgb(34,42,51);border-radius:5px;font-family:monospace;line-height:30px;text-align:center;position:fixed;border:2.5px solid rgb(134,142,151);height:30px;color:#ddd;width:50%;}
-			.three{font:900 20px monospace;}
-			#disp{background-color:#fff;border-radius:10px;padding:15px;width:90%;}
+			#disp{background-color:rgba(0,0,0,0);border-radius:10px;padding:100%;border:3px dashed #777f88;width:94%}
 		</style>
 	</head>
 	<body bgcolor=#222>
 		<div id=tab1 onclick='main_page.style.display="block";pi_page.style.display="none"'>Input pi</div><div id=tab2 onclick='main_page.style.display="none";pi_page.style.display="block";input.value=""'>View pi</div>
 		<br><br>
 		<div id=main_page>
-			type pi from memory<br><textarea id=input onpaste='crash()'oncopy='crash()'oncut='crash()'onchange='cpi.innerText="";ypi.innerText="";result.innerText=""'></textarea><br>
+			type pi from memory<br><textarea id=input onpaste='crash()'oncopy='crash()'oncut='crash()'onchange='cpi.innerText="";ypi.innerText="";result.innerText=""'readonly></textarea><br>
 			<button onclick='result.innerText=getAcc(dp,input.value)'>Check</button>
 			<p id=cpi></p>
 			<p id=ypi></p>
@@ -25,10 +25,8 @@
 			<table border=1 id=keyboard><tr><td>7</td><td>8</td><td>9</td></tr><tr><td>4</td><td>5</td><td>6</td></tr><tr><td>1</td><td>2</td><td>3</td></tr><tr><td>.</td><td>0</td><td onclick="try{input.value=input.value.substring(0,input.value.length-1)}catch(e){}"><</td></tr></table>
 		</div>
 		<div id=pi_page style="display:none">
-			<span class=three>3.</span>
-			<center>
-				<canvas id=disp></canvas>
-			</center>
+			<span style="font:900 200% monospace">3.</span>
+			<canvas id=disp></canvas>
 		</div>
 		<script>
 /* Memorize PI in minutes!
@@ -100,13 +98,13 @@ setInterval(()=>{
 	disp.width=per*spacing-clearance;
 	ctx.clearRect(0,0,disp.height,disp.width);
 	ctx.font=fontsize+"px monospace";
-	ctx.fillStyle="#000";
+	ctx.fillStyle="#fff";
 	subject.forEach(e=>{
 		x>=per&&(++y,x=0);
 		ctx.fillText(e,spacing*x++,clearance+(fontsize*y));
 	});
 	ctx.fill();
-},2500);
+},1e3);
 function hold(e,f=a=>{},c,i=null){
 	e.addEventListener("touchstart",v=>{
 		clearInterval(i);
@@ -116,7 +114,7 @@ function hold(e,f=a=>{},c,i=null){
 	});
 	e.addEventListener("touchend",v=>{
 		clearInterval(i);
-		e.style.backgroundColor="initial";
+		setTimeout(()=>e.style.backgroundColor="initial",50);
 		i=null
 	});
 }
