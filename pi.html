@@ -10,19 +10,19 @@
 			table,td{border-collapse:collapse;table-layout:fixed;border-color:#eee;text-align:center;font-size:67.5px;height:90px;width:90px;}
 			#main_page,#pi_page{padding:10px;}
 			#tab1,#tab2{background-color:rgb(34,42,51);border-radius:5px;font-family:monospace;line-height:30px;text-align:center;position:fixed;border:2.5px solid rgb(134,142,151);height:30px;color:#ddd;width:50%;}
-			#disp{background-color:rgba(0,0,0,0);border-radius:10px;padding:100%;border:3px dashed #777f88;width:94%}
+			#disp{background-color:rgba(0,0,0,0);border-radius:10px;border:3px dashed #777f88;width:94%}
 		</style>
 	</head>
 	<body bgcolor=#222>
 		<div id=tab1 onclick='main_page.style.display="block";pi_page.style.display="none"'>Input pi</div><div id=tab2 onclick='main_page.style.display="none";pi_page.style.display="block";input.value=""'>View pi</div>
 		<br><br>
 		<div id=main_page>
-			type pi from memory<br><textarea id=input onpaste='crash()'oncopy='crash()'oncut='crash()'onchange='cpi.innerText="";ypi.innerText="";result.innerText=""'readonly></textarea><br>
-			<button onclick='result.innerText=getAcc(dp,input.value)'>Check</button>
+			type pi from memory<br><textarea id=input onchange='cpi.innerText="";ypi.innerText="";result.innerText=""'readonly></textarea><br>
+			<button onclick='result.innerText=(()=>{let ac=0,t=dp.length;cpi.innerHTML="";ypi.innerHTML="";for(let i=0;i<t;i++){dp[i]===input.value[i]?(ac++,cpi.innerHTML+=input.value[i],ypi.innerHTML+=input.value[i]):(ypi.innerHTML+=`<span style="color:red">`+input.value[i]+"</span>",cpi.innerHTML+=`<span style="color:#0f0">`+dp[i]+"</span>")};ac>2?ac-=2:ac-=ac;t>2?t-=2:t-=t;return"You got "+ac+" out of "+t+" decimal places of pi";})()'>Check</button><button onclick='cpi.innerText="";ypi.innerText="";result.innerText="";input.value=""'>Clear</button>
 			<p id=cpi></p>
 			<p id=ypi></p>
 			<div id=result></div>
-			<table border=1 id=keyboard><tr><td>7</td><td>8</td><td>9</td></tr><tr><td>4</td><td>5</td><td>6</td></tr><tr><td>1</td><td>2</td><td>3</td></tr><tr><td>.</td><td>0</td><td onclick="try{input.value=input.value.substring(0,input.value.length-1)}catch(e){}"><</td></tr></table>
+			<table border=1 id=keyboard><tr><td>7</td><td>8</td><td>9</td></tr><tr><td>4</td><td>5</td><td>6</td></tr><tr><td>1</td><td>2</td><td>3</td></tr><tr><td>.</td><td>0</td><td onclick="input.value=input.value.substring(0,input.value.length-1)"><</td></tr></table>
 		</div>
 		<div id=pi_page style="display:none">
 			<span style="font:900 200% monospace">3.</span>
@@ -39,32 +39,14 @@
  * note: familiarize its pattern and not just its sequence
  * Usually takes me around a minute to memorize 10
 */
-function*calc_pi(q,r,t,i){
-	while(q){
-		u=3n*i;
-		u=3n*u**2n+9n*u+6n;
-		let d=(27n*q*i+5n*r-12n*q)/(t*5n);
-		yield Number(d);
-		r=10n*u*(r+(5n*i-2n)*q-d*t);
-		t*=u;
-		q*=i*10n*(2n*i++-1n);
+function*calc_pi(q,r,t,i,d){
+	for(;;){
+		u=3n*i,u=6n+3n*u**2n+u*9n,d=(27n*q*i+5n*r-12n*q)/(t*5n),yield Number(d),r=10n*u*(r+(5n*i-2n)*q-d*t),t*=u,q*=i*10n*(2n*i++-1n);
 	}
 }
 let pi="",
 	dp="",
-	sequence=calc_pi(1n,180n,60n,2n);
-sequence.next();
-function getAcc(a,b){
-	let ac=0,t=a.length;
-	cpi.innerHTML="";
-	ypi.innerHTML="";
-	for(let i=0;i<t;i++){
-		a[i]===b[i]?(ac++,cpi.innerHTML+=b[i],ypi.innerHTML+=b[i]):(ypi.innerHTML+="<span style='color:red'>"+b[i]+"</span>",cpi.innerHTML+="<span style='color:#0f0'>"+a[i]+"</span>")
-	}
-	ac>2?ac-=2:ac-=ac;
-	t>2?t-=2:t-=t;
-	return"You got "+ac+" out of "+t+" decimal places of pi"
-}
+	sequence=calc_pi(60n,13440n,10080n,3n,3n);
 function crash(){
 	alert("crash");
 	setInterval(()=>{
@@ -83,42 +65,21 @@ setInterval((z=input)=>{
 	keyboard.style.left=window.innerWidth/2-parseFloat(window.getComputedStyle(keyboard).getPropertyValue("width"))/2+"px";
 	z.value.split(".").length>2&&(z.value=z.value.substring(0,z.value.length-1));
 })
-setInterval(()=>{
-	let subject=pi.match(/.{1,10}/g),
-		ctx=disp.getContext("2d"),
-		clearance=10,
-		fontsize=15,
-		spacing=100,
-		padding=15,
-		per=5,
-		x=0,
-		y=0;
+setInterval(()=>((subject,ctx,clearance,fontsize,spacing,padding,per,x,y)=>{
 	disp.style.padding=padding+"px";
-	disp.height=fontsize*(subject.length-1)/per+clearance;
+	disp.height=subject.length*fontsize/per+clearance;
 	disp.width=per*spacing-clearance;
 	ctx.clearRect(0,0,disp.height,disp.width);
 	ctx.font=fontsize+"px monospace";
 	ctx.fillStyle="#fff";
 	subject.forEach(e=>{
 		x>=per&&(++y,x=0);
-		ctx.fillText(e,spacing*x++,clearance+(fontsize*y));
+		ctx.fillText(e,x++*spacing,clearance+(fontsize*y));
 	});
 	ctx.fill();
-},1e3);
-function hold(e,f=a=>{},c,i=null){
-	e.addEventListener("touchstart",v=>{
-		clearInterval(i);
-		e.style.backgroundColor="#666";
-		f();
-		i=setInterval(f,c)
-	});
-	e.addEventListener("touchend",v=>{
-		clearInterval(i);
-		setTimeout(()=>e.style.backgroundColor="initial",50);
-		i=null
-	});
-}
-Array.from(document.getElementsByTagName("td")).forEach(e=>hold(e,a=>input.value+=e.innerText,150))
+})(pi.match(/.{10}/g),disp.getContext("2d"),10,15,100,15,5,0,0),9e2);
+function hold(e,f=a=>{},c,i=null){e.addEventListener("touchstart",v=>{clearInterval(i);e.style.backgroundColor="#666";f();i=setInterval(f,c)});e.addEventListener("touchend",v=>{clearInterval(i);setTimeout(()=>e.style.backgroundColor="initial",50);i=null})}
+Array.from(document.getElementsByTagName("td")).forEach(e=>hold(e,a=>{input.value+=e.innerText;cpi.innerText="";ypi.innerText="";result.innerText=""},100))
 /*
 grouped into 10 decimals
 

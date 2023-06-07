@@ -13,18 +13,17 @@
 				<td><button onclick="restart()">restart</button></td>
 			</tr>
 		</table>
-		
 		<script>
 var{restart,settings}=(function(){
 	let map=[],
 		canvas=document.querySelector("canvas"),
 		color={wall:"#222a33",path:"#fff"},
-		pathSize=3,
-		wallSize=1,
+		pathSize=2,//2
+		wallSize=1,//1
 		ctx=canvas.getContext("2d"),
 		off=pathSize/2+wallSize,
-		height=136,
-		width=74,
+		height=274,//274
+		width=148,//148
 		head=[0,0],
 		loopTimeout;
 	function init(){
@@ -45,18 +44,33 @@ var{restart,settings}=(function(){
 		head=[route[route.length-1][0]|0,route[route.length-1][1]|0];
 		let dirs=[[1,0],[-1,0],[0,1],[0,-1]],adir=[];
 		for(let i=0;i<dirs.length;i++){
-			map[(dirs[i][1]+head[1])*2]!=undefined&&map[(dirs[i][1]+head[1])*2][(dirs[i][0]+head[0])*2]===false&&adir.push(dirs[i]);
+			//checking any valid directions to go to
+			map[(dirs[i][1]+head[1])*2]!=undefined&&
+			//checking if it isnt visited
+			map[(dirs[i][1]+head[1])*2][(dirs[i][0]+head[0])*2]===false&&
+			//if so, we add it in possible dirs
+			adir.push(dirs[i]);
 		}
 		if(adir.length===0){
-			route.pop()&&route.length>0&&(ctx.moveTo(route[route.length-1][0]*(pathSize+wallSize)+off,route[route.length-1][1]*(pathSize+wallSize)+off),loopTimeout=setTimeout(loop));
-		}else{
+			//if no possible directions to go to, we backtrack
+			route.pop()//going back by removing route
+			if(route.length>0){//checking if there is still a route
+				ctx.moveTo(
+					route[route.length-1][0]*(pathSize+wallSize)+off,
+					route[route.length-1][1]*(pathSize+wallSize)+off
+				),
+				loop()
+			}else{
+				alert("done")
+			};
+		}else{//if there is possible dirs then we continue
+			loopTimeout=setTimeout(loop);
 			dir=adir[Math.random()*adir.length|0];
 			route.push([dir[0]+head[0],dir[1]+head[1]]);
 			ctx.lineTo((dir[0]+head[0])*(pathSize+wallSize)+off,(dir[1]+head[1])*(pathSize+wallSize)+off);
 			map[(dir[1]+head[1])*2][(dir[0]+head[0])*2]=true;
 			map[dir[1]+head[1]*2][dir[0]+head[0]*2]=true;
 			ctx.stroke();
-			loopTimeout=setTimeout(loop);
 		}
 	}
 	loop();
@@ -127,7 +141,6 @@ var{restart,settings}=(function(){
 			}
 		})
 	}
-	
 })();
 		</script>
 	</body>
