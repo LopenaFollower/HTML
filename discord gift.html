@@ -32,7 +32,7 @@
 						gen();
 					},rcd);
 				}else if(r.match("application_id")){
-					console.log(url);
+					logs="\n"+url+logs;
 					valids++;
 					setTimeout(gen,rcd);
 				}else if(r.match("limited")){
@@ -41,6 +41,7 @@
 					setTimeout(gen,JSON.parse(r).retry_after*1e3);
 				}
 			}
+			setTimeout(()=>{window.scrollBy(0,50)},1000);
 		}
 		xhr.open("GET",url,true);
 		xhr.setRequestHeader("Content-type","application/json");
