@@ -205,10 +205,10 @@ function HMS(s){
 	return(hrs<10?"0"+hrs:hrs)+" : "+(min<10?"0"+min:min)+" : "+(m.pi(sec)<10?"0"+m.pi(sec):m.pi(sec));
 }
 $("blur").set("display","none");
-if(!ls.getItem("hs")){ls.setItem("hs",0)}
+if(!ls.getItem("snake_hs")){ls.setItem("snake_hs",0)}
 if(!ls.getItem("total_time")){ls.setItem("total_time",1)}
 ls.setItem("run_time",date())
-$("sd").innerHTML="\x48\x69\x67\x68\x65\x73\x74\x20\x53\x63o\x72\x65:\x20"+ls.getItem("hs")
+$("sd").innerHTML="\x48\x69\x67\x68\x65\x73\x74\x20\x53\x63o\x72\x65:\x20"+ls.getItem("snake_hs")
 m.d.addEventListener("keydown",e=>{
 	if(_){
 		switch(e.keyCode){
@@ -322,9 +322,9 @@ setInterval(()=>{
 			}
 		},speed);
 	}
-	if(score>ls.getItem("hs")){
-		ls.setItem("hs",score)
-		$("sd").innerHTML="\x48\x69\x67\x68\x65\x73\x74\x20\x53\x63o\x73e:\x20"+ls.getItem("hs")
+	if(score>ls.getItem("snake_hs")){
+		ls.setItem("snake_hs",score)
+		$("sd").innerHTML="\x48\x69\x67\x68\x65\x73\x74\x20\x53\x63o\x73e:\x20"+ls.getItem("snake_hs")
 	}
 	if(status){
 		$("head").style.WebkitTransitionDuration=speed+"ms"

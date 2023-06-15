@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>game(2nd remake)</title>
+		<title>game(3rd revamp)</title>
 		<style>
+			body{
+				user-select:none;
+				color:#fff;
+			}
 			#base{
 				table-layout:fixed;
 				height:fit-content;
@@ -12,27 +16,20 @@
 			}
 			.row>td,#next{
 				transition-timing-function:linear;
-				transition-duration:.3s;
+				transition-duration:.1s;
 				border:1px solid grey;
 				text-overflow:clip;
 				text-align:center;
 				line-height:53px;
-				user-select:none;
 				height:max(57px);
 				width:max(57px);
 				font-size:20px;
-				color:white;
-			}
-			p{
-				user-select:none;
-				color:white;
 			}
 			.dh{
 				color:red;
 				transform:rotate(365deg);
 			}
 			#container{
-				color:#fff;
 				font-size:17px;
 				position:fixed;
 				top:0;
@@ -113,17 +110,17 @@
 		<script>
 //variables
 const rgb=((r)=>{r={s:5,r:255,g:0,b:0,rg:![],gg:true,bg:![],rl:![],gl:![],bl:![],fetch:function(f="rgb"){return f.length==3?"rgb("+this[f[0]]+","+this[f[1]]+","+this[f[2]]+")":"rgb("+this.r+","+this.g+","+this.b+")"}};setInterval((m=0xff,f=![],t=[])=>{r.r>m&&(r.rg=f,r.r=m);r.g>m&&(r.gg=f,r.g=m);r.b>m&&(r.bg=f,r.b=m);r.r<0&&(r.rl=f,r.r=0);r.g<0&&(r.gl=f,r.g=0);r.b<0&&(r.bl=f,r.b=0);r.r==m&&r.g==0&&r.b==0&&(r.gg=t);r.r==m&&r.g==m&&r.b==0&&(r.rl=t);r.r==0&&r.g==m&&r.b==0&&(r.bg=t);r.r==0&&r.g==m&&r.b==m&&(r.gl=t);r.r==0&&r.g==0&&r.b==m&&(r.rg=t);r.r==m&&r.g==0&&r.b==m&&(r.bl=t);r.rg&&(r.r+=r.s);r.gg&&(r.g+=r.s);r.bg&&(r.b+=r.s);r.rl&&(r.r-=r.s);r.gl&&(r.g-=r.s);r.bl&&(r.b-=r.s)});return r})(),
-	{floor}=Math,
-	{abs}=Math,
+	{floor,abs}=Math,
 	rand=Math.random,
 	{log}=console,
 	delay=setTimeout,
-	cd=150,
+	cd=100,
 	BGC="background-color",
 	IT="innerText",
 	contrast=150,
 scheme={
 	"":"rgba(0,0,0,0)",
+	"8":"#222a33",
 	"16":"#D22A77",
 	"32":"#f00",
 	"64":"#0ef",
@@ -140,7 +137,7 @@ scheme={
 	"131072":"#B3C77A",
 	"262144":"#FF00E4",
 	"524288":"#FB0",
-	"1048576":"#F8FF00",
+	"1048576":"#36AF5D",
 	"2097152":"#7A001E",
 	"4194304":"#85FFD6",
 	"8388608":"#C4BC34",
@@ -148,13 +145,13 @@ scheme={
 	"33554432":"#FD9CFF",
 	"67108864":"#59CAFF",
 	"134217728":"#156F36",
-	"268435456":"#FF9B62",
+	"268435456":"#AF0085",
 	"536870912":"#DA9B5E",
 	"1073741824":"#D6E300",
 	"2147483648":"#7A687F",
-	"4294967296":"ff0",
+	"4294967296":"#ff0",
 	"8589934592":"#0f0",
-	"17179869184":"0ff",
+	"17179869184":"#0ff",
 	"34359738368":"#00f",
 	"68719476736":"#fff",
 	"137438953472":"#eee",
@@ -179,7 +176,7 @@ var graph_map={
 	c3:{c:0,h:null},
 	c4:{c:0,h:null},
 	c5:{c:0,h:null}
-},recent_row=null,score=0;
+},recent=null,score=0;
 //functions
 function $(n){
 	return document.getElementById(n)
@@ -187,20 +184,31 @@ function $(n){
 function p(id){
 	if(!$("next")[IT])return;
 	try{
-		let x=id.split(",")[1],
-			y=id.split(",")[0],
+		let[y,x]=id.split(","),
 			pid=highest(x)?highest(x)[0].num()+1+","+x:"1,"+x;
-		if($("7,"+id.split(",")[1].num())[IT]===$("next")[IT]){
-			$("7,"+id.split(",")[1].num()).bigInt(2)
+		if($("7,"+x.num())[IT]===$("next")[IT]){
+			$("7,"+x.num()).bigInt(2)
+			pid="7,"+x.num()
 		}else{
 			$(pid)[IT]=BigInt($("next")[IT]);
 		}
-		recent_row=x.num();
+		recent=pid
+		combine(pid)
 		score+=$("next")[IT].num()
 		$("next")[IT]="";
+		delay(fall,100)
 		delay(next_p,cd)
 	}catch(ñ){
-		reset()
+		let ready=true
+		for(let i=1;i<6;i++){
+			if($("7,"+i)[IT]==$("next")[IT]){
+				ready=false
+			}
+			if($("7,"+i)[IT]==""){
+				ready=false
+			}
+		}
+		if(ready)reset();
 	}
 }
 function highlight(cs){
@@ -215,23 +223,23 @@ function highlight(cs){
 	})
 }
 function rem(cs){
-	if(cs=="all")reset()
+	if(cs=="all")reset();
 	Array.from(document.getElementsByClassName("dh")).forEach(e=>{
 		e[IT]=""
 		e.className=""
 	})
 }
-function are(...a){
-	let l=a.length
+function arent(a,...b){
+	let l=b.length
 	for(let i=1;i<l;i++){
-		if(!(a[i]===a[0])){
+		if(!(b[i]===b[0])||b[0]===a){
 			return false
 		}
 	}
 	return true
 }
 function validate_forced(f){
-	for(let i=4;i<1050;i++){
+	for(let i=3;i<1050;i++){
 		if(2**i==f){
 			return true
 		}
@@ -249,15 +257,15 @@ function highest(col){
 function reset(){
 	for(let i=1;i<=7;i++){
 		for(let v=1;v<=5;v++){
-				$(i+","+v)[IT]=""
+			$(i+","+v)[IT]=""
 		}
 	}
 	score=0
 	next_p()
 }
 function next_p(forced){
-	recent_row=undefined;
-	try{if(forced)forced=eval("BigInt("+forced+")")+""}catch(e){};
+	recent=undefined;
+	try{if(forced)forced=eval("BigInt("+forced.replaceAll(/[\[\]\{\}=<>\.a-zA-Z\"\'\`]/g,"")+")")+""}catch(e){};
 	if(forced&&validate_forced(forced)){
 		$("next")[IT]=forced
 	}else if(!$("next")[IT]){
@@ -265,609 +273,70 @@ function next_p(forced){
 	}
 }
 function combine(row){
-	delay(()=>{
-	if(are($("7,1")[IT],$("6,2")[IT],$("7,3")[IT],$("7,2")[IT])&&$("7,2")[IT]!==""){
-		$("7,1")[IT]="";
-		$("7,3")[IT]="";
-		$("7,2")[IT]="";
-		$("6,2").bigInt(8);
+	let y=row.split(",")[0].num(),
+		x=row.split(",")[1].num();
+	if($(y+","+(x-1))&&$(y+","+(x+1))&&$((y-1)+","+x)&&arent("",$(y+","+(x-1))[IT],$(y+","+(x+1))[IT],$(y-1+","+x)[IT],$(row)[IT])){
+		$(y+","+(x-1))[IT]=""
+		$(y+","+(x+1))[IT]=""
+		$(y-1+","+x)[IT]=""
+		$(row).bigInt(8)
+		delay(()=>{
+			combine(row)
+		},cd/4)
+	}else if($(y+","+(x+1))&&$((y-1)+","+x)&&arent("",$(y+","+(x+1))[IT],$(y-1+","+x)[IT],$(row)[IT])){
+		$(y+","+(x+1))[IT]=""
+		$(y-1+","+x)[IT]=""
+		$(row).bigInt(4)
+		delay(()=>{
+			combine(row)
+		},cd/4)
+	}else if($(y+","+(x-1))&&$(y-1+","+x)&&arent("",$(y+","+(x-1))[IT],$(y-1+","+x)[IT],$(row)[IT])){
+		$(y+","+(x-1))[IT]=""
+		$(y-1+","+x)[IT]=""
+		$(row).bigInt(4)
+		delay(()=>{
+			combine(row)
+		},cd/4)
+	}else if($(y+","+(x-1))&&$(y+","+(x+1))&&arent("",$(y+","+(x-1))[IT],$(y+","+(x+1))[IT],$(row)[IT])){
+		$(y+","+(x-1))[IT]=""
+		$(y+","+(x+1))[IT]=""
+		$(row).bigInt(4)
+		delay(()=>{
+			combine(row)
+		},cd/4)
+	}else if($(y+","+(x+1))&&arent("",$(y+","+(x+1))[IT],$(row)[IT])){
+		$(y+","+(x+1))[IT]=""
+		$(row).bigInt(2)
+		delay(()=>{
+			combine(row)
+		},cd/4)
+	}else if($(y+","+(x-1))&&arent("",$(y+","+(x-1))[IT],$(row)[IT])){
+		$(y+","+(x-1))[IT]=""
+		$(row).bigInt(2)
+		delay(()=>{
+			combine(row)
+		},cd/4)
+	}else if($(y-1+","+x)&&arent("",$(y-1+","+x)[IT],$(row)[IT])){
+		$(y-1+","+x)[IT]=""
+		$(row).bigInt(2)
+		delay(()=>{
+			combine(row)
+		},cd/4)
 	}
-	if(are($("7,2")[IT],$("6,3")[IT],$("7,4")[IT],$("7,3")[IT])&&$("7,3")[IT]!==""){
-		$("7,2")[IT]="";
-		$("7,3")[IT]="";
-		$("7,4")[IT]="";
-		$("6,3").bigInt(8);
-	}
-	if(are($("7,3")[IT],$("6,4")[IT],$("7,5")[IT],$("7,4")[IT])&&$("7,4")[IT]!==""){
-		$("7,5")[IT]="";
-		$("7,3")[IT]="";
-		$("7,4")[IT]="";
-		$("6,4").bigInt(8);
-	}
-	if(are($("6,1")[IT],$("5,2")[IT],$("6,3")[IT],$("6,2")[IT])&&$("6,2")[IT]!==""){
-		$("6,1")[IT]="";
-		$("6,3")[IT]="";
-		$("6,2")[IT]="";
-		$("5,2").bigInt(8);
-	}
-	if(are($("6,2")[IT],$("5,3")[IT],$("6,4")[IT],$("6,3")[IT])&&$("6,3")[IT]!==""){
-		$("6,2")[IT]="";
-		$("6,3")[IT]="";
-		$("6,4")[IT]="";
-		$("5,3").bigInt(8);
-	}
-	if(are($("6,3")[IT],$("5,4")[IT],$("6,5")[IT],$("6,4")[IT])&&$("6,4")[IT]!==""){
-		$("6,3")[IT]="";
-		$("6,4")[IT]="";
-		$("6,5")[IT]="";
-		$("5,4").bigInt(8);
-	}
-	if(are($("5,1")[IT],$("4,2")[IT],$("5,3")[IT],$("5,2")[IT])&&$("5,2")[IT]!==""){
-		$("5,1")[IT]="";
-		$("5,3")[IT]="";
-		$("5,2")[IT]="";
-		$("4,2").bigInt(8);
-	}
-	if(are($("5,2")[IT],$("4,3")[IT],$("5,4")[IT],$("5,3")[IT])&&$("5,3")[IT]!==""){
-		$("5,2")[IT]="";
-		$("5,3")[IT]="";
-		$("5,4")[IT]="";
-		$("4,3").bigInt(8);
-	}
-	if(are($("5,3")[IT],$("4,4")[IT],$("5,5")[IT],$("5,4")[IT])&&$("5,4")[IT]!==""){
-		$("5,4")[IT]="";
-		$("5,3")[IT]="";
-		$("5,5")[IT]="";
-		$("4,4").bigInt(8);
-	}
-	if(are($("4,1")[IT],$("3,2")[IT],$("4,3")[IT],$("4,2")[IT])&&$("4,2")[IT]!==""){
-		$("4,1")[IT]="";
-		$("4,3")[IT]="";
-		$("4,2")[IT]="";
-		$("3,2").bigInt(8);
-	}
-	if(are($("4,2")[IT],$("3,3")[IT],$("4,4")[IT],$("4,3")[IT])&&$("4,3")[IT]!==""){
-		$("4,2")[IT]="";
-		$("4,3")[IT]="";
-		$("4,4")[IT]="";
-		$("3,3").bigInt(8);
-	}
-	if(are($("4,3")[IT],$("3,4")[IT],$("4,5")[IT],$("4,4")[IT])&&$("4,4")[IT]!==""){
-		$("4,4")[IT]="";
-		$("4,3")[IT]="";
-		$("4,5")[IT]="";
-		$("3,4").bigInt(8);
-	}
-	if(are($("3,1")[IT],$("2,2")[IT],$("3,3")[IT],$("3,2")[IT])&&$("3,2")[IT]!==""){
-		$("3,1")[IT]="";
-		$("3,3")[IT]="";
-		$("3,2")[IT]="";
-		$("2,2").bigInt(8);
-	}
-	if(are($("3,2")[IT],$("2,3")[IT],$("3,4")[IT],$("3,3")[IT])&&$("3,3")[IT]!==""){
-		$("3,4")[IT]="";
-		$("3,3")[IT]="";
-		$("3,2")[IT]="";
-		$("2,3").bigInt(8);
-	}
-	if(are($("3,3")[IT],$("2,4")[IT],$("3,5")[IT],$("3,4")[IT])&&$("3,4")[IT]!==""){
-		$("3,4")[IT]="";
-		$("3,3")[IT]="";
-		$("3,5")[IT]="";
-		$("2,4").bigInt(8);
-	}
-	if(are($("2,1")[IT],$("1,2")[IT],$("2,3")[IT],$("2,2")[IT])&&$("2,2")[IT]!==""){
-		$("2,1")[IT]="";
-		$("2,3")[IT]="";
-		$("2,2")[IT]="";
-		$("1,2").bigInt(8);
-	}
-	if(are($("2,2")[IT],$("1,3")[IT],$("2,4")[IT],$("2,3")[IT])&&$("2,3")[IT]!==""){
-		$("2,4")[IT]="";
-		$("2,3")[IT]="";
-		$("2,2")[IT]="";
-		$("1,3").bigInt(8);
-	}
-	if(are($("2,3")[IT],$("1,4")[IT],$("2,5")[IT],$("2,4")[IT])&&$("2,4")[IT]!==""){
-		$("2,4")[IT]="";
-		$("2,3")[IT]="";
-		$("2,5")[IT]="";
-		$("1,4").bigInt(8);
-	}
-	if(are($("7,1")[IT],$("7,2")[IT],$("6,2")[IT])&&$("6,2")[IT]!==""){
-		$("7,1")[IT]="";
-		$("7,2")[IT]="";
-		$("6,2").bigInt(4);
-	}
-	if(are($("7,2")[IT],$("7,3")[IT],$("6,3")[IT])&&$("6,3")[IT]!==""){
-		$("7,2")[IT]="";
-		$("7,3")[IT]="";
-		$("6,3").bigInt(4);
-	}
-	if(are($("7,3")[IT],$("7,4")[IT],$("6,4")[IT])&&$("6,4")[IT]!==""){
-		$("7,3")[IT]="";
-		$("7,4")[IT]="";
-		$("6,4").bigInt(4);
-	}
-	if(are($("7,4")[IT],$("7,5")[IT],$("6,5")[IT])&&$("6,5")[IT]!==""){
-		$("7,4")[IT]="";
-		$("7,5")[IT]="";
-		$("6,5").bigInt(4);
-	}
-	
-	if(are($("6,1")[IT],$("6,2")[IT],$("5,2")[IT])&&$("5,2")[IT]!==""){
-		$("6,1")[IT]="";
-		$("6,2")[IT]="";
-		$("5,2").bigInt(4);
-	}
-	if(are($("6,2")[IT],$("6,3")[IT],$("5,3")[IT])&&$("5,3")[IT]!==""){
-		$("6,2")[IT]="";
-		$("6,3")[IT]="";
-		$("5,3").bigInt(4);
-	}
-	if(are($("6,3")[IT],$("6,4")[IT],$("5,4")[IT])&&$("5,4")[IT]!==""){
-		$("6,3")[IT]="";
-		$("6,4")[IT]="";
-		$("5,4").bigInt(4);
-	}
-	if(are($("6,4")[IT],$("6,5")[IT],$("5,5")[IT])&&$("5,5")[IT]!==""){
-		$("6,4")[IT]="";
-		$("6,5")[IT]="";
-		$("5,5").bigInt(4);
-	}
-	
-	if(are($("5,1")[IT],$("5,2")[IT],$("4,2")[IT])&&$("4,2")[IT]!==""){
-		$("5,1")[IT]="";
-		$("5,2")[IT]="";
-		$("4,2").bigInt(4);
-	}
-	if(are($("5,2")[IT],$("5,3")[IT],$("4,3")[IT])&&$("4,3")[IT]!==""){
-		$("5,2")[IT]="";
-		$("5,3")[IT]="";
-		$("4,3").bigInt(4);
-	}
-	if(are($("5,3")[IT],$("5,4")[IT],$("4,4")[IT])&&$("4,4")[IT]!==""){
-		$("5,3")[IT]="";
-		$("5,4")[IT]="";
-		$("4,4").bigInt(4);
-	}
-	if(are($("5,4")[IT],$("5,5")[IT],$("4,5")[IT])&&$("4,5")[IT]!==""){
-		$("5,4")[IT]="";
-		$("5,5")[IT]="";
-		$("4,5").bigInt(4);
-	}
-	
-	if(are($("4,1")[IT],$("4,2")[IT],$("3,2")[IT])&&$("3,2")[IT]!==""){
-		$("4,1")[IT]="";
-		$("4,2")[IT]="";
-		$("3,2").bigInt(4);
-	}
-	if(are($("4,2")[IT],$("4,3")[IT],$("3,3")[IT])&&$("3,3")[IT]!==""){
-		$("4,2")[IT]="";
-		$("4,3")[IT]="";
-		$("3,3").bigInt(4);
-	}
-	if(are($("4,3")[IT],$("4,4")[IT],$("3,4")[IT])&&$("3,4")[IT]!==""){
-		$("4,3")[IT]="";
-		$("4,4")[IT]="";
-		$("3,4").bigInt(4);
-	}
-	if(are($("4,4")[IT],$("4,5")[IT],$("3,5")[IT])&&$("3,5")[IT]!==""){
-		$("4,4")[IT]="";
-		$("4,5")[IT]="";
-		$("3,5").bigInt(4);
-	}
-	if(are($("3,1")[IT],$("3,2")[IT],$("2,2")[IT])&&$("2,2")[IT]!==""){
-		$("3,1")[IT]="";
-		$("3,2")[IT]="";
-		$("2,2").bigInt(4);
-	}
-	if(are($("3,2")[IT],$("3,3")[IT],$("2,3")[IT])&&$("2,3")[IT]!==""){
-		$("3,2")[IT]="";
-		$("3,3")[IT]="";
-		$("2,3").bigInt(4);
-	}
-	if(are($("3,3")[IT],$("3,4")[IT],$("2,4")[IT])&&$("2,4")[IT]!==""){
-		$("3,3")[IT]="";
-		$("3,4")[IT]="";
-		$("2,4").bigInt(4);
-	}
-	if(are($("3,4")[IT],$("3,5")[IT],$("2,5")[IT])&&$("2,5")[IT]!==""){
-		$("3,4")[IT]="";
-		$("3,5")[IT]="";
-		$("2,5").bigInt(4);
-	}
-	if(are($("2,1")[IT],$("2,2")[IT],$("1,2")[IT])&&$("1,2")[IT]!==""){
-		$("2,1")[IT]="";
-		$("2,2")[IT]="";
-		$("1,2").bigInt(4);
-	}
-	if(are($("2,2")[IT],$("2,3")[IT],$("1,3")[IT])&&$("1,3")[IT]!==""){
-		$("2,2")[IT]="";
-		$("2,3")[IT]="";
-		$("1,3").bigInt(4);
-	}
-	if(are($("2,3")[IT],$("2,4")[IT],$("1,4")[IT])&&$("1,4")[IT]!==""){
-		$("2,3")[IT]="";
-		$("2,4")[IT]="";
-		$("1,4").bigInt(4);
-	}
-	if(are($("2,4")[IT],$("2,5")[IT],$("1,5")[IT])&&$("1,5")[IT]!==""){
-		$("2,4")[IT]="";
-		$("2,5")[IT]="";
-		$("1,5").bigInt(4);
-	}
-	if(are($("7,1")[IT],$("7,2")[IT],$("6,1")[IT])&&$("6,1")[IT]!==""){
-		$("7,1")[IT]="";
-		$("7,2")[IT]="";
-		$("6,1").bigInt(4);
-	}
-	if(are($("7,2")[IT],$("7,3")[IT],$("6,2")[IT])&&$("6,2")[IT]!==""){
-		$("7,2")[IT]="";
-		$("7,3")[IT]="";
-		$("6,2").bigInt(4);
-	}
-	if(are($("7,3")[IT],$("7,4")[IT],$("6,3")[IT])&&$("6,3")[IT]!==""){
-		$("7,3")[IT]="";
-		$("7,4")[IT]="";
-		$("6,3").bigInt(4);
-	}
-	if(are($("7,4")[IT],$("7,5")[IT],$("6,4")[IT])&&$("6,4")[IT]!==""){
-		$("7,4")[IT]="";
-		$("7,5")[IT]="";
-		$("6,4").bigInt(4);
-	}
-	if(are($("6,1")[IT],$("6,2")[IT],$("5,1")[IT])&&$("5,1")[IT]!==""){
-		$("6,1")[IT]="";
-		$("6,2")[IT]="";
-		$("5,1").bigInt(4);
-	}
-	if(are($("6,2")[IT],$("6,3")[IT],$("5,2")[IT])&&$("5,2")[IT]!==""){
-		$("6,2")[IT]="";
-		$("6,3")[IT]="";
-		$("5,2").bigInt(4);
-	}
-	if(are($("6,3")[IT],$("6,4")[IT],$("5,3")[IT])&&$("5,3")[IT]!==""){
-		$("6,3")[IT]="";
-		$("6,4")[IT]="";
-		$("5,3").bigInt(4);
-	}
-	if(are($("6,4")[IT],$("6,5")[IT],$("5,4")[IT])&&$("5,4")[IT]!==""){
-		$("6,4")[IT]="";
-		$("6,5")[IT]="";
-		$("5,4").bigInt(4);
-	}
-	if(are($("5,1")[IT],$("5,2")[IT],$("4,1")[IT])&&$("4,1")[IT]!==""){
-		$("5,1")[IT]="";
-		$("5,2")[IT]="";
-		$("4,1").bigInt(4);
-	}
-	if(are($("5,2")[IT],$("5,3")[IT],$("4,2")[IT])&&$("4,2")[IT]!==""){
-		$("5,2")[IT]="";
-		$("5,3")[IT]="";
-		$("4,2").bigInt(4);
-	}
-	if(are($("5,3")[IT],$("5,4")[IT],$("4,3")[IT])&&$("4,3")[IT]!==""){
-		$("5,3")[IT]="";
-		$("5,4")[IT]="";
-		$("4,3").bigInt(4);
-	}
-	if(are($("5,4")[IT],$("5,5")[IT],$("4,4")[IT])&&$("4,4")[IT]!==""){
-		$("5,4")[IT]="";
-		$("5,5")[IT]="";
-		$("4,4").bigInt(4);
-	}
-	if(are($("4,1")[IT],$("4,2")[IT],$("3,1")[IT])&&$("3,1")[IT]!==""){
-		$("4,1")[IT]="";
-		$("4,2")[IT]="";
-		$("3,1").bigInt(4);
-	}
-	if(are($("4,2")[IT],$("4,3")[IT],$("3,2")[IT])&&$("3,2")[IT]!==""){
-		$("4,2")[IT]="";
-		$("4,3")[IT]="";
-		$("3,2").bigInt(4);
-	}
-	if(are($("4,3")[IT],$("4,4")[IT],$("3,3")[IT])&&$("3,3")[IT]!==""){
-		$("4,3")[IT]="";
-		$("4,4")[IT]="";
-		$("3,3").bigInt(4);
-	}
-	if(are($("4,4")[IT],$("4,5")[IT],$("3,4")[IT])&&$("3,4")[IT]!==""){
-		$("4,4")[IT]="";
-		$("4,5")[IT]="";
-		$("3,4").bigInt(4);
-	}
-	if(are($("3,1")[IT],$("3,2")[IT],$("2,1")[IT])&&$("2,1")[IT]!==""){
-		$("3,1")[IT]="";
-		$("3,2")[IT]="";
-		$("2,1").bigInt(4);
-	}
-	if(are($("3,2")[IT],$("3,3")[IT],$("2,2")[IT])&&$("2,2")[IT]!==""){
-		$("3,2")[IT]="";
-		$("3,3")[IT]="";
-		$("2,2").bigInt(4);
-	}
-	if(are($("3,3")[IT],$("3,4")[IT],$("2,3")[IT])&&$("2,3")[IT]!==""){
-		$("3,3")[IT]="";
-		$("3,4")[IT]="";
-		$("2,3").bigInt(4);
-	}
-	if(are($("3,4")[IT],$("3,5")[IT],$("2,4")[IT])&&$("2,4")[IT]!==""){
-		$("3,4")[IT]="";
-		$("3,5")[IT]="";
-		$("2,4").bigInt(4);
-	}
-	if(are($("2,1")[IT],$("2,2")[IT],$("1,1")[IT])&&$("1,1")[IT]!==""){
-		$("2,1")[IT]="";
-		$("2,2")[IT]="";
-		$("1,1").bigInt(4);
-	}
-	if(are($("2,2")[IT],$("2,3")[IT],$("1,2")[IT])&&$("1,2")[IT]!==""){
-		$("2,2")[IT]="";
-		$("2,3")[IT]="";
-		$("1,2").bigInt(4);
-	}
-	if(are($("2,3")[IT],$("2,4")[IT],$("1,3")[IT])&&$("1,3")[IT]!==""){
-		$("2,3")[IT]="";
-		$("2,4")[IT]="";
-		$("1,3").bigInt(4);
-	}
-	if(are($("2,4")[IT],$("2,5")[IT],$("1,4")[IT])&&$("1,4")[IT]!==""){
-		$("2,4")[IT]="";
-		$("2,5")[IT]="";
-		$("1,4").bigInt(4);
-	}
-	try{
-		if(are($("7,"+row)[IT],$("7,"+(row+1))[IT],$("7,"+(row-1))[IT])&&$("7,"+(row+1))[IT]!==""){
-			$("7,"+(row+1))[IT]="";
-			$("7,"+(row-1))[IT]="";
-			$("7,"+row).bigInt(4);
-		}
-		if(are($("6,"+row)[IT],$("6,"+(row+1))[IT],$("6,"+(row-1))[IT])&&$("6,"+(row+1))[IT]!==""){
-			$("6,"+(row+1))[IT]="";
-			$("6,"+(row-1))[IT]="";
-			$("6,"+row).bigInt(4);
-		}
-		if(are($("5,"+row)[IT],$("5,"+(row+1))[IT],$("5,"+(row-1))[IT])&&$("5,"+(row+1))[IT]!==""){
-			$("5,"+(row+1))[IT]="";
-			$("5,"+(row-1))[IT]="";
-			$("5,"+row).bigInt(4);
-		}
-		if(are($("4,"+row)[IT],$("4,"+(row+1))[IT],$("4,"+(row-1))[IT])&&$("4,"+(row+1))[IT]!==""){
-			$("4,"+(row+1))[IT]="";
-			$("4,"+(row-1))[IT]="";
-			$("4,"+row).bigInt(4);
-		}
-		if(are($("3,"+row)[IT],$("3,"+(row+1))[IT],$("3,"+(row-1))[IT])&&$("3,"+(row+1))[IT]!==""){
-			$("3,"+(row+1))[IT]="";
-			$("3,"+(row-1))[IT]="";
-			$("3,"+row).bigInt(4);
-		}
-		if(are($("2,"+row)[IT],$("2,"+(row+1))[IT],$("2,"+(row-1))[IT])&&$("2,"+(row+1))[IT]!==""){
-			$("2,"+(row+1))[IT]="";
-			$("2,"+(row-1))[IT]="";
-			$("2,"+row).bigInt(4);
-		}
-		if(are($("1,"+row)[IT],$("1,"+(row+1))[IT],$("1,"+(row-1))[IT])&&$("1,"+(row+1))[IT]!==""){
-			$("1,"+(row+1))[IT]="";
-			$("1,"+(row-1))[IT]="";
-			$("1,"+row).bigInt(4);
-		}
-	}catch(e){}
-	if(are($("2,1")[IT],$("1,1")[IT])&&$("1,1")[IT]!==""){
-		$("2,1")[IT]="";
-		$("1,1").bigInt(2);
-	}
-	if(are($("2,2")[IT],$("1,2")[IT])&&$("1,2")[IT]!==""){
-		$("2,2")[IT]="";
-		$("1,2").bigInt(2);
-	}
-	if(are($("2,3")[IT],$("1,3")[IT])&&$("1,3")[IT]!==""){
-		$("2,3")[IT]="";
-		$("1,3").bigInt(2);
-	}
-	if(are($("2,4")[IT],$("1,4")[IT])&&$("1,4")[IT]!==""){
-		$("2,4")[IT]="";
-		$("1,4").bigInt(2);
-	}
-	if(are($("2,5")[IT],$("1,5")[IT])&&$("1,5")[IT]!==""){
-		$("2,5")[IT]="";
-		$("1,5").bigInt(2);
-	}
-	if(are($("3,1")[IT],$("2,1")[IT])&&$("2,1")[IT]!==""){
-		$("3,1")[IT]="";
-		$("2,1").bigInt(2);
-	}
-	if(are($("3,2")[IT],$("2,2")[IT])&&$("2,2")[IT]!==""){
-		$("3,2")[IT]="";
-		$("2,2").bigInt(2);
-	}
-	if(are($("3,3")[IT],$("2,3")[IT])&&$("2,3")[IT]!==""){
-		$("3,3")[IT]="";
-		$("2,3").bigInt(2);
-	}
-	if(are($("3,4")[IT],$("2,4")[IT])&&$("2,4")[IT]!==""){
-		$("3,4")[IT]="";
-		$("2,4").bigInt(2);
-	}
-	if(are($("3,5")[IT],$("2,5")[IT])&&$("2,5")[IT]!==""){
-		$("3,5")[IT]="";
-		$("2,5").bigInt(2);
-	}
-	if(are($("4,1")[IT],$("3,1")[IT])&&$("3,1")[IT]!==""){
-		$("4,1")[IT]="";
-		$("3,1").bigInt(2);
-	}
-	if(are($("4,2")[IT],$("3,2")[IT])&&$("3,2")[IT]!==""){
-		$("4,2")[IT]="";
-		$("3,2").bigInt(2);
-	}
-	if(are($("4,3")[IT],$("3,3")[IT])&&$("3,3")[IT]!==""){
-		$("4,3")[IT]="";
-		$("3,3").bigInt(2);
-	}
-	if(are($("4,4")[IT],$("3,4")[IT])&&$("3,4")[IT]!==""){
-		$("4,4")[IT]="";
-		$("3,4").bigInt(2);
-	}
-	if(are($("4,5")[IT],$("3,5")[IT])&&$("3,5")[IT]!==""){
-		$("4,5")[IT]="";
-		$("3,5").bigInt(2);
-	}
-	if(are($("5,1")[IT],$("4,1")[IT])&&$("4,1")[IT]!==""){
-		$("5,1")[IT]="";
-		$("4,1").bigInt(2);
-	}
-	if(are($("5,2")[IT],$("4,2")[IT])&&$("4,2")[IT]!==""){
-		$("5,2")[IT]="";
-		$("4,2").bigInt(2);
-	}
-	if(are($("5,3")[IT],$("4,3")[IT])&&$("4,3")[IT]!==""){
-		$("5,3")[IT]="";
-		$("4,3").bigInt(2);
-	}
-	if(are($("5,4")[IT],$("4,4")[IT])&&$("4,4")[IT]!==""){
-		$("5,4")[IT]="";
-		$("4,4").bigInt(2);
-	}
-	if(are($("5,5")[IT],$("4,5")[IT])&&$("4,5")[IT]!==""){
-		$("5,5")[IT]="";
-		$("4,5").bigInt(2);
-	}
-	if(are($("6,1")[IT],$("5,1")[IT])&&$("5,1")[IT]!==""){
-		$("6,1")[IT]="";
-		$("5,1").bigInt(2);
-	}
-	if(are($("6,2")[IT],$("5,2")[IT])&&$("5,2")[IT]!==""){
-		$("6,2")[IT]="";
-		$("5,2").bigInt(2);
-	}
-	if(are($("6,3")[IT],$("5,3")[IT])&&$("5,3")[IT]!==""){
-		$("6,3")[IT]="";
-		$("5,3").bigInt(2);
-	}
-	if(are($("6,4")[IT],$("5,4")[IT])&&$("5,4")[IT]!==""){
-		$("6,4")[IT]="";
-		$("5,4").bigInt(2);
-	}
-	if(are($("6,5")[IT],$("5,5")[IT])&&$("5,5")[IT]!==""){
-		$("6,5")[IT]="";
-		$("5,5").bigInt(2);
-	}
-	if(are($("7,1")[IT],$("6,1")[IT])&&$("6,1")[IT]!==""){
-		$("7,1")[IT]="";
-		$("6,1").bigInt(2);
-	}
-	if(are($("7,2")[IT],$("6,2")[IT])&&$("6,2")[IT]!==""){
-		$("7,2")[IT]="";
-		$("6,2").bigInt(2);
-	}
-	if(are($("7,3")[IT],$("6,3")[IT])&&$("6,3")[IT]!==""){
-		$("7,3")[IT]="";
-		$("6,3").bigInt(2);
-	}
-	if(are($("7,4")[IT],$("6,4")[IT])&&$("6,4")[IT]!==""){
-		$("7,4")[IT]="";
-		$("6,4").bigInt(2);
-	}
-	if(are($("7,5")[IT],$("6,5")[IT])&&$("6,5")[IT]!==""){
-		$("7,5")[IT]="";
-		$("6,5").bigInt(2);
-	}
-	try{
-		if(are($("7,"+row)[IT],$("7,"+(row+1))[IT])&&$("7,"+(row+1))[IT]!==""){
-			$("7,"+(row+1))[IT]="";
-			$("7,"+row).bigInt(2);
-		}
-		if(are($("6,"+row)[IT],$("6,"+(row+1))[IT])&&$("6,"+(row+1))[IT]!==""){
-			$("6,"+(row+1))[IT]="";
-			$("6,"+row).bigInt(2);
-		}
-		if(are($("5,"+row)[IT],$("5,"+(row+1))[IT])&&$("5,"+(row+1))[IT]!==""){
-			$("5,"+(row+1))[IT]="";
-			$("5,"+row).bigInt(2);
-		}
-		if(are($("4,"+row)[IT],$("4,"+(row+1))[IT])&&$("4,"+(row+1))[IT]!==""){
-			$("4,"+(row+1))[IT]="";
-			$("4,"+row).bigInt(2);
-		}
-		if(are($("3,"+row)[IT],$("3,"+(row+1))[IT])&&$("3,"+(row+1))[IT]!==""){
-			$("3,"+(row+1))[IT]="";
-			$("3,"+row).bigInt(2);
-		}
-		if(are($("2,"+row)[IT],$("2,"+(row+1))[IT])&&$("2,"+(row+1))[IT]!==""){
-			$("2,"+(row+1))[IT]="";
-			$("2,"+row).bigInt(2);
-		}
-		if(are($("1,"+row)[IT],$("1,"+(row+1))[IT])&&$("1,"+(row+1))[IT]!==""){
-			$("1,"+(row+1))[IT]="";
-			$("1,"+row).bigInt(2);
-		}
-	}catch(ñ){}
-	try{
-		if(are($("7,"+row)[IT],$("7,"+(row-1))[IT])&&$("7,"+(row-1))[IT]!==""){
-			$("7,"+(row-1))[IT]="";
-			$("7,"+row).bigInt(2);
-		}
-		if(are($("6,"+row)[IT],$("6,"+(row-1))[IT])&&$("6,"+(row-1))[IT]!==""){
-			$("6,"+(row-1))[IT]="";
-			$("6,"+row).bigInt(2);
-		}
-		if(are($("5,"+row)[IT],$("5,"+(row-1))[IT])&&$("5,"+(row-1))[IT]!==""){
-			$("5,"+(row-1))[IT]="";
-			$("5,"+row).bigInt(2);
-		}
-		if(are($("4,"+row)[IT],$("4,"+(row-1))[IT])&&$("4,"+(row-1))[IT]!==""){
-			$("4,"+(row-1))[IT]="";
-			$("4,"+row).bigInt(2);
-		}
-		if(are($("3,"+row)[IT],$("3,"+(row-1))[IT])&&$("3,"+(row-1))[IT]!==""){
-			$("3,"+(row-1))[IT]="";
-			$("3,"+row).bigInt(2);
-		}
-		if(are($("2,"+row)[IT],$("2,"+(row-1))[IT])&&$("2,"+(row-1))[IT]!==""){
-			$("2,"+(row-1))[IT]="";
-			$("2,"+row).bigInt(2);
-		}
-		if(are($("1,"+row)[IT],$("1,"+(row-1))[IT])&&$("1,"+(row-1))[IT]!==""){
-			$("1,"+(row-1))[IT]="";
-			$("1,"+row).bigInt(2);
-		}
-	}catch(ñ){}
-	},cd*.7);
 }
 function fall(){
 	for(let c=1;c<6;c++){
-		if(graph_map["c"+c].c>0){
-			if(graph_map["c"+c].c<graph_map["c"+c].h[0].num()){
-				for(let i=1;i<7;i++){
-					if($(i+","+c)[IT]==""){
-						$(i+","+c)[IT]=$(i+1+","+c)[IT]
-						$(i+1+","+c)[IT]=""
-						combine(c)
-					}
+		if(graph_map["c"+c].c>0&&graph_map["c"+c].c<graph_map["c"+c].h[0].num()){
+			for(let r=1;r<7;r++){
+				if($(r+","+c)[IT]==""){
+					$(r+","+c)[IT]=$(r+1+","+c)[IT]
+					$(r+1+","+c)[IT]=""
+					combine(r+","+c)
+					delay(fall,100)
 				}
 			}
 		}
 	}
-	try{
-		combine(recent_row)
-		combine(recent_row)
-		combine(recent_row)
-		combine(recent_row+1)
-		combine(recent_row-1)
-		combine(recent_row+2)
-		combine(recent_row-2)
-		combine(recent_row+3)
-		combine(recent_row-3)
-		combine(recent_row+1)
-		combine(recent_row-1)
-		combine(recent_row+3)
-		combine(recent_row-3)
-		combine(recent_row+2)
-		combine(recent_row-2)
-		combine(recent_row)
-	}catch(e){}
 }
 //object methods
 Array.prototype.random=function(){
@@ -876,9 +345,9 @@ Array.prototype.random=function(){
 String.prototype.num=function(){
 	if(this.length>0)return parseFloat(this);
 }
-Element.prototype.bigInt=function(n){
-	this[IT]=BigInt(this[IT]*n||1).toString()
-	score+=this[IT]/4*n
+Element.prototype.bigInt=function(n=1){
+	score+=(this[IT]*n)-this[IT].num()
+	this[IT]=BigInt(this[IT]*n).toString()
 }
 //repeating
 setInterval(()=>{
@@ -891,13 +360,19 @@ setInterval(()=>{
 	scheme["288230376151711744"]=rgb.fetch("rbg")
 	scheme["576460752303423488"]=rgb.fetch("gbr")
 	scheme["1152921504606846976"]=rgb.fetch("bgr")
-	scheme["2305843009213693952"]=rgb.fetch("rrb")
+	scheme["2305843009213693952"]=rgb.fetch("ggb")
 	scheme["4611686018427387904"]=rgb.fetch("rbr")
 	scheme["9223372036854775808"]=rgb.fetch("grg")
 	scheme["18446744073709551616"]=rgb.fetch("bgb")
 	scheme["36893488147419103232"]=rgb.fetch("rgr")
 	scheme["73786976294838206464"]=rgb.fetch("gbg")
 	scheme["147573952589676412928"]=rgb.fetch("brb")
+	scheme["295147905179352825856"]=rgb.fetch("rrg")
+	scheme["590295810358705651712"]=rgb.fetch("ggb")
+	scheme["1180591620717411303424"]=rgb.fetch("bbr")
+	scheme["2361183241434822606848"]=rgb.fetch("rrb")
+	scheme["4722366482869645213696"]=rgb.fetch("ggr")
+	scheme["9444732965739290427392"]=rgb.fetch("bbg")
 	graph_map={
 		c1:{c:0,h:null},
 		c2:{c:0,h:null},
@@ -910,18 +385,17 @@ setInterval(()=>{
 			$(e)[IT].length>0&&(graph_map["c"+i].c++,graph_map["c"+i].h=highest(i));
 			$(e).style[BGC]=scheme[$(e)[IT]]
 			let cbg=$(e).style[BGC].split("(")[1].split(")")[0].split(", ");
-			((cbg[0]*0.299+cbg[1]*0.587+cbg[2]*0.114)>contrast)?($(e).style["color"]="#000"):($(e).style["color"]="#fff")
+			$(e).style.color=((cbg[0]*0.299+cbg[1]*0.587+cbg[2]*0.114)>contrast)?"#000":"#fff";
 		});
 	}
 	$("next").style[BGC]=scheme[$("next")[IT]]
 	let cbg=$("next").style[BGC].split("(")[1].split(")")[0].split(", ");
-	$("next").style["color"]=((cbg[0]*0.299+cbg[1]*0.587+cbg[2]*0.114)>contrast)?"#000":"#fff"
-	fall();
+	$("next").style.color=((cbg[0]*0.299+cbg[1]*0.587+cbg[2]*0.114)>contrast)?"#000":"#fff"
 	$("score")[IT]="Score: "+BigInt(score).toLocaleString();
-	if(score>localStorage.getItem("hs"))localStorage.setItem("hs",BigInt(score));
-	$("highs")[IT]="High: "+BigInt(localStorage.getItem("hs")).toLocaleString()
+	if(score>localStorage.getItem("game_thing_hs"))localStorage.setItem("game_thing_hs",BigInt(score));
+	$("highs")[IT]="High: "+BigInt(localStorage.getItem("game_thing_hs")).toLocaleString();
 },50);
-if(!localStorage.getItem("hs"))localStorage.setItem("hs",0);
+if(!localStorage.getItem("game_thing_hs"))localStorage.setItem("game_thing_hs",0);
 reset()
 		</script>
 	</body>
