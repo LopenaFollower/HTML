@@ -12,14 +12,65 @@
 		<script>
 let ctx=canvas.getContext("2d");
 var items={};
+var scheme=[
+	"#822a33",
+	"#D22A77",
+	"#f00",
+	"#0ef",
+	"#808080",
+	"#fa0",
+	"#a5c710",
+	"#6517bf",
+	"#754f23",
+	"#ffd",
+	"#93d9c7",
+	"#474747",
+	"#888",
+	"#afbdb7",
+	"#B3C77A",
+	"#FF00E4",
+	"#FB0",
+	"#36AF5D",
+	"#7A001E",
+	"#85FFD6",
+	"#C4BC34",
+	"#000C6A",
+	"#FD9CFF",
+	"#59CAFF",
+	"#156F36",
+	"#AF0085",
+	"#DA9B5E",
+	"#D6E300",
+	"#7A687F",
+	"#ff0",
+	"#0f0",
+	"#0ff",
+	"#00f",
+	"#fff",
+	"#eee",
+	"#ddd",
+	"#ccc",
+	"#bbb",
+	"#aaa",
+	"#999",
+	"#888",
+	"#777",
+	"#666",
+	"#555",
+	"#444",
+	"#333",
+	"#222",
+	"#111",
+	"#000"
+]
 function getDensity(str){
 	let len=str.length
 	items={}
 	let diameter=Math.max(canvas.width,canvas.height)
 	ctx.clearRect(0,0,diameter,diameter);
-	str.split("").forEach(e=>{
+	str.split("").forEach((e,i)=>{
 		if(!items[e]){
-			items[e]=[1,"#"+Math.floor(Math.random()*256).toString(16)+Math.floor(Math.random()*256).toString(16)+Math.floor(Math.random()*256).toString(16)]
+			items[e]=[1,scheme[i]]
 		}else{
 			items[e][0]+=1
 		}
@@ -40,7 +91,8 @@ function getDensity(str){
 		ctx.fillStyle="#000";
 		ctx.fill();
 		ctx.font="15px monospace";
-		ctx.fillText(e+" "+items[e][0]+"("+Math.round(items[e][0]/total*10000)/100+")%",235,items[e][2]+(25/2));
+		let dec=1e3
+		ctx.fillText(e+" "+items[e][0]+"("+Math.round(items[e][0]/total*dec*10)/dec+")%",235,items[e][2]+(25/2));
 		ctx.fillStyle=items[e][1];
 		ctx.fill();
 	})

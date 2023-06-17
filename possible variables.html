@@ -33,9 +33,7 @@ function*fromCharCode(start,end){
 let contents="";
 let symbols=fromCharCode(-65536,65536),
 	interval=
-setInterval(()=>{
-	display.insertAdjacentHTML("beforeend",symbols.next().value);
-});
+setInterval(()=>display.insertAdjacentHTML("beforeend",symbols.next().value));
 		</script>
 	</body>
 </html>

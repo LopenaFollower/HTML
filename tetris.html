@@ -56,7 +56,7 @@
 		<script>
 //default grid_dimension = [10,20], canvas size = 30
 const a=(function(s=function(){
-		CANVAS_SIZE=30,
+		CANVAS_SIZE=40,
 		COLOR_CHANGING=0,
 		GRID_DIMENSION=[10,20],
 		PREVIEW_COUNT=9;return[CANVAS_SIZE,COLOR_CHANGING,GRID_DIMENSION,PREVIEW_COUNT]}(),g=document.getElementById("game")){g.width=s[0]*s[2][0];g.height=s[0]*s[2][1];document.getElementById("cont").style.left=s[0]*s[2][0]+5+"px";document.getElementById("s").value=Math.round(Math.random()*100000);return[5,[],s[1],s[2],s[3]]})(),rgb={step:1,r:255,g:0,b:0,rg:false,gg:true,bg:false,rl:false,gl:false,bl:false,fetch:function(f){if(!f)return"rgb("+this.r+","+this.g+","+this.b+")";if(f.length==3){return"rgb("+this[f[0]]+","+this[f[1]]+","+this[f[2]]+")"}}}
@@ -74,7 +74,7 @@ const a=(function(s=function(){
 	function hold(e,f,c,i=null){e.addEventListener("touchstart",v=>{clearInterval(i);e.style.backgroundColor="#666";if(gameOver)return;f();i=setInterval(f,c)});e.addEventListener("touchend",v=>{clearInterval(i);e.style.backgroundColor="initial";i=null})}
 	hold($("left"),()=>move(ttr.col-1),cdd);hold($("right"),()=>move(ttr.col+1),cdd);hold($("drop"),()=>drop(ttr.row+1),cdd);hold($("rotate"),()=>rrot(ttr.rot.map((row,i)=>row.map((val,j)=>ttr.rot[ttr.rot.length-1-j][i]))),cdd*2)
 	document.addEventListener("keydown",e=>{if(gameOver)return;if(e.which===37||e.which===39)move(e.which==37?ttr.col-1:ttr.col+1);if(e.which==38)rrot(ttr.rot.map((row,i)=>row.map((val,j)=>ttr.rot[ttr.rot.length-1-j][i])));if(e.which==40)drop(ttr.row+1)});rAF=requestAnimationFrame(loop)
-})(Math.floor,(s,res=0)=>{res=(s*31)*a[0]*(1-a[0]);res=res.toString().replace("-","").replace("e+","").replace(".","");a[0]=parseInt(res);return parseFloat("0."+res)},Math.ceil,document.getElementById("game"),a[1],[],{"I":"#0ff","O":"#ff0","T":"#808","S":"#0f0","Z":"red","J":"#00f","L":"#f70"},0,null,{"I":[[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]],"J":[[1,0,0],[1,1,1],[0,0,0]],"L":[[0,0,1],[1,1,1],[0,0,0]],"O":[[1,1],[1,1]],"S":[[0,1,1],[1,1,0],[0,0,0]],"Z":[[1,1,0],[0,1,1],[0,0,0]],"T":[[0,1,0],[1,1,1],[0,0,0]]},![],(_)=>document.getElementById(_),0,a[2],null,null,a[3],50)
+})(Math.floor,(s,res=0)=>{res=(s*31)*a[0]*(1-a[0]);res=res.toString().replace("-","").replace("e+","").replace(".","");a[0]=parseInt(res);return parseFloat("0."+res)},Math.ceil,document.getElementById("game"),a[1],[],{"I":"#0ff","O":"#ff0","T":"#808","S":"#0f0","Z":"red","J":"#00f","L":"#f70"},0,null,{"I":[[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]],"J":[[1,0,0],[1,1,1],[0,0,0]],"L":[[0,0,1],[1,1,1],[0,0,0]],"O":[[1,1],[1,1]],"S":[[0,1,1],[1,1,0],[0,0,0]],"Z":[[1,1,0],[0,1,1],[0,0,0]],"T":[[0,1,0],[1,1,1],[0,0,0]]},![],_=>document.getElementById(_),0,a[2],null,null,a[3],100)
 		</script>
 	</body>
 </html>

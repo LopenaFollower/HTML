@@ -11,6 +11,7 @@
 			#main_page,#pi_page{padding:10px;}
 			#tab1,#tab2{background-color:#222a33;border-radius:5px;font-family:monospace;line-height:30px;text-align:center;position:fixed;border:2.5px solid rgb(134,142,151);height:30px;color:#ddd;width:50%;}
 			#disp{background-color:rgba(0,0,0,0);border-radius:10px;border:3px dashed #777f88;width:94%}
+			#keyboard{display:block}
 		</style>
 	</head>
 	<body bgcolor=#222>
@@ -40,7 +41,7 @@
  * Usually takes me around a minute to memorize 10
 */
 function*calc_pi(q,r,t,i,d){
-	for(;;)u=3n*i,u=6n+3n*u**2n+u*9n,d=(27n*q*i+5n*r-12n*q)/(t*5n),yield Number(d),r=10n*u*(r+(5n*i-2n)*q-d*t),t*=u,q*=i*10n*(2n*i++-1n);
+	for(;;)u=3n*i,u=6n+3n*u**2n+u*9n,d=(27n*q*i+5n*r-12n*q)/(t*5n),yield d,r=10n*u*(r+(5n*i-2n)*q-d*t),t*=u,q*=i*10n*(2n*i++-1n);
 }
 let pi="",
 	dp="",
@@ -66,7 +67,7 @@ document.body.onclick=()=>{
 	tab2.style.backgroundColor="#222a33";
 }
 setInterval((z=input)=>{
-	for(let i=0;i<5;i++)pi+=sequence.next().value;
+	for(let i=0;i<5;i++)pi+=Number(sequence.next().value);
 	dp=("3."+pi).substr(0,z.value.length)
 	z.value=z.value.replace(/[^\d.]/g,"")
 	tab1.style.left=0;

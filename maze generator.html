@@ -64,13 +64,13 @@ var{restart,settings}=(function(){
 				alert("done")
 			};
 		}else{//if there is possible dirs then we continue
-			loopTimeout=setTimeout(loop);	
 			dir=adir[Math.random()*adir.length|0];
 			route.push([dir[0]+head[0],dir[1]+head[1]]);
 			ctx.lineTo((dir[0]+head[0])*(pathSize+wallSize)+off,(dir[1]+head[1])*(pathSize+wallSize)+off);
 			map[(dir[1]+head[1])*2][(dir[0]+head[0])*2]=true;
 			map[dir[1]+head[1]*2][dir[0]+head[0]*2]=true;
 			ctx.stroke();
+			loopTimeout=setTimeout(loop);
 		}
 	}
 	loop();

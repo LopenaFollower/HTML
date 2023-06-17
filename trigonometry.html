@@ -20,10 +20,13 @@
 		x = <input id=x value=0 style="width:50px"oninput="try{x=eval(this.value)}catch(e){}"/>
 		y = <input id=x value=0 style="width:50px"oninput="try{y=eval(this.value)}catch(e){}"/>
 		z = <input id=x value=0 style="width:50px"oninput="try{z=eval(this.value)}catch(e){}"/><br>
+		a = <input id=x value=0 style="width:50px"oninput="try{a=eval(this.value)}catch(e){}"/>
+		b = <input id=x value=0 style="width:50px"oninput="try{b=eval(this.value)}catch(e){}"/>
+		c = <input id=x value=0 style="width:50px"oninput="try{c=eval(this.value)}catch(e){}"/><br>
 		<br>
 		<textarea style="width:100%"id=equation></textarea><br>
 		<div id=res></div><br>
-		<button onclick='equation.value=""'>clear</button><button onclick='try{equation.value=equation.value.removeEnd()}catch(e){res.innerText=e.message}'>back</button><button onclick='try{res.innerText=eval(equation.value)}catch(e){res.innerText=e.message}'>solve</button><br><br>
+		<button onclick='equation.value=""'>clear</button><button onclick='try{res.innerText=eval(equation.value)}catch(e){res.innerText=e.message}'>solve</button><br><br>
 		<table border=1 style='border-collapse:collapse;'>
 			<tr>
 				<td class='num'onclick='add(this.innerText,this.className)'>7</td>
@@ -59,7 +62,13 @@
 				<td class='variable'onclick='add(this.innerText,this.className)'>x</td>
 				<td class='variable'onclick='add(this.innerText,this.className)'>y</td>
 				<td class='variable'onclick='add(this.innerText,this.className)'>z</td>
-				<td class='variable'onclick='add(this.innerText,this.className)'></td>
+				<td class=''onclick='try{equation.value=equation.value.removeEnd()}catch(e){res.innerText=e.message}'><</td>
+			</tr>
+			<tr>
+				<td class='variable'onclick='add(this.innerText,this.className)'>a</td>
+				<td class='variable'onclick='add(this.innerText,this.className)'>b</td>
+				<td class='variable'onclick='add(this.innerText,this.className)'>c</td>
+				<td class=''onclick=''></td>
 			</tr>
 		</table>
 		<table border=1 style='border-collapse:collapse;'>
@@ -101,57 +110,19 @@ String.prototype.removeEnd=function(c=1){
 String.prototype.insert=function(str,index){
 	return this.substring(0,index)+str+this.substring(index,this.length)
 };
-var x=0,y=0,z=0,focused=false;
-const
-{tan}=Math,
-{tanh}=Math,
-{atan}=Math,
-{atan2}=Math,
-{atanh}=Math,
-{cos}=Math,
-{cosh}=Math,
-{acos}=Math,
-{acosh}=Math,
-{sin}=Math,
-{sinh}=Math,
-{asin}=Math,
-{asinh}=Math,
-{sqrt}=Math,
-{pow}=Math,
-{cbrt}=Math,
-{abs}=Math
+var x=0,y=0,z=0,a=0,b=0,c=0,focused=false;
+const{tan,tanh,atan,atan2,atanh,cos,cosh,acos,acosh,sin,sinh,asin,asinh,sqrt,pow,cbrt,abs}=Math
 const fact=function(a){
 	a=parseInt(eval(a))
 	let r=a;
 	if(a>0){
-		for(let i=a-1;i>0;i--){
-			r*=i
-		}
+		while(--a)r*=a;
 	}else if(a<0){
-		for(let i=a+1;i<0;i++){
-			r*=i
-		}
+		while(++a)r*=a;
 	}else{
 		return 1
 	}
 	return r
-}
-function setSelectionRange(input,selectionStart, selectionEnd) {
-    if (input.setSelectionRange) {
-        input.focus();
-        input.setSelectionRange(selectionStart, selectionEnd);
-    }
-    else if (input.createTextRange) {
-        var range = input.createTextRange();
-        range.collapse(true);
-        range.moveEnd('character', selectionEnd);
-        range.moveStart('character', selectionStart);
-        range.select();
-    }
-}
-
-function setCaretToPos (input, pos) {
-       setSelectionRange(input, pos, pos);
 }
 function add(e,t,r=""){
 	if(t=="num"||t=="op"||t=="reg"||t=="variable"){

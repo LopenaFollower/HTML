@@ -101,6 +101,10 @@
 					<td><input id=n oninput="next_p(this.value)"onload='this.value=2**(Math.round(Math.random()*49)+5)'/></td>
 					<td><button onclick="next_p($('n').value)">force</button></td>
 				</tr>
+				<tr>
+					<td>auto place</td>
+					<td><input type=checkbox id=autoplace /></td>
+				</tr>
 			</table>
 		</center>
 		<div id=container>
@@ -269,7 +273,35 @@ function next_p(forced){
 	if(forced&&validate_forced(forced)){
 		$("next")[IT]=forced
 	}else if(!$("next")[IT]){
-		$("next")[IT]=[64,128,32].random();
+		$("next")[IT]=[32,64,128].random();
+	}
+	if(autoplace.checked){
+		delay(()=>{
+			let retries=0,retry=()=>{
+				let x=Math.floor(Math.random()*5+1);
+				if($("7,"+x)[IT]===""||$("7,"+x)[IT]===$("next")[IT]){
+					$("1,"+x).click()
+				}else{
+					setTimeout(retry)
+					++retries
+					if(retries>25){
+						delay(()=>{
+							let ready=true
+							for(let i=1;i<6;i++){
+								if($("7,"+i)[IT]==$("next")[IT]){
+									ready=false
+								}
+								if($("7,"+i)[IT]==""){
+									ready=false
+								}
+							}
+							if(ready)reset();
+						},250);
+					}
+				}
+			}
+			retry()
+		},50);
 	}
 }
 function combine(row){
