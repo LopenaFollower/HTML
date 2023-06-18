@@ -4,16 +4,21 @@
 		<title></title>
 		<meta name="viewport"content="width=device-width,initial-scale=1">
 		<style>
-			*{
+			body{
 				word-wrap:break-word;
-				
 			}
 			#display{
 				font-family:monospace;
+				border:1px black solid;
+			}
+			button{
+				padding:10px;
 			}
 		</style>
 	</head>
-	<body>
+	<body onclick="ns()">
+		<br>
+		<span id=cs></span>&nbsp;<span id=ci></span>
 		<div id=display></div>
 		<script>
 function save(t){
@@ -27,13 +32,19 @@ function*fromCharCode(start,end){
 	start=Math.round(Math.min(start,end));
 	end=Math.round(Math.max(start,end));
 	while(start++<=end){
-		yield String.fromCharCode(start)
+		yield[String.fromCharCode(start),start]
 	}
 }
 let contents="";
-let symbols=fromCharCode(-65536,65536),
-	interval=
-setInterval(()=>display.insertAdjacentHTML("beforeend",symbols.next().value));
+let symbols=fromCharCode(-65536,65536)
+var current=[];
+function ns(){
+	current=symbols.next().value
+	cs.textContent=current[0];
+	ci.textContent=current[1];
+	display.insertAdjacentHTML("beforeend",current[0]);
+}
+setInterval(ns)
 		</script>
 	</body>
 </html>

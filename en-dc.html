@@ -3,6 +3,7 @@
 	<head>
 		<title>string encrypt</title>
 		<style>
+			textarea{width:98%;word-wrap:break-word;}
 		</style>
 	</head>
 	<body bgcolor=#d4efd8>
@@ -11,7 +12,7 @@
 		<textarea id=res readonly></textarea>
 		<p id="req"style="display:none;">\</p>
 		<script>
-let z_EdIc = 5;
+let z_EdIc=5;
 var yum=((a,t,i)=>{let m=a.length;while(m){i=Math.floor((random=(s,r=0)=>{r=(s*31)*z_EdIc*(1-z_EdIc);r=r.toString().replace("-","").replace("e+","").replace(".","");z_EdIc=parseInt(r);return parseFloat("0."+r)})(6942069)*m--);t=a[m];a[m]=a[i];a[i]=t}return a})("1234567890qwertyuiopasdfghjklzxcvbnm,.@#$_&-+()/*\"':;!?~`|^={}%[] QWERTYPOIUASDFGHLKJZXCVBMN".split(""))
 function dealwith(string){
 	return document.getElementById("s").checked?((str,string=yum,res="")=>{for(let i in str){res+=string.join("")[string.reverse().join("").indexOf(str[i])]}return res})(((t1,r="")=>{t1=t1.split("");let l=t1.length;for(let i=0;i<l;i++){r+=t1[i%2==0?"pop":"shift"]();}return r})(btoa(string))):atob(((string,r1="",r2="")=>{let l=string.length;for(let i=0;i<=l;i++){i%2==0?r2=string.charAt(i)+r2:r1+=string.charAt(i)}return r1+r2})(((str,string=yum,res="")=>{for(let i in str){res+=string.join("")[string.reverse().join("").indexOf(str[i])]}return res})(string)))
