@@ -29,38 +29,21 @@
 		<span contenteditable id=happen>i</span><br><br>
 		<button onclick='it()'>Iterate</button>
 		<script>
-var n=0,l=100;
-const
-{tan}=Math,
-{tanh}=Math,
-{atan}=Math,
-{atan2}=Math,
-{atanh}=Math,
-{cos}=Math,
-{cosh}=Math,
-{acos}=Math,
-{acosh}=Math,
-{sin}=Math,
-{sinh}=Math,
-{asin}=Math,
-{asinh}=Math,
-{sqrt}=Math,
-{pow}=Math,
-{cbrt}=Math,
-{abs}=Math,
+var n,l;
+const{tan,tanh,atan,atan2,atanh,cos,cosh,acos,acosh,sin,sinh,asin,asinh,sqrt,pow,cbrt,abs}=Math
 fact=function(a){
 	a=parseInt(eval(a))
 	let r=a;
 	if(a>0){
-		for(let i=a-1;i>0;i--){
-			r*=i
+		while(--a){
+			r*=a
 		}
 	}else if(a<0){
-		for(let i=a+1;i<0;i++){
-			r*=i
+		while(++a){
+			r*=a
 		}
 	}else{
-		return 1
+		r=1
 	}
 	return r
 }

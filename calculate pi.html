@@ -18,24 +18,39 @@
 		</style>
 	</head>
 	<body onbeforeunload="save()">
-		<button onclick='save()'>download</button><div id=len></div><br>
-		<div id=res></div>
+		<button onclick="save()">download</button><div id=len></div><br>
 		<script>
-/*
-calculated using the Spigot Algorithms
-http://www.cs.ox.ac.uk/jeremy.gibbons/publications/spigot.pdf*/
-function*calc_pi(q,r,t,i,d){
-	for(;;){
-		u=3n*i,u=6n+3n*u**2n+u*9n,d=(27n*q*i+5n*r-12n*q)/(t*5n),yield Number(d),r=10n*u*(r+(5n*i-2n)*q-d*t),t*=u,q*=i*10n*(2n*i++-1n);
-	}
+if(!localStorage.getItem("pi_formula")){
+	localStorage.setItem("pi_formula","60,13440,10080,3")
 }
-var pi="3.",sequence=calc_pi(60n,13440n,10080n,3n,3n),i=parseInt(localStorage.getItem("pi-index"))||0;
+if(!localStorage.getItem("pi")){
+	localStorage.setItem("pi","3.")
+}
+let stored=localStorage.getItem("pi_formula").split(",")
+var q=BigInt(stored[0]),
+	r=BigInt(stored[1]),
+	t=BigInt(stored[2]),
+	i=BigInt(stored[3]);
+function calc_pi(){
+	u=3n*i;
+	u=6n+3n*u**2n+u*9n;
+	d=(27n*q*i+5n*r-12n*q)/(t*5n);
+	r=10n*u*(r+(5n*i-2n)*q-d*t);
+	t*=u;
+	q*=i*10n*(2n*i++-1n);
+	localStorage.setItem("pi_formula",q.toString()+","+r.toString()+","+t.toString()+","+i.toString())
+	return Number(d)
+}
 setInterval(()=>{
-	for(let i=0;i<25;i++)pi+=sequence.next().value;
+	for(let index=0;index<5;index++)localStorage.setItem("pi",localStorage.getItem("pi")+calc_pi());
 })
+setInterval(()=>{
+	len.innerText=localStorage.getItem("pi").length
+},5e3)
 function save(){
 	let link=document.createElement("a");
-	link.href=URL.createObjectURL(new Blob([pi],{type:'text/plain'}));
+	let pi=localStorage.getItem("pi")
+	link.href=URL.createObjectURL(new Blob([pi],{type:"text/plain"}));
 	link.download=pi.length.toLocaleString()+" chars of pi.txt";
 	link.click();
 	URL.revokeObjectURL(link.href);

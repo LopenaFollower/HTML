@@ -8,7 +8,7 @@
 	</head>
 	<body bgcolor=#d4efd8>
 		encrypt<input type=checkbox id=s checked/><br><br>
-		<textarea oninput='res.value=dealwith(this.value)'></textarea><br>
+		<textarea id=input oninput='res.value=dealwith(this.value)'></textarea><br>
 		<textarea id=res readonly></textarea>
 		<p id="req"style="display:none;">\</p>
 		<script>
@@ -17,6 +17,25 @@ var yum=((a,t,i)=>{let m=a.length;while(m){i=Math.floor((random=(s,r=0)=>{r=(s*3
 function dealwith(string){
 	return document.getElementById("s").checked?((str,string=yum,res="")=>{for(let i in str){res+=string.join("")[string.reverse().join("").indexOf(str[i])]}return res})(((t1,r="")=>{t1=t1.split("");let l=t1.length;for(let i=0;i<l;i++){r+=t1[i%2==0?"pop":"shift"]();}return r})(btoa(string))):atob(((string,r1="",r2="")=>{let l=string.length;for(let i=0;i<=l;i++){i%2==0?r2=string.charAt(i)+r2:r1+=string.charAt(i)}return r1+r2})(((str,string=yum,res="")=>{for(let i in str){res+=string.join("")[string.reverse().join("").indexOf(str[i])]}return res})(string)))
 }
+function hxed(str,hz={[" "]:"x20",["!"]:"x21",['"']:"x22",["#"]:"x23",["$"]:"x24",["%"]:"x25",["&"]:"x26",["'"]:"x27",["("]:"x28",[")"]:"x29",["0"]:"x30",["1"]:"x31",["2"]:"x32",["3"]:"x33",["4"]:"x34",["5"]:"x35",["6"]:"x36",["7"]:"x37",["8"]:"x38",["9"]:"x39",["@"]:"x40",["A"]:"x41",["B"]:"x42",["C"]:"x43",["D"]:"x44",["E"]:"x45",["F"]:"x46",["G"]:"x47",["H"]:"x48",["I"]:"x49",["P"]:"x50",["Q"]:"x51",["R"]:"x52",["S"]:"x53",["T"]:"x54",["U"]:"x55",["V"]:"x56",["W"]:"x57",["X"]:"x58",["Y"]:"x59",["`"]:"x60",["a"]:"x61",["b"]:"x62",["c"]:"x63",["d"]:"x64",["e"]:"x65",["f"]:"x66",["g"]:"x67",["h"]:"x68",["i"]:"x69",["p"]:"x70",["q"]:"x71",["r"]:"x72",["s"]:"x73",["t"]:"x74",["u"]:"x75",["v"]:"x76",["w"]:"x77",["x"]:"x78",["y"]:"x79"}){
+	let res="";
+	for(let i=0;i<str.length;i++){
+		res+=typeof hz[str[i]]=="string"?String.fromCharCode(92)+hz[str[i]]:str[i];
+	}
+	return res;
+};
+function automate(arr){
+	let r=[];
+	arr&&arr.forEach(e=>{
+		console.log('"'+hxed(dealwith(e))+'",')
+		if(dealwith(e).indexOf("'")!==-1)r.push("uh oh");
+	})
+	alert(r)
+}
+let arr=[
+
+]//48
+automate(arr)
 		</script>
 	</body>
 </html>

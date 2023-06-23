@@ -15,11 +15,11 @@
 		</style>
 	</head>
 	<body bgcolor=#222>
-		<div id=tab1 onclick='changeTab("input")'>Input pi</div><div id=tab2 onclick='changeTab()'>View pi</div>
+		<div id=tab1 onclick='changeTab("input")'>Input pi</div><div id=tab2 onclick='changeTab("view")'>View pi</div>
 		<br><br>
 		<div id=main_page>
 			type pi from memory<br><textarea id=input onchange='cpi.innerText="";ypi.innerText="";result.innerText=""'></textarea><br>
-			<button onclick='result.innerText=((ac=0,t=dp.length)=>{cpi.innerHTML="";ypi.innerHTML="";for(let i=0;i<t;i++){dp[i]===input.value[i]?(ac++,cpi.innerHTML+=input.value[i],ypi.innerHTML+=input.value[i]):(ypi.innerHTML+=`<span style="color:red">${input.value[i]}</span>`,cpi.innerHTML+=`<span style="color:#0f0">${dp[i]}</span>`)};ac>2?ac-=2:ac-=ac;t>2?t-=2:t-=t;return`You got ${ac} out of ${t} decimal places of pi`})()'>Check</button><button onclick='if((prompt("type \"yes\" to confirm")||"").toLowerCase()=="yes")cpi.innerText="",ypi.innerText="",result.innerText="",input.value=""'>Clear</button><br>
+			<button onclick='result.innerText=((ac=0,t=dp.length)=>{cpi.innerHTML="";ypi.innerHTML="";for(let i=0;i<t;i++){dp[i]===input.value[i]?(ac++,cpi.innerHTML+=input.value[i],ypi.innerHTML+=input.value[i]):(ypi.innerHTML+=`<span style="color:red">${input.value[i]}</span>`,cpi.innerHTML+=`<span style="color:#0f0">${dp[i]}</span>`)};ac>2?ac-=2:ac-=ac;t>2?t-=2:t-=t;return`You got ${ac} out of ${t} decimal places of pi`})()'>Check</button><button onclick='if((prompt("type \"yes\" to confirm")||"").toLowerCase().indexOf("yes")!==-1)cpi.innerText="",ypi.innerText="",result.innerText="",input.value=""'>Clear</button><br>
 			<p id=cpi readonly></p>
 			<p id=ypi readonly></p>
 			<div id=result></div>
@@ -48,17 +48,20 @@ let pi="",
 	sequence=calc_pi(60n,13440n,10080n,3n,3n);
 function changeTab(tab){
 	setTimeout(()=>{
-		if(tab=="input"){
-			main_page.style.display="block";
-			pi_page.style.display="none";
-			tab1.style.backgroundColor="#555";
-			tab2.style.backgroundColor="#222a33";
-		}else{
-			main_page.style.display="none";
-			pi_page.style.display="block";
-			input.value="";
-			tab1.style.backgroundColor="#222a33";
-			tab2.style.backgroundColor="#555";
+		switch(tab){
+			case"input":
+				main_page.style.display="block";
+				pi_page.style.display="none";
+				tab1.style.backgroundColor="#555";
+				tab2.style.backgroundColor="#222a33";
+				break;
+			case"view":
+				main_page.style.display="none";
+				pi_page.style.display="block";
+				input.value="";
+				tab1.style.backgroundColor="#222a33";
+				tab2.style.backgroundColor="#555";
+				break;
 		}
 	});
 }
@@ -93,7 +96,7 @@ setInterval(()=>((subject,ctx,clearance,fontsize,spacing,padding,per,x,y)=>{
 function hold(e,f=a=>{},c,i=null){e.addEventListener("touchstart",v=>{clearInterval(i);e.style.backgroundColor="#666";f();i=setInterval(f,c)});e.addEventListener("touchend",v=>{clearInterval(i);setTimeout(()=>e.style.backgroundColor="initial",50);i=null})}
 Array.from(document.getElementsByTagName("td")).forEach(e=>hold(e,a=>{!e.id?(input.value+=e.innerText,cpi.innerText="",ypi.innerText="",result.innerText=""):input.value=input.value.substring(0,input.value.length-1)},100))
 /*
-grouped into 10 decimals
+grouped into 10s
 
 3.1415926535
 
