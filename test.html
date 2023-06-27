@@ -48,28 +48,9 @@ var ls=localStorage,
 	its=ls.getItem("its")||0,
 	ps=0,
 	sqrt=Math.sqrt,
-	pow=Math.pow,
 	scale=349,
 	ctx=visual.getContext("2d"),
-	_re=null,
-	rgb={
-		step:1,
-		r:255,
-		g:0,
-		b:0,
-		rg:false,
-		gg:true,
-		bg:false,
-		rl:false,
-		gl:false,
-		bl:false,
-		fetch:function(f){
-			if(!f)return"rgb("+this.r+","+this.g+","+this.b+")";
-			if(f.length==3){
-				return"rgb("+this[f[0]]+","+this[f[1]]+","+this[f[2]]+")";
-			}
-		}
-	}
+	_re=null
 if(!ls.getItem("c"))ls.setItem("c",0);
 if(!ls.getItem("its"))ls.setItem("its",0);
 function it(is=250000){
@@ -77,15 +58,13 @@ function it(is=250000){
 		its++
 		let x=Math.random()*2-1,
 			y=Math.random()*2-1;
-		if(i%(is/100)===0){
+		/*if(i%(is/100)===0){
 			ctx.beginPath();
 			ctx.rect(x*scale-1,y*scale-1,2,2);
-			ctx.fillStyle=sqrt(pow(x,2)+pow(y,2))<=1?"#0d0":"rgba(200,0,0,.5)"
+			ctx.fillStyle=sqrt(x**2+y**2)<=1?"#0d0":"rgba(200,0,0,.5)"
 			ctx.fill()
-		}
-		if(sqrt(pow(x,2)+pow(y,2))<1){
-			c++
-		}
+		}*/
+		sqrt(x**2+y**2)<1&&c++
 	}
 }
 function re(rate){
@@ -112,24 +91,6 @@ function re(rate){
 }
 setInterval((f=0xff)=>{
 	it()
-	rgb.r>f&&(rgb.rg=false,rgb.r=f)
-	rgb.g>f&&(rgb.gg=false,rgb.g=f)
-	rgb.b>f&&(rgb.bg=false,rgb.b=f)
-	rgb.r<0&&(rgb.rl=false,rgb.r=0)
-	rgb.g<0&&(rgb.gl=false,rgb.g=0)
-	rgb.b<0&&(rgb.bl=false,rgb.b=0)
-	rgb.r==f&&rgb.g==0&&rgb.b==0&&(rgb.gg=true)
-	rgb.r==f&&rgb.g==f&&rgb.b==0&&(rgb.rl=true)
-	rgb.r==0&&rgb.g==f&&rgb.b==0&&(rgb.bg=true)
-	rgb.r==0&&rgb.g==f&&rgb.b==f&&(rgb.gl=true)
-	rgb.r==0&&rgb.g==0&&rgb.b==f&&(rgb.rg=true)
-	rgb.r==f&&rgb.g==0&&rgb.b==f&&(rgb.bl=true)
-	rgb.rg&&(rgb.r+=rgb.step)
-	rgb.gg&&(rgb.g+=rgb.step)
-	rgb.bg&&(rgb.b+=rgb.step)
-	rgb.rl&&(rgb.r-=rgb.step)
-	rgb.gl&&(rgb.g-=rgb.step)
-	rgb.bl&&(rgb.b-=rgb.step)
 });
 (function(a){
 	let past=a,
@@ -144,7 +105,7 @@ setInterval((f=0xff)=>{
 			}
 			requestAnimationFrame(update)
 		}
-		requestAnimationFrame(update)
+	requestAnimationFrame(update)
 })(Date.now())
 re(5)
 		</script>

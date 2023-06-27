@@ -53,7 +53,7 @@ var grid=[],
 	cc=true;
 const $=ñ=>document.getElementById(ñ);
 function check(ç){
-	!(pg||!cc)&&$(ç).innerText==""&&(place(ç,me),cc=![],setTimeout(circle,200))
+	!(pg||!cc)&&$(ç).innerText==""&&(place(ç,me),cc=![],setTimeout(circle,random()*250+100))
 }
 function place(ã,ā){
 	$(ã).innerText=ā
@@ -78,7 +78,6 @@ function reset(){
 	cc=true
 }
 function circle(){
-	if(pg)return;
 	if(!$("mode").checked){
 		let rplace=()=>{
 			let rid=grid_ids[floor(random()*grid_ids.length)]

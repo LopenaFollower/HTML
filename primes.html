@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>primes</title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+		</style>
+	</head>
+	<body>
+		indexed so far <span id=nc></span><br>
+		nth prime<input id=nth type=number oninput='dis.innerText=primes[BigInt(this.value)-1n]'/>
+		<p id=dis></p>
+		<script>
+function isPrime(n){
+	if(n<=1)return false
+	for(let i=2;i<n;i++){
+		if(n%i===0)return false
+	}
+	return true
+}
+let n=0;
+const primes=[],l=
+setInterval(()=>{
+	for(let i=0;i<5e3;i++){
+		isPrime(++n)&&(primes[primes.length]=n)
+	}
+	nc.innerText=primes.length
+})
+
+		</script>
+	</body>
+</html>
