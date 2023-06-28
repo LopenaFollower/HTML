@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>tic tac toe</title>
+		<style>
+			body{
+				color:#fff;
+			}
+			input{
+				color:#000;
+				accent-color:grey;
+				border:none;
+			}
+			td,table{
+				width:110px;
+				height:110px;
+				text-align:center;
+				font-size:88px;
+				table-layout:fixed;
+				border-collapse:collapse;
+				border-color:#303030;
+			}
+		</style>
+	</head>
+	<body bgcolor=#222>
+		You are <select id=first oninput='reset();this.value=="1"&&setTimeout(botMove,100)'><option value=0>X</option><option value=1>O</option></select><br>
+		<input type=button onclick="reset()"value="reset"/>
+		<table border=1>
+			<tr>
+				<td id="1,1"onclick="check(this.id)"></td>
+				<td id="1,2"onclick="check(this.id)"></td>
+				<td id="1,3"onclick="check(this.id)"></td>
+			</tr>
+			<tr>
+				<td id="2,1"onclick="check(this.id)"></td>
+				<td id="2,2"onclick="check(this.id)"></td>
+				<td id="2,3"onclick="check(this.id)"></td>
+			</tr>
+			<tr>
+				<td id="3,1"onclick="check(this.id)"></td>
+				<td id="3,2"onclick="check(this.id)"></td>
+				<td id="3,3"onclick="check(this.id)"></td>
+			</tr>
+		</table>
+		<div id=win onclick="reset();this.text('')"></div>
+		<script>
+const $=id=>document.getElementById(id),grid_ids=[],
+	corners=["1,1","1,3","3,1","3,3"],
+	winningPatterns=[["1,1","2,1","3,1"],["1,2","2,2","3,2"],["1,3","2,3","3,3"],["1,1","1,2","1,3"],["2,1","2,2","2,3"],["3,1","3,2","3,3"],["1,1","2,2","3,3"],["1,3","2,2","3,1"]];
+var me;
+var bot;
+var lastMove;
+var moveCnt=0;
+var canMove=true;
+var ongoing=true;
+var grid=[];
+var score={
+	x:0,
+	o:0
+}
+for(let x=1;x<=3;x++){
+	for(let y=1;y<=3;y++){
+		grid_ids.push(x+","+y)
+	}
+}
+Element.prototype.text=function(t=1){
+	return t!=1?(this.innerText=t):this.innerText
+}
+Array.prototype.rand=function(){
+	return this[Math.floor(Math.random()*this.length)]
+}
+const t=id=>$(id).text();
+function arent(a,...b){
+	return a!==b[0]&&b.every(e=>e==b[0])
+}
+function place(id,s){
+	return $(id).text()==""&&(grid.push(id))&&$(id).text(s)
+}
+function check(id){
+	canMove&&ongoing&&place(id,me)&&(setTimeout(botMove,150),lastMove=id,canMove=![],moveCnt++)
+}
+function blockThreat(){
+	let toBlock=[];
+	let hwm=false;
+	for(let i=0;i<3;i++){
+		winningPatterns.forEach(e=>{
+			let e2=[...e]
+			e2.splice(i,1)
+			arent("",t(e2[0]),t(e2[1]),bot)&&t(e[i])==""&&(hwm=e[i]);
+			arent("",t(e2[0]),t(e2[1]),me)&&t(e[i])!=bot&&toBlock.push(e[i]);
+		})
+	}
+	let final=toBlock.filter((e,i)=>toBlock.indexOf(e)==i)
+	return hwm||final.length>0&&final||![]
+}
+function createThreat(){
+	let threats=[];
+	grid_ids.forEach(e=>{
+		if(t(e)==bot){
+			let x=parseInt(e.split(",")[0]);
+			let y=parseInt(e.split(",")[1]);
+			for(let i=-2;i<=2;i+=4){
+				for(let o=-1;o<=1;o+=2){
+					grid_ids.includes(`${x},${y+i}`)&&grid_ids.includes(`${x},${y+i-o}`)&&!$(`${x},${y+i}`).text()&&!$(`${x},${y+i-o}`).text()&&threats.push(`${x},${y+i}`)
+					grid_ids.includes(`${x+i},${y}`)&&grid_ids.includes(`${x+i-o},${y}`)&&!$(`${x+i},${y}`).text()&&!$(`${x+i-o},${y}`).text()&&threats.push(`${x+i},${y}`)
+				}
+			}
+		}
+	})
+	let final=threats.filter((e,i)=>threats.indexOf(e)==i)
+	return final.length>0&&final||[![]]
+}
+function beside(p){
+	let x=parseInt(p.split(",")[0]);
+	let y=parseInt(p.split(",")[1]);
+	let points=[];
+	for(let i=-1;i<=1;i+=2){
+		try{
+			!$(`${x},${y+i}`).text()&&points.push(`${x},${y+i}`)
+			!$(`${x+i},${y}`).text()&&points.push(`${x+i},${y}`)
+		}catch(e){}
+	}
+	let final=[];
+	points.forEach(e=>{
+		let x=parseInt(e.split(",")[0]);
+		let y=parseInt(e.split(",")[1]);
+		for(let i=-2;i<=2;i+=4){
+			grid_ids.includes(`${x},${y+i}`)&&!$(`${x},${y+i}`).text()&&final.push(`${x},${y}`)
+			grid_ids.includes(`${x+i},${y}`)&&!$(`${x+i},${y}`).text()&&final.push(`${x},${y}`)
+		}
+	})
+	return final.length>0&&final||![]
+}
+function randomMove(){
+	let sp;
+	grid_ids.forEach(e=>!$(e).text()&&(sp=e))
+	return sp
+}
+function botMove(){
+	if(grid.length==9)return;
+	if(bot=="X"){
+		if(moveCnt==0){
+			place("2,2",bot)
+		}else if(moveCnt==1){
+			place(beside(lastMove).rand(),bot)
+		}else{
+			place(blockThreat()||createThreat().rand()||beside(lastMove)[0]||randomMove(),bot)
+		}
+	}else{
+		moveCnt==1?(place("2,2",bot)||place(corners.rand(),bot)):place(blockThreat()||createThreat().rand()||beside(lastMove)[0]||randomMove(),bot)
+	}
+	setTimeout(()=>canMove=true,100);
+}
+function winner(w){
+	ongoing&&score[w.toLowerCase()]++
+	ongoing=![];
+	canMove=![];
+	win.text(w+" wins!\nScore: "+score.x+" - "+score.o+"\n\nrestart?");
+}
+function won(){
+	winningPatterns.forEach(e=>{
+		arent("",t(e[0]),t(e[1]),t(e[2]))&&winner(t(e[0]));
+	})
+}
+function reset(){
+	grid_ids.forEach(e=>$(e).text(""));
+	win.text("");
+	lastMove=null;
+	grid=[];
+	moveCnt=0;
+	ongoing=true;
+	setTimeout(()=>{
+		canMove=me=="X";
+		!canMove&&botMove();
+	},200)
+}
+setInterval(()=>{
+	let fm=first.value;
+	me=fm=="1"?"O":"X";
+	bot=fm=="0"?"O":"X";
+	won();
+	grid.length==9&&(grid=[])&&setTimeout(reset,300)
+})
+		</script>
+	</body>
+</html>
