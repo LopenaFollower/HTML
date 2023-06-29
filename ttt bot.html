@@ -9,23 +9,20 @@
 			}
 			input{
 				color:#000;
-				accent-color:grey;
-				border:none;
 			}
 			td,table{
-				width:110px;
-				height:110px;
+				width:130px;
+				height:130px;
 				text-align:center;
-				font-size:88px;
+				font-size:104px;
 				table-layout:fixed;
-				border-collapse:collapse;
-				border-color:#303030;
+				border:2.5px solid #444;
 			}
 		</style>
 	</head>
 	<body bgcolor=#222>
-		<select id=difficulty oninput='setTimeout(reset);score={X:0,O:0}'><option value=0>Impossible</option><option value=1>Medium</option><option value=2>Easy</option></select>
-		<table border=1>
+		<select id=difficulty oninput="reset();score={X:0,O:0}"><option value=0>Impossible</option><option value=1>Medium</option><option value=2>Easy</option></select>
+		<table>
 			<tr>
 				<td id="1,1"onclick="check(this.id)"></td>
 				<td id="1,2"onclick="check(this.id)"></td>
@@ -42,11 +39,11 @@
 				<td id="3,3"onclick="check(this.id)"></td>
 			</tr>
 		</table>
-		You are <select id=first oninput='setTimeout(reset);score={X:0,O:0}'><option value=0>X</option><option value=1>O</option></select><br>
+		You are <select id=first oninput="reset();score={X:0,O:0}"><option value=0>X</option><option value=1>O</option></select><br>
 		<input type=button onclick="reset()"value="reset"/><br><br>
-		<div id=win onclick="reset();this.text('')"></div>
+		<div id=win></div>
 		<script>
-const $=id=>document.getElementById(id),grid_ids=[],
+const $=id=>document.getElementById(id),log=console.log,grid_ids=[],
 	corners=["1,1","1,3","3,1","3,3"],
 	sides=["1,2","2,1","2,3","3,2"],
 	winningPatterns=[["1,1","2,1","3,1"],["1,2","2,2","3,2"],["1,3","2,3","3,3"],["1,1","1,2","1,3"],["2,1","2,2","2,3"],["3,1","3,2","3,3"],["1,1","2,2","3,3"],["1,3","2,2","3,1"]];
@@ -58,15 +55,10 @@ var mode=0;
 var canMove=true;
 var ongoing=true;
 var grid=[];
-var score={
-	X:0,
-	O:0
-}
-for(let x=1;x<4;x++)
-	for(let y=1;4>y;y++)
-		grid_ids.push(x+","+y)
+var score={X:0,O:0};
+for(let x=1;x<4;x++)for(let y=1;4>y;y++)grid_ids.push(x+","+y);
 Element.prototype.text=function(t=1){
-	return t!=1?(this.innerText=t):this.innerText
+	return t!=1?(this.innerText=t):this.innerText;
 }
 Array.prototype.rand=function(){
 	return this[Math.random()*this.length|0]
@@ -76,15 +68,15 @@ function arent(a,...b){
 	return a!==b[0]&&b.every(e=>e==b[0])
 }
 function place(id,s){
-	return id&&$(id).text()==""&&(grid.push(id))&&$(id).text(s)
+	return id&&!win.text("")&&$(id).text()==""&&(grid.push(id))&&$(id).text(s)
 }
 function check(id){
 	canMove&&ongoing&&place(id,me)&&(setTimeout(botMove,150),lastMove=id,canMove=![],moveCnt++);
 }
 function blockThreat(){
-	if(mode==2)return false
+	if(mode==2)return![];
 	let toBlock=[];
-	let hwm=false;
+	let hwm=![];
 	for(let i=0;3>i;i++)
 		winningPatterns.forEach(e=>{
 			let e2=[...e]
@@ -97,7 +89,7 @@ function blockThreat(){
 	return hwm||final?.length>0&&final||![]
 }
 function createThreat(){
-	if(mode==2)return false
+	if(mode==2)return![];
 	let threats=[];
 	grid_ids.forEach(e=>{
 		if(t(e)==bot){
@@ -117,11 +109,10 @@ function beside(p){
 	let x=parseInt(p.split(",")[0]);
 	let y=parseInt(p.split(",")[1]);
 	let points=[];
-	for(let i=-1;i<2;i+=2)
-		try{
-			!$(`${x},${y+i}`).text()&&points.push(`${x},${y+i}`)
-			!$(`${x+i},${y}`).text()&&points.push(`${x+i},${y}`)
-		}catch(e){}
+	for(let i=-1;i<2;i+=2){
+		grid_ids.includes(`${x},${y+i}`)&&!$(`${x},${y+i}`).text()&&points.push(`${x},${y+i}`)
+		grid_ids.includes(`${x+i},${y}`)&&!$(`${x+i},${y}`).text()&&points.push(`${x+i},${y}`)
+	}
 	let final=points.filter(e=>{
 		let x=parseInt(e.split(",")[0]);
 		let y=parseInt(e.split(",")[1]);
@@ -129,7 +120,7 @@ function beside(p){
 			return grid_ids.includes(`${x},${y+i}`)&&!$(`${x},${y+i}`).text()||grid_ids.includes(`${x+i},${y}`)&&!$(`${x+i},${y}`).text()
 		}
 	})
-	return final.length>0&&final[0]||![]
+	return final.length>0&&final[0]||points.length>0&&points[0]||![]
 }
 function randomMove(){
 	let sp;
@@ -140,20 +131,21 @@ function botMove(){
 	if(grid.length==9||!ongoing)return;
 	if(bot=="X"&&moveCnt<2){
 		if(!mode){
-			!moveCnt?(place("2,2",bot)):place(beside(lastMove).rand(),bot)
+			moveCnt?place(beside(lastMove),bot):place("2,2",bot);
 		}else if(mode==1){
-			place(sides.rand(),bot)
+			place(sides.rand(),bot);
 		}else{
-			let r=[corners.rand(),sides.rand()].rand()
-			place(r,bot)
+			let r=![]
+			while(!r)
+				r=place([corners.rand(),sides.rand()].rand(),bot);
 		}
 	}else if(bot=="O"&&moveCnt==1){
 		if(!mode){
-			place("2,2",bot)||place(corners.rand(),bot)
+			place("2,2",bot)||place(corners.rand(),bot);
 		}else{
-			let r=false
+			let r=![];
 			while(!r){
-				r=place(mode==1?sides.rand():[corners.rand(),sides.rand()].rand(),bot)
+				r=place(mode==1?sides.rand():[corners.rand(),sides.rand()].rand(),bot);
 			}
 		}
 	}else{
@@ -166,7 +158,7 @@ function botMove(){
 	setTimeout(()=>canMove=true,100);
 }
 function winner(w){
-	ongoing&&score[w]++
+	ongoing&&score[w]++&&grid.length<9&&setTimeout(reset,750)
 	ongoing=![];
 	canMove=![];
 	win.text(w+" wins!\nScore: "+score[me]+" - "+score[bot]);
@@ -176,16 +168,15 @@ function won(){
 }
 function reset(){
 	grid_ids.forEach(e=>$(e).text(""));
-	win.text("");
 	lastMove=null;
 	grid=[];
 	moveCnt=0;
 	ongoing=true;
-	canMove=false;
+	canMove=![];
 	setTimeout(()=>{
 		canMove=me=="X";
 		!canMove&&botMove();
-	},200)
+	},500)
 }
 setInterval(()=>{
 	let fm=first.value;
@@ -193,7 +184,7 @@ setInterval(()=>{
 	bot=fm=="0"?"O":"X";
 	mode=parseInt(difficulty.value)
 	won();
-	grid.length==9&&(grid=[])&&setTimeout(reset,300)
+	grid.length==9&&(grid=[])&&setTimeout(reset,500)
 })
 		</script>
 	</body>
