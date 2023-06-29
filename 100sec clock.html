@@ -2,55 +2,35 @@
 <html>
 	<head>
 		<title></title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
 		<style>
 		</style>
 	</head>
 	<body>
-		<span id=hr>00</span> :
-		<span id=min>00</span> :
-		<span id=sec>00</span>
+		<span id=di>00</span>
 		<script>
-let mult=10/3/2,
-	hrs=0,
+let hrs=0,
 	mins=0,
-	seconds=0,
-	old={
-		hr:new Date().getHours(),
-		min:new Date().getMinutes(),
-		sec:new Date().getSeconds()
-	},
-	_600=null
-hrs=old.hr
-mins=old.min
-seconds=Math.round(new Date().getSeconds()*mult)
+	seconds=0;
 function pad(d,i=2){
 	return("000"+d).slice(-i)
 }
-function resync(){
-	clearInterval(_600)
-	_600=setInterval(()=>{
-		seconds++
-	},600)
+function convertMsToHMS(ms) {
+	let seconds=Math.floor(ms/1000);
+	let minutes=Math.floor(seconds/60);
+	seconds%=60;
+	let hours=Math.floor(minutes/60);
+	minutes%=60;
+	let days=Math.floor(hours/24);
+	hours%=24
+	let years=Math.floor(days/365);
+	days%=365
+	return [seconds,minutes,hours,days,years].reverse();
 }
 setInterval(()=>{
-	if(old.min!=new Date().getMinutes()){
-		old.min=new Date().getMinutes();
-		mins=old.min;
-		seconds=0;
-		resync()
-	}
-	if(old.hr!=new Date().getHours()){
-		old.hr=new Date().getHours();
-		hrs=old.hr;
-		mins=0;
-		seconds=0;
-		resync()
-	}
-	hr.innerText=pad(hrs)
-	min.innerText=pad(mins)
-	sec.innerText=pad(seconds)
+	hrs
+	di.textContent=convertMsToHMS(Date.now()).join(" : ")
 })
-resync()
 		</script>
 	</body>
 </html>

@@ -2,6 +2,7 @@
 <html>
 	<head>
 		<title>game(3rd revamp)</title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
 		<style>
 			body{
 				user-select:none;
@@ -234,13 +235,7 @@ function rem(cs){
 	})
 }
 function arent(a,...b){
-	let l=b.length
-	for(let i=1;i<l;i++){
-		if(!(b[i]===b[0])||b[0]===a){
-			return false
-		}
-	}
-	return true
+	return a!==b[0]&&b.every(e=>e===b[0])
 }
 function validate_forced(f){
 	for(let i=3;i<1050;i++){

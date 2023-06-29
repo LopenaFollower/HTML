@@ -2,6 +2,7 @@
 <html>
 	<head>
 		<title>tic tac toe</title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
 		<style>
 			body{
 				color:#fff;
@@ -23,8 +24,6 @@
 		</style>
 	</head>
 	<body bgcolor=#222>
-		You are <select id=first oninput='reset();this.value=="1"&&setTimeout(botMove,100)'><option value=0>X</option><option value=1>O</option></select><br>
-		<input type=button onclick="reset()"value="reset"/>
 		<table border=1>
 			<tr>
 				<td id="1,1"onclick="check(this.id)"></td>
@@ -42,6 +41,8 @@
 				<td id="3,3"onclick="check(this.id)"></td>
 			</tr>
 		</table>
+		You are <select id=first oninput='reset();score={X:0,O:0};this.value=="1"&&setTimeout(botMove,100)'><option value=0>X</option><option value=1>O</option></select><br>
+		<input type=button onclick="reset()"value="reset"/>
 		<div id=win onclick="reset();this.text('')"></div>
 		<script>
 const $=id=>document.getElementById(id),grid_ids=[],
@@ -55,14 +56,12 @@ var canMove=true;
 var ongoing=true;
 var grid=[];
 var score={
-	x:0,
-	o:0
+	X:0,
+	O:0
 }
-for(let x=1;x<=3;x++){
-	for(let y=1;y<=3;y++){
+for(let x=1;x<=3;x++)
+	for(let y=1;y<=3;y++)
 		grid_ids.push(x+","+y)
-	}
-}
 Element.prototype.text=function(t=1){
 	return t!=1?(this.innerText=t):this.innerText
 }
@@ -74,23 +73,22 @@ function arent(a,...b){
 	return a!==b[0]&&b.every(e=>e==b[0])
 }
 function place(id,s){
-	return $(id).text()==""&&(grid.push(id))&&$(id).text(s)
+	return id&&$(id).text()==""&&(grid.push(id))&&$(id).text(s)
 }
 function check(id){
-	canMove&&ongoing&&place(id,me)&&(setTimeout(botMove,150),lastMove=id,canMove=![],moveCnt++)
+	canMove&&ongoing&&place(id,me)&&(setTimeout(botMove,150),lastMove=id,canMove=![],moveCnt++);
 }
 function blockThreat(){
 	let toBlock=[];
 	let hwm=false;
-	for(let i=0;i<3;i++){
+	for(let i=0;i<3;i++)
 		winningPatterns.forEach(e=>{
 			let e2=[...e]
 			e2.splice(i,1)
 			arent("",t(e2[0]),t(e2[1]),bot)&&t(e[i])==""&&(hwm=e[i]);
 			arent("",t(e2[0]),t(e2[1]),me)&&t(e[i])!=bot&&toBlock.push(e[i]);
 		})
-	}
-	let final=toBlock.filter((e,i)=>toBlock.indexOf(e)==i)
+	let final=toBlock.filter((e,i)=>toBlock.indexOf(e)==i);
 	return hwm||final.length>0&&final||![]
 }
 function createThreat(){
@@ -152,10 +150,10 @@ function botMove(){
 	setTimeout(()=>canMove=true,100);
 }
 function winner(w){
-	ongoing&&score[w.toLowerCase()]++
+	ongoing&&score[w]++
 	ongoing=![];
 	canMove=![];
-	win.text(w+" wins!\nScore: "+score.x+" - "+score.o+"\n\nrestart?");
+	win.text(w+" wins!\nScore: "+score[me]+" - "+score[bot]+"\n\nrestart?");
 }
 function won(){
 	winningPatterns.forEach(e=>{

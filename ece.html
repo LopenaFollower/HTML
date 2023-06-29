@@ -2,6 +2,7 @@
 <html>
 	<head>
 		<title>string encode</title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
 		<style>
 			#res{
 				width:90%;
@@ -30,6 +31,16 @@ function hxed(str){
 	}
 	return'"'+res+'"';
 };
+function automate(arr){
+	arr&&arr.forEach(e=>{
+		res.innerText+=hxed(e)+',\n'
+	})
+}
+arr=[
+"test1","test2"
+]
+
+automate(arr)
 		</script>
 	</body>
 </html>
