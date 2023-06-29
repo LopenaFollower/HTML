@@ -39,12 +39,12 @@
  * note: familiarize its pattern and not just its sequence
  * Usually takes me around a minute to memorize 10
 */
-function*calc_pi(q,r,t,i){
+function*calc_pi(q=60n,r=13440n,t=10080n,i=2n){
 	for(;;)u=3n*++i,u=6n+3n*u**2n+u*9n,d=(27n*q*i+5n*r-12n*q)/(t*5n),yield d,r=10n*u*(r+(5n*i-2n)*q-d*t),t*=u,q*=i*10n*(2n*i-1n);
 }
 let pi="",
 	dp="",
-	sequence=calc_pi(60n,13440n,10080n,2n);
+	sequence=calc_pi();
 function changeTab(tab){
 	setTimeout(()=>{
 		switch(tab){
