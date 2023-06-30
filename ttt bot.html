@@ -143,7 +143,8 @@ function botMove(){
 	setTimeout(()=>canMove=true,75);
 }
 function winner(w){
-	ongoing&&score[w]++&&setTimeout(reset,550)
+	ongoing&&score[w]++
+	ongoing&&setTimeout(reset,550)
 	ongoing=![];
 	canMove=![];
 	win.text(w+" wins!\nScore: "+score[me]+" - "+score[bot]);
