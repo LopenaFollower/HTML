@@ -19,32 +19,36 @@
 	<body onclick="ns()">
 		<br>
 		<span id=cs></span>&nbsp;<span id=ci></span>
-		<div id=display></div>
+		<textarea id=display></textarea>
 		<script>
-function save(t){
-	let link=document.createElement("a");
-	link.href=URL.createObjectURL(new Blob([t],{type:"text/plain"}))
-	link.download="variables.txt"
-	link.click();
-	URL.revokeObjectURL(link.href);
-}
 function*fromCharCode(start,end){
 	start=Math.round(Math.min(start,end));
 	end=Math.round(Math.max(start,end));
-	while(start++<=end){
-		yield[String.fromCharCode(start),start]
+	while(start<=end){
+		yield[String.fromCharCode(start),start++]
 	}
 }
 let contents="";
-let symbols=fromCharCode(-65536,65536)
+/*combining
+-64770 to -64657
+-64382 to -64375
+-64112 to -64065
+-63786 to -63780
+-63777 to -63768
+-63766 to -63763
+-63696 to -63670
+-63578 to -63567
+-63510 to -63501
+*/
+let symbols=fromCharCode(-63500,-63450)
 var current=[];
 function ns(){
 	current=symbols.next().value
 	cs.textContent=current[0];
 	ci.textContent=current[1];
-	display.insertAdjacentHTML("beforeend",current[0]);
+	display.value+=current[0]
 }
-setInterval(ns)
+setInterval(ns,50)
 		</script>
 	</body>
 </html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>crazy?</title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+			*{
+				color:#fff;
+				background-color:#0e0e0e;
+			}
+		</style>
+	</head>
+	<body>
+		<button onclick="save(str,'thing')">download</button><br>
+		<input id=speed oninput='!isNaN(this.value)&&this.value>0&&this.value<=5e5&&(rate=this.value)'/>
+		<p id=index></p>
+		<p id=len></p>
+		<script>
+let str="bro got me"
+var rate=1e3;
+const end="hi";
+const tr=setInterval(()=>{
+	for(let r=0;r<rate;r++){
+		if((str+end).length>=1e4){
+			clearInterval(tr)
+			str+=end
+			break;
+		}
+		str+="\n"
+	}
+})
+function save(t,name){
+	let link=document.createElement("a"),
+		file=new File([t],name||"");
+	link.href=URL.createObjectURL(file);
+	link.download=file.name;
+	link.click();
+	URL.revokeObjectURL(link.href);
+}
+		</script>
+	</body>
+</html>

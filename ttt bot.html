@@ -68,7 +68,7 @@ function check(id){
 	canMove&&ongoing&&place(id,me)&&(setTimeout(botMove,150),lastMove=id,canMove=![],moveCnt++);
 }
 function blockThreat(){
-	if(mode==2)return![];
+	if(mode>1)return![];
 	let toBlock=[],
 		wm=![];
 	for(let i=0;3>i;i++)
@@ -83,7 +83,7 @@ function blockThreat(){
 	return wm||final?.length&&final||![]
 }
 function createThreat(){
-	if(mode==2)return![];
+	if(mode>1)return![];
 	let threats=[];
 	grid_ids.forEach(e=>{
 		if(t(e)==bot){
@@ -112,12 +112,10 @@ function beside(p){
 	return final.length&&final[0]||points.length&&points[0]||![]
 }
 function randomMove(){
-	let s;
-	grid_ids.forEach(e=>!t(e)&&(s=e))
-	return s;
+	return grid_ids.find(e=>!t(e));
 }
 function botMove(){
-	if(grid.length==9||!ongoing)return;
+	if(grid.length>8||!ongoing)return;
 	let r=![];
 	if(bot=="X"&&moveCnt<2){
 		if(!mode){
@@ -138,13 +136,12 @@ function botMove(){
 			createThreat()||
 			beside(lastMove)||
 			randomMove();
-			place(w,bot);
+		place(w,bot);
 	}
 	setTimeout(()=>canMove=true,75);
 }
 function winner(w){
-	ongoing&&score[w]++
-	ongoing&&setTimeout(reset,550)
+	ongoing&&(score[w]++,setTimeout(reset,600))
 	ongoing=![];
 	canMove=![];
 	win.text(w+" wins!\nScore: "+score[me]+" - "+score[bot]);
@@ -163,11 +160,11 @@ function reset(n){
 	},300)
 }
 setInterval(()=>{
-	let fv=first.value;
-	me=fv=="1"?"O":"X";
-	bot=fv=="0"?"O":"X";
+	let fv=eval(first.value);
+	me=fv?"O":"X";
+	bot=fv?"X":"O";
 	mode=Number(diff.value)
-	winningPatterns.forEach(e=>arent("",t(e[0]),t(e[1]),t(e[2]))&&winner(t(e[0])));
+	winningPatterns.find(e=>arent("",t(e[0]),t(e[1]),t(e[2]))&&winner(t(e[0])));
 	grid.length==9&&(grid=[],setTimeout(reset,500))
 })
 		</script>
