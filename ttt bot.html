@@ -117,11 +117,11 @@ function randomMove(){
 function botMove(){
 	if(grid.length>8||!ongoing)return;
 	let r=![];
-	if(bot=="X"&&moveCnt<2){
+	if(bot=="X"&&moveCnt<=1){
 		if(!mode){
 			moveCnt?place(beside(lastMove),bot):place("2,2",bot);
 		}else if(mode==1){
-			place(sides.rand(),bot);
+			while(!r)r=place(sides.rand(),bot);
 		}else{
 			while(!r)r=place([corners.rand(),sides.rand()].rand(),bot);
 		}
