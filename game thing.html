@@ -181,7 +181,7 @@ var graph_map={
 	c3:{c:0,h:null},
 	c4:{c:0,h:null},
 	c5:{c:0,h:null}
-},recent=null,score=0;
+},score=0;
 //functions
 function $(n){
 	return document.getElementById(n)
@@ -191,13 +191,12 @@ function p(id){
 	try{
 		let[y,x]=id.split(","),
 			pid=highest(x)?highest(x)[0].num()+1+","+x:"1,"+x;
-		if($("7,"+x.num())[IT]===$("next")[IT]){
-			$("7,"+x.num()).bigInt(2)
-			pid="7,"+x.num()
+		if($("7,"+x)[IT]===$("next")[IT]){
+			$("7,"+x).bigInt(2)
+			pid="7,"+x
 		}else{
 			$(pid)[IT]=BigInt($("next")[IT]);
 		}
-		recent=pid
 		combine(pid)
 		score+=$("next")[IT].num()
 		$("next")[IT]="";
@@ -206,24 +205,20 @@ function p(id){
 	}catch(ñ){
 		let ready=true
 		for(let i=1;i<6;i++){
-			if($("7,"+i)[IT]==$("next")[IT]){
-				ready=false
-			}
-			if($("7,"+i)[IT]==""){
+			if($("7,"+i)[IT]==$("next")[IT]||$("7,"+i)[IT]==""){
 				ready=false
 			}
 		}
-		if(ready)reset();
+		ready&&reset();
 	}
 }
 function highlight(cs){
 	Array.from(document.getElementsByClassName("dh")).forEach(e=>{
 		e.className=""
 	})
-	cs=cs.split(";");
-	cs.forEach(e=>{
+	cs.split(";").forEach(e=>{
 		try{
-			$(e.split(",")[1]+","+e.split(",")[0]).className="dh"
+			$(e.split(",").reverse().join(",")).className="dh"
 		}catch(e){}
 	})
 }
@@ -263,7 +258,6 @@ function reset(){
 	next_p()
 }
 function next_p(forced){
-	recent=undefined;
 	try{if(forced)forced=eval("BigInt("+forced.replaceAll(/[\[\]\{\}=<>\.a-zA-Z\"\'\`]/g,"")+")")+""}catch(e){};
 	if(forced&&validate_forced(forced)){
 		$("next")[IT]=forced
@@ -300,8 +294,7 @@ function next_p(forced){
 	}
 }
 function combine(row){
-	let y=row.split(",")[0].num(),
-		x=row.split(",")[1].num();
+	let[y,x]=row.split(",").map(e=>e.num())
 	if($(y+","+(x-1))&&$(y+","+(x+1))&&$((y-1)+","+x)&&arent("",$(y+","+(x-1))[IT],$(y+","+(x+1))[IT],$(y-1+","+x)[IT],$(row)[IT])){
 		$(y+","+(x-1))[IT]=""
 		$(y+","+(x+1))[IT]=""
@@ -378,6 +371,7 @@ Element.prototype.bigInt=function(n=1){
 }
 //repeating
 setInterval(()=>{
+	scheme[""]="rgba(0,0,0,0)"
 	scheme["4503599627370496"]=rgb.fetch("rrr")
 	scheme["9007199254740992"]=rgb.fetch("ggg")
 	scheme["18014398509481984"]=rgb.fetch("bbb")
@@ -418,10 +412,10 @@ setInterval(()=>{
 	$("next").style[BGC]=scheme[$("next")[IT]]
 	let cbg=$("next").style[BGC].split("(")[1].split(")")[0].split(", ");
 	$("next").style.color=((cbg[0]*0.299+cbg[1]*0.587+cbg[2]*0.114)>contrast)?"#000":"#fff"
-	$("score")[IT]="Score: "+BigInt(score).toLocaleString();
+	$("score")[IT]="Score: "+score.toExponential();
 	if(score>localStorage.getItem("game_thing_hs"))localStorage.setItem("game_thing_hs",BigInt(score));
-	$("highs")[IT]="High: "+BigInt(localStorage.getItem("game_thing_hs")).toLocaleString();
-},50);
+	$("highs")[IT]="High: "+Number(localStorage.getItem("game_thing_hs")).toExponential();
+},1e3/24);
 if(!localStorage.getItem("game_thing_hs"))localStorage.setItem("game_thing_hs",0);
 reset()
 		</script>

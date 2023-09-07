@@ -4,23 +4,22 @@
 		<title>learn pi</title>
 		<meta name="viewport"content="width=device-width,initial-scale=1">
 		<style>
-			body{user-select:none;margin:0;color:#fff;}
-			#cpi,#ypi,textarea{font-family:monospace;word-wrap:break-word;resize:none;width:100%;}
-			table{position:fixed;bottom:10px;}
-			table,td{border-collapse:collapse;table-layout:fixed;border-color:#eee;text-align:center;font-size:67.5px;height:90px;width:90px;}
-			#main_page,#pi_page{padding:10px;}
-			#tab1,#tab2{background-color:#222a33;border-radius:5px;font-family:monospace;line-height:30px;text-align:center;position:fixed;border:2.5px solid rgb(134,142,151);height:30px;color:#ddd;width:50%;}
-			#disp{background-color:rgba(0,0,0,0);border-radius:10px;border:3px dashed #777f88;width:94%}
+			body{user-select:none;margin:0;color:#fff}
+			#cpi,#ypi,textarea{font-family:monospace;word-wrap:break-word;resize:none;width:100%}
+			table{position:fixed;bottom:10px}
+			table,td{border-collapse:collapse;table-layout:fixed;border-color:#eee;text-align:center;font-size:67.5px;height:90px;width:90px}
+			#main_page,#pi_page{padding:10px}
+			#tab1,#tab2{background-color:#222a33;border-radius:5px;font-family:monospace;line-height:30px;text-align:center;position:fixed;border:2.5px solid #868e97;height:30px;color:#ddd;width:50%}
+			#disp{background-color:rgba(0,0,0,0);border-radius:10px;border:3px dashed #777f88;width:90%}
 		</style>
 	</head>
 	<body bgcolor=#222>
-		<div id=tab1 onclick='changeTab("input")'>Input pi</div><div id=tab2 onclick='changeTab("view")'>View pi</div>
-		<br><br>
+		<div id=tab1 onclick='changeTab(1)'>Input pi</div><div id=tab2 onclick='changeTab(0)'>View pi</div><br><br>
 		<div id=main_page>
 			type pi from memory<br><textarea id=input onchange='cpi.innerText="";ypi.innerText="";result.innerText=""'></textarea><br>
-			<button onclick='result.innerText=((ac=0,t=dp.length)=>{cpi.innerHTML="";ypi.innerHTML="";for(let i=0;i<t;i++){dp[i]===input.value[i]?(ac++,cpi.innerHTML+=input.value[i],ypi.innerHTML+=input.value[i]):(ypi.innerHTML+=`<span style="color:red">${input.value[i]}</span>`,cpi.innerHTML+=`<span style="color:#0f0">${dp[i]}</span>`)};ac>2?ac-=2:ac-=ac;t>2?t-=2:t-=t;return`You got ${ac} out of ${t} decimal places of pi`})()'>Check</button><button onclick='if((prompt("type \"yes\" to confirm")||"").toLowerCase().indexOf("ye")!==-1)cpi.innerText="",ypi.innerText="",result.innerText="",input.value=""'>Clear</button><br>
-			<p id=cpi readonly></p>
-			<p id=ypi readonly></p>
+			<button onclick='dp=("3."+pi).substr(0,input.value.length);result.innerText=((ac=0,t=dp.length)=>{cpi.innerHTML="";ypi.innerHTML="";input.value.split("").forEach((e,i)=>{dp[i]===e?(ac++,cpi.innerHTML+=e,ypi.innerHTML+=e):(ypi.innerHTML+=`<span style="color:red">${e}</span>`,cpi.innerHTML+=`<span style="color:#0f0">${dp[i]}</span>`)});ac>2?ac-=2:ac-=ac;t>2?t-=2:t-=t;return`You got ${ac} out of ${t} decimal places of pi`})()'>Check</button><button onclick='if((prompt("type \"yes\" to confirm")||"").toLowerCase().indexOf("ye")!==-1)cpi.innerText="",ypi.innerText="",result.innerText="",input.value=""'>Clear</button><br>
+			<p id=cpi></p>
+			<p id=ypi></p>
 			<div id=result></div>
 			<table border=1 id=keyboard><tr><td>7</td><td>8</td><td>9</td></tr><tr><td>4</td><td>5</td><td>6</td></tr><tr><td>1</td><td>2</td><td>3</td></tr><tr><td>.</td><td>0</td><td id=back><</td></tr></table>
 		</div>
@@ -44,23 +43,20 @@ function*calc_pi(q=60n,r=13440n,t=10080n,i=2n){
 }
 let pi="",
 	dp="",
-	sequence=calc_pi();
+	seq=calc_pi();
 function changeTab(tab){
 	setTimeout(()=>{
-		switch(tab){
-			case"input":
-				main_page.style.display="block";
-				pi_page.style.display="none";
-				tab1.style.backgroundColor="#555";
-				tab2.style.backgroundColor="#222a33";
-				break;
-			case"view":
-				main_page.style.display="none";
-				pi_page.style.display="block";
-				input.value="";
-				tab1.style.backgroundColor="#222a33";
-				tab2.style.backgroundColor="#555";
-				break;
+		if(tab){
+			main_page.style.display="block";
+			pi_page.style.display="none";
+			tab1.style.backgroundColor="#555";
+			tab2.style.backgroundColor="#222a33";
+		}else{
+			main_page.style.display="none";
+			pi_page.style.display="block";
+			input.value="";
+			tab1.style.backgroundColor="#222a33";
+			tab2.style.backgroundColor="#555";
 		}
 	});
 }
@@ -69,8 +65,7 @@ document.body.onclick=()=>{
 	tab2.style.backgroundColor="#222a33";
 }
 setInterval((z=input)=>{
-	for(let i=0;i<5;i++)pi+=Number(sequence.next().value);
-	dp=("3."+pi).substr(0,z.value.length)
+	for(let i=0;i<5;i++)pi+=Number(seq.next().value);
 	z.value=z.value.replace(/[^\d.]/g,"")
 	tab1.style.left=0;
 	tab2.style.left=2.5+window.innerWidth/2+"px";
@@ -79,14 +74,14 @@ setInterval((z=input)=>{
 	keyboard.style.left=window.innerWidth/2-parseFloat(window.getComputedStyle(keyboard).getPropertyValue("width"))/2+"px";
 	z.value.split(".").length>2&&(z.value=z.value.substring(0,z.value.length-1));
 })
-setInterval(()=>((subject,ctx,clearance,fontsize,spacing,padding,per,x,y)=>{
+setInterval(()=>((sub,ctx,clearance,fontsize,spacing,padding,per,x,y)=>{
 	disp.style.padding=padding+"px";
-	disp.height=subject.length*fontsize/per+clearance;
+	disp.height=sub.length*fontsize/per+clearance;
 	disp.width=per*spacing-clearance;
 	ctx.clearRect(0,0,disp.height,disp.width);
 	ctx.font=fontsize+"px monospace";
 	ctx.fillStyle="#fff";
-	subject.forEach(e=>{
+	sub.forEach(e=>{
 		x>=per&&(++y,x=0);
 		ctx.fillText(e,x++*spacing,clearance+fontsize*y);
 	});

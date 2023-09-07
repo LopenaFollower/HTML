@@ -56,7 +56,7 @@
 		<script>
 //default grid_dimension = [10,20], canvas size = 30
 const a=(function(s=function(){
-		CANVAS_SIZE=40,
+		CANVAS_SIZE=36,
 		COLOR_CHANGING=0,
 		GRID_DIMENSION=[10,20],
 		PREVIEW_COUNT=9;return[CANVAS_SIZE,COLOR_CHANGING,GRID_DIMENSION,PREVIEW_COUNT]}(),g=document.getElementById("game")){g.width=s[0]*s[2][0];g.height=s[0]*s[2][1];document.getElementById("cont").style.left=s[0]*s[2][0]+5+"px";document.getElementById("s").value=Math.round(Math.random()*100000);return[5,[],s[1],s[2],s[3]]})(),rgb={step:1,r:255,g:0,b:0,rg:false,gg:true,bg:false,rl:false,gl:false,bl:false,fetch:function(f){if(!f)return"rgb("+this.r+","+this.g+","+this.b+")";if(f.length==3){return"rgb("+this[f[0]]+","+this[f[1]]+","+this[f[2]]+")"}}}

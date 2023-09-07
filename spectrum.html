@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+			body{
+				margin:0;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id=cvs></canvas>
+		<script>
+const s=1,ctx=cvs.getContext("2d"),t=256*5;
+let n=0,p=0;
+cvs.width=t*s
+cvs.height=t*10
+setInterval(()=>{
+	for(let i=0;i<500;i++){
+		if(n>2**24)return;
+		let c="#"+("00000"+n.toString(16)).slice(-6)
+		ctx.fillStyle=c
+		ctx.fillRect((p%t)*s,(p/t|0)*s,s,s)
+		n+=5
+		p++
+	}
+})
+		</script>
+	</body>
+</html>

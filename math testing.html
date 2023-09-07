@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+		</style>
+	</head>
+	<body>
+		<sub id=fps>fps</sub>
+		<div id=disp></div>
+		<script>
+(function(){
+	let elapsed=Date.now(),
+		frame=0;
+	const update=()=>{
+		let r=4;
+		if(Date.now()-elapsed<=1e3/r){
+			frame+=r
+		}else{
+			fps.textContent=frame+" fps";
+			elapsed=Date.now()
+			frame=0
+		}
+		requestAnimationFrame(update)
+	}
+	requestAnimationFrame(update)
+})();
+const rate=5e4;
+function display(a){
+	switch(typeof a){
+		case"object":
+			a=JSON.stringify(a);
+			break;
+		case"function":
+			let r=a();
+			a=typeof r=="object"?JSON.stringify(r):r;
+	}
+	disp.innerText=a;
+}
+const harmonic=(()=>{
+	let r=1,
+		d=2;
+	setInterval(()=>{
+		for(let i=0;i<rate;i++){
+			r+=1/d++;
+		}
+	})
+	return()=>{return{r:r,d:d}};
+})();
+const piOverFour=(()=>{
+	let r=0,
+		d=0;
+	setInterval(()=>{
+		for(let i=0;i<rate;i++){
+			r+=((-1)**(++d+1))/(2*d-1)
+		}
+	})
+	return()=>r*4;
+})();
+const odseries=(()=>{
+	let r=4,
+		d=1,
+		s=-1;
+	setInterval(()=>{
+		for(let i=0;i<rate;i++){
+			d+=2
+			r+=(4/d)*s;
+			s*=-1;
+		}
+	})
+	return()=>r;
+})();
+const piOverTwo=(()=>{
+	let r=1,
+		d=2;
+	setInterval(()=>{
+		for(let i=0;i<rate;i++){
+			r*=(d*d)/((d-1)*(d+1))
+			d+=2;
+		}
+	})
+	return()=>r*2;
+})();
+setInterval(()=>{
+	display(piOverFour);
+},1e3/30);
+		</script>
+	</body>
+</html>

@@ -12,7 +12,6 @@
 	</head>
 	<body bgcolor=#d4efd8>
 		<center>
-			<p id="req"style="display:none;background-color:rgba(0,0,0,0);opacity:0;visibility:none;">\</p>
 			<input onkeyup='res.innerText=hxed(this.value)'/>
 			<div id=res></div>
 		</center>
@@ -24,7 +23,7 @@ function hxed(str){
 	let res="";
 	for(let i=0;i<str.length;i++){
 		if(typeof hz[str[i]]=="string"){
-			res+=req.innerText+hz[str[i]];
+			res+=String.fromCharCode(92)+hz[str[i]];
 		}else{
 			res+=str[i];
 		}
@@ -37,7 +36,7 @@ function automate(arr){
 	})
 }
 arr=[
-"test1","test2"
+
 ]
 
 automate(arr)

@@ -62,10 +62,21 @@ function arent(a,...b){
 	return a!==b[0]&&b.every(e=>e==b[0])
 }
 function place(id,s){
+	if(s==bot&&moveCnt>0){
+		let n={"1,1":"tL","1,2":"tM","1,3":"tR","2,1":"L","2,2":"M","2,3":"R","3,1":"lL","3,2":"lM","3,3":"lR"}
+		let a="["+JSON.stringify(read())+",\""+n[id.toString()]+"\"]";
+		//storage[storage.length]=a
+	}
 	return id&&!win.text("")&&!t(id)&&(grid.push(id))&&$(id).text(s)
 }
 function check(id){
 	canMove&&ongoing&&place(id,me)&&(setTimeout(botMove,150),lastMove=id,canMove=![],moveCnt++);
+}
+let storage=[];
+function read(){
+	let a=Array.from(document.getElementsByTagName("td"))
+	let res=a.map(e=>t(e.id));
+	return res
 }
 function blockThreat(){
 	if(mode>1)return![];
@@ -73,8 +84,7 @@ function blockThreat(){
 		wm=![];
 	for(let i=0;3>i;i++)
 		winningPatterns.forEach(e=>{
-			let e2=[...e]
-			e2.splice(i,1)
+			let e2=e.filter((m,n)=>n!=i)
 			arent("",t(e2[0]),t(e2[1]),bot)&&!t(e[i])&&(wm=e[i]);
 			arent("",t(e2[0]),t(e2[1]),me)&&!t(e[i])&&toBlock.push(e[i]);
 		})
@@ -123,20 +133,20 @@ function botMove(){
 		}else if(mode==1){
 			while(!r)r=place(sides.rand(),bot);
 		}else{
-			while(!r)r=place([corners.rand(),sides.rand()].rand(),bot);
+			while(!r)r=place([...corners,...sides].rand(),bot);
 		}
 	}else if(bot=="O"&&moveCnt==1){
 		if(!mode){
 			place("2,2",bot)||place(corners.rand(),bot);
 		}else{
-			while(!r)r=place(mode==1?sides.rand():[corners.rand(),sides.rand()].rand(),bot);
+			while(!r)r=place(mode==1?sides.rand():[...corners,...sides].rand(),bot);
 		}
 	}else{
-		let w=blockThreat()||
+		place(blockThreat()||
 			createThreat()||
 			beside(lastMove)||
-			randomMove();
-		place(w,bot);
+			randomMove()
+		,bot);
 	}
 	setTimeout(()=>canMove=true,75);
 }
@@ -159,6 +169,13 @@ function reset(n){
 		!canMove&&botMove();
 	},300)
 }
+/*let loop=setInterval(()=>{
+	check(grid_ids.rand())
+	if(storage.length==1000){
+		clearInterval(loop)
+		storage=storage.filter((e,i)=>storage.indexOf(e)==i)
+	}
+},100)*/
 setInterval(()=>{
 	let fv=eval(first.value);
 	me=fv?"O":"X";

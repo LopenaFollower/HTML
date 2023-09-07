@@ -5,12 +5,12 @@
 		<meta name="viewport"content="width=device-width,initial-scale=1">
 		<style>
 			textarea{
-				background-color:#ddd;
+				background:#ddd;
 				font-family:monospace;
 				border:2px solid #000;
 				word-wrap:break-word;
 				border-radius:5px;
-				color:#040404;
+				color:#030303;
 			}
 			td{
 				border-style:dashed
@@ -20,50 +20,31 @@
 	<body>
 		<table>
 			<tr>
-				<td id=m0>
-					encrypt
-				</td>
-				<td>
-					<input type=checkbox oninput="start(input.value)"id=s checked/>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					Method 1
-				</td>
-				<td>
-					<input type=checkbox oninput="start(input.value)"id=m1 checked/>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					Method 2
-				</td>
-				<td>
-					<input type=checkbox oninput="start(input.value)"id=m2 checked/>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					Method 3
-				</td>
-				<td>
-					<input type=checkbox oninput="start(input.value)"id=m3 checked/>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					Method 4
-				</td>
-				<td>
-					<input type=checkbox oninput="start(input.value)"id=m4 checked/>
-				</td>
+				<td id=m0>encrypt</td>
+				<td><input type=checkbox oninput="start(input.value)"id=s checked/></td>
 			</tr>
 		</table>
 		<br>
 		<textarea id=input oninput="start(input.value)"></textarea><br><br>
 		<textarea id=output readonly></textarea>
 		<script>
+function main({mode,str,start,seed}){
+	if(mode==undefined||typeof str!="string"||str.length===0||isNaN(start)||start.toString().length===0||start!==1||start!==0||isNaN(seed))return;
+	const lib=((a,b)=>((c,d,e)=>{let f=c.length;while(f){e=((g,h=0)=>{h=(g*Math.PI*a*(1-a)+"").replace(/[^0-9]/g,"");a=parseInt(h);return parseFloat("0."+h)})(b)*f--|0;[c[f],c[e]]=[c[e],c[f]]};return c})([...Array(95).keys()].map((e,i)=>String.fromCharCode(i+32))))(start,seed);
+	return((m,t)=>{
+		const f=(s=>[...s].map((e,i)=>lib.join("")[lib.reverse().join("").indexOf(s[i])]).join(""));
+		return m?f(((a,b="")=>{
+			let c=a.length;
+			for(let i=0;i<c;i++)b+=a[i%2?"shift":"pop"]();
+			return b
+		})(btoa(t).split(""))):
+		atob(((a,b="",c="")=>{
+			let l=a.length;
+			for(let i=0;i<=l;i++)i%2==0?c=a.charAt(i)+c:b+=a.charAt(i);
+			return b+c
+		})(f(t)))
+	})(mode,str)
+}
 const[offset,binarySeparator]=[(Math.random()*1.3e5).toFixed()-6e4,String.fromCharCode(8294)],
 	[start,obf_1,deob_1,obf_2,deob_2,obf_3,deob_3,obf_4,deob_4]=[
 	str=>{
@@ -77,48 +58,26 @@ const[offset,binarySeparator]=[(Math.random()*1.3e5).toFixed()-6e4,String.fromCh
 		})(s.checked):"";
 		m0.innerText=s.checked?"encrypt":"decrypt";
 	},
+	str=>btoa(str),
+	str=>atob(str),
+	str=>[...str].map(e=>String.fromCharCode(e.charCodeAt(0)+offset)).join(""),
+	str=>[...str].map(e=>String.fromCharCode(e.charCodeAt(0)-offset)).join(""),
 	str=>{
-		return m1.checked?btoa(str):str
-	},
-	str=>{
-		return m1.checked?atob(str):str
-	},
-	str=>{
-		let out="",i;
-		for(i=0;i<str.length;i++){
-			out+=String.fromCharCode(str.charCodeAt(i)+offset);
-		}
-		return m2.checked?out:str;
-	},
-	str=>{
-		let out="",i;
-		for(i=0;i<str.length;i++){
-			out+=String.fromCharCode(str.charCodeAt(i)-offset);
-		}
-		return m2.checked?out:str;
-	},
-	str=>{
-		let[t,out,i]=[str.split(""),""];
+		let[t,out,i]=[[...str],""];
 		for(i=0;i<str.length;i++){
 			out+=t[i%2==0?"pop":"shift"]();
 		}
-		return m3.checked?out:str;
+		return out
 	},
 	str=>{
 		let out=["",""],i;
 		for(i=0;i<=str.length;i++){
 			i%2==0?out[1]=str.charAt(i)+out[1]:out[0]+=str.charAt(i);
 		}
-		return m3.checked?out.join(""):str;
+		return out.join("")
 	},
-	str=>{
-		let out="",i;
-		for(i=0;i<str.length;i++){
-			out+=str[i].charCodeAt(0).toString(2)+(i<str.length-1?binarySeparator:"");
-		}
-		return m4.checked?out:str;
-	},
-	str=>m4.checked?String.fromCharCode(...str.split(binarySeparator).map(n=>parseInt(n,2))):str
+	str=>[...str].map((e,i)=>e.charCodeAt(0).toString(2)+(i<str.length-1?binarySeparator:"")).join(""),
+	str=>String.fromCharCode(...str.split(binarySeparator).map(n=>parseInt(n,2)))
 ]
 setInterval(()=>[input.style.width,output.style.width,input.style.height,output.style.height]=["99%","99%",input.scrollHeight-.3+"px",output.scrollHeight-.3+"px"]);
 		</script>

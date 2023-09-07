@@ -8,69 +8,18 @@
 	</head>
 	<body>
 		<input id=inp oninput='getDensity(this.value)'/>
-		<canvas id=canvas width=350 height=10000></canvas>
+		<canvas id=canvas width=400 height=10000></canvas>
 		<script>
 let ctx=canvas.getContext("2d");
 var items={};
-var scheme=[
-	"#822a33",
-	"#D22A77",
-	"#f00",
-	"#0ef",
-	"#808080",
-	"#fa0",
-	"#a5c710",
-	"#6517bf",
-	"#754f23",
-	"#ffd",
-	"#93d9c7",
-	"#474747",
-	"#888",
-	"#afbdb7",
-	"#B3C77A",
-	"#FF00E4",
-	"#FB0",
-	"#36AF5D",
-	"#7A001E",
-	"#85FFD6",
-	"#C4BC34",
-	"#000C6A",
-	"#FD9CFF",
-	"#59CAFF",
-	"#156F36",
-	"#AF0085",
-	"#DA9B5E",
-	"#D6E300",
-	"#7A687F",
-	"#ff0",
-	"#0f0",
-	"#0ff",
-	"#00f",
-	"#fff",
-	"#eee",
-	"#ddd",
-	"#ccc",
-	"#bbb",
-	"#aaa",
-	"#999",
-	"#888",
-	"#777",
-	"#666",
-	"#555",
-	"#444",
-	"#333",
-	"#222",
-	"#111",
-	"#000"
-]
+var scheme=["#d58988","#ada8d1","#2c256a","#101a9","#c15fa","#9da76b","#8994b","#da54ab","#5d48e2","#c35be8","#47cd5","#39f08c","#684b5","#2e1dd","#b6d25c","#ed4a33","#85aa7d","#d05338","#839fac","#9e7c96","#7f85db","#16796b","#df9d72","#42566f","#5c6c76","#d37b4a","#9831e","#c0b798","#ba738","#505af4","#194c86","#f0a734","#aa3f5a","#3033c9","#f6638","#18c238","#11c7d0","#eba057","#8a6f82","#8342e0","#eb88a3","#6572d4","#646f1d","#131e5","#cc879","#165f15","#75d46f","#4bdd57","#1a3e6","#c6221a","#31c280","#f4a6a1","#3929d0","#f4bc10","#b0d3b9","#536864","#e2d7d","#c733ea","#15e8f9","#f0ae","#171cac","#d0ae22","#38fb7","#5f24e","#c1ddd0","#a888bd","#74d3f6","#f4eeb9","#c8a3b1","#2b587","#ed3f8","#d7d02c","#7c13c0","#f8d065","#4f4eae","#27eb5a","#c1b63","#b9814f","#4d9249","#9fdba2","#e42b0","#6c1b5","#bdef1c","#b2b01d","#46b8f1","#ccab23","#2e6090","#85ae7","#33a1b","#85ca82","#f18097","#353937","#f9a029","#8380ae","#5a19bd","#bd16a","#8b338f","#851eb","#fa4e56","#d04bea"]
 function getDensity(str){
-	let len=str.length
 	items={}
 	let diameter=Math.max(canvas.width,canvas.height)
 	ctx.clearRect(0,0,diameter,diameter);
 	str.split("").forEach((e,i)=>{
 		if(!items[e]){
-			items[e]=[1,scheme[i]]
+			items[e]=[1,scheme[Object.keys(items).length]]
 		}else{
 			items[e][0]+=1
 		}
@@ -91,8 +40,8 @@ function getDensity(str){
 		ctx.fillStyle="#000";
 		ctx.fill();
 		ctx.font="15px monospace";
-		let dec=1e3
-		ctx.fillText(e+" "+items[e][0]+"("+Math.round(items[e][0]/total*dec*10)/dec+")%",235,items[e][2]+(25/2));
+		let dec=3
+		ctx.fillText(e+" "+items[e][0]+"("+(items[e][0]/total*100).toFixed(dec)+")%",235,items[e][2]+12.5);
 		ctx.fillStyle=items[e][1];
 		ctx.fill();
 	})

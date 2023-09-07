@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+			#res{
+				width:max-content;
+				padding:1px;
+			}
+		</style>
+	</head>
+	<body>
+		<button id=btn onclick='inp.value=(Math.random()*1e16|0).toString(16).slice(-7);c(inp.value.trim())'>rng</button><br>
+		<input id=inp oninput="c(this.value.trim())"/><br>
+		<div id=res>rgb: <span id=rgb></span><br>hex: <span id=hex></span></div>
+		<script>
+function c(v){
+	let s="",d=null;
+	if(v.match("rgb")){
+		s=v.replaceAll(" ","").split("(")[1].split(")")[0].split(",");
+		d=true
+	}else{
+		let rgx=[/.{2}/g,/.{1}/g];
+		if(v.length==4||v.length==7){
+			s=v.replace("#","").match(rgx[v.length==7?0:1]).map(e=>parseInt("0x"+e+(v.length==7?"":e)))
+			d=true
+		}
+	}
+	if(d){
+		let rr="rgb("+s.join(", ")+")";
+		let rh="#"+s.map(e=>("0"+parseInt(e).toString(16)).slice(-2)).join("")
+		res.style.backgroundColor=((s[0]*0.299+s[1]*0.587+s[2]*0.114)>150)?"#000":"#fff";
+		res.style.textShadow="-.2px -.2px 2px "+((s[0]*0.299+s[1]*0.587+s[2]*0.114>150)?"#fff":"#000");
+		rgb.innerText=rr;
+		rgb.style.color=rr;
+		rgb.style.textShadow="-.2px -.2px 2px "+rr;
+		hex.innerText=rh;
+		hex.style.color=rh;
+		hex.style.textShadow="-.2px -.2px 2px "+rh;
+	}
+}
+setInterval(()=>{
+	btn.click()
+})
+		</script>
+	</body>
+</html>
