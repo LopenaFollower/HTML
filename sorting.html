@@ -3749,7 +3749,7 @@ function merryGoRoundSort(){
 }
 function XSort(){
 	let array=[...arr];
-	let gap = len;
+	let gap=len;
 	function cf(ar,g,l){
 		let as=0
 		for(let i=1;i-1+g<l;i++){
@@ -3781,9 +3781,116 @@ function XSort(){
 	}
 	return[5,1]
 }
-function Sort(){
+function blockShellSort(){
 	let array=[...arr];
-	
+	function gappedBinary(A,P,l,K,G,i){
+		let L=-1,R=l,C,M;
+		while(L<R-1){
+			M=L+((R-L)>>1);
+			C=compareIndices(A,P+M*G,K);
+			if(C==1||(i&&C==0))R=M;
+			else L=M;
+		}
+		return R;
+	}
+	function GSFW(A,P,L,G){
+		let t=A[P];
+		for(let i=0;i<L;i++)rset(A,P+i*G,A[P+(i+1)*G]);
+		rset(A,P+L*G,t);
+	}
+	function GSBW(A,P,L,G){
+		let t=A[P+L*G];
+		for(let i=L;i>0;i--)rset(A,P+i*G,A[P+(i-1)*G]);
+		rset(A,P,t);
+	}
+	function GMSFW(A,lA,lB,L,G){
+		for(let i=0;i<L;i++)rswap(A,lA+i*G,lB+i*G);
+	}
+	function GMSBW(A,lA,lB,L,G){
+		for(let i=0;i<L;i++)rswap(A,lA+i*G,lB+i*G);
+	}
+	function rotate(A,P,L,R,G){
+		while(L>1&&R>1){
+			if(L<=R){
+				GMSFW(A,P,P+L*G,L,G);
+				P+=L*G;
+				R-=L;
+			}else{
+				GMSBW(A,P+(L-R)*G,P+L*G,R,G);
+				L-=R;
+			}
+		}
+		if(L>0&&R>0){
+			if(L==1)GSFW(A,P,R,G);
+			else if(R==1)GSBW(A,P,L,G);
+		}
+	}
+	function merge(array,P,L0,L1,G){
+		let S;
+		if(L0<L1){
+			while(L0!=0){
+				S=gappedBinary(array,P+L0*G,L1,P,G,true);
+				if(S!=0){
+					rotate(array,P,L0,S,G);
+					P+=S*G;
+					L1-=S;
+				}
+				if(L1==0)break;
+				do{P+=G;L0--;}while(L0!=0&&compareIndices(array,P,P+L0*G)<=0);
+			}
+		}else{
+			while(L1!=0){
+				S=gappedBinary(array,P,L0,P+(L0+L1-1)*G,G,false);
+				if(S!=L0){
+					rotate(array,P+S*G,L0-S,L1,G);
+					L0=S;
+				}
+				if(L0==0)break;
+				do L1--;while(L1!=0&&compareIndices(array,P+(L0-1)*G,P+(L0+L1-1)*G)<=0);
+			}
+		}
+	}
+	function gappedReverse(a,s,e,g){
+		for(;s<=e-g;s+=g,e-=g)rswap(a,s,e);
+	}
+	function getRun(array,start,end,gap){
+		let t=start,iD=-compareIndices(array,start,start+gap),len=1;
+		if(end-start<gap)return 1;
+		if(iD==0)iD=1;
+		do{len++;start+=gap;}while(start<=end-gap&&compareIndices(array,start,start+gap)!=iD);
+		if(iD==-1)gappedReverse(array,t,start,gap);
+		return len;
+	}
+	let gaps=[1,4,10,23,57,132,301,701];
+	function ciura(n){
+		if(n<=gaps.length)return gaps[n-1];
+		return pow(2.25,n)|0;
+	}
+	function shellPass(array,start,end,gap){
+		if(end-start<gap)return;
+		let done,starts=new Array(gap),lens=new Array(gap),ends=new Array(gap);
+		for(let i=0;i<gap;i++){
+			starts[i]=start+i;
+			lens[i]=0;
+			ends[i]=(end-(end%gap))+i;
+			if(ends[i]>=end)
+				ends[i]-=gap;
+		}
+		do{
+			done=true;
+			for(let i=0;i<gap;i++){
+				let v=starts[i]+lens[i]*gap;
+				if(v>ends[i]||ends[i]==-1)continue;
+				done=false;
+				let r=getRun(array,v,ends[i],gap);
+				merge(array,starts[i],lens[i],r,gap);
+				write(lens,i,lens[i]+r);
+			}
+		}while(!done);
+	}
+	let k=1;
+	while(ciura(k++)<len);
+	while(--k>1)shellPass(array,0,len,ciura(k-1));
 	return[5,1]
 }
 function Sort(){
@@ -4246,6 +4353,7 @@ set(["Iterative Shircle Sort",iterativeShircleSort])
 set(["Recursive Shircle Sort",recursiveShircleSort])
 set(["Merry-Go-Round Sort",merryGoRoundSort])
 set(["X Pattern Sort",XSort])
+set(["Block Shell Sort",blockShellSort])
 //set(["test Sort",testSort])
 sn.sort((a,b)=>a[0].localeCompare(b[0]))
 const inputs=[
@@ -4265,8 +4373,8 @@ const inputs=[
 	"Final Radix Pass",
 	"Sorted",
 ]
-let req=get("")
-s(req,13)
+let req=get("block shell")
+s(req)
 function hold(e){
 	e.addEventListener("touchstart",v=>e.style.opacity=.5);
 	e.addEventListener("touchend",v=>e.style.opacity=1);
