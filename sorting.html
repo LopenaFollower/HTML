@@ -183,9 +183,8 @@ const fps=(()=>{
 	let elapsed=Date.now(),el2=Date.now(),frame=0,fps=60;
 	let update=()=>{
 		let rate=1;
-		if(Date.now()-elapsed<=1e3/rate){
-			frame+=rate
-		}else{
+		if(Date.now()-elapsed<=1e3/rate)frame+=rate
+		else{
 			elapsed=Date.now()
 			fps=frame
 			fpsdisplay.innerText=frame
