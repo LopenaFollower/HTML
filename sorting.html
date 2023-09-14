@@ -5,49 +5,55 @@
 		<meta name="viewport"content="width=device-width,initial-scale=1">
 		<style>
 			body{
-				overflow:scroll;
+				overflow-y:scroll;
 				padding:0;
 				margin:0 auto;
 				zoom:.6;
 			}
-			.container,.holder{display:flex}
+			div.holder{display:flex}
 			#cvs{
 				background:#000;
 				aspect-ratio:auto;
 			}
-			.lfa{text-align:right}
-			td,#names{
+			td.lfa{text-align:right}
+			td,#names,.topicname,#nextsort{
 				font-family:monospace;
 				color:#fff;
 			}
 			fieldset{width:fit-content}
-			.btnholder{
+			div.btnholder{
+				transition-timing-function:linear;
+				transition-duration:.2s;
 				border-radius:4px;
 				background:rgb(29,42,53);
 				border:3px black solid;
-				height:300px;
+				height:0px;
+				opacity:0;
+				margin:0 5;
 				overflow:scroll;
-				padding:3px;
 				width:fit-content;
-				margin:10px;
 			}
-			.selectbtn{
+			div.selectbtn{
 				color:#fff;
 				background:rgb(4,170,109);
 				border-radius:10px;
 				padding:3px;
+				margin:3px;
 				border:1px black solid;
 			}
-			.titles>td{
+			div.topicname{
+				margin:5px;
+				border:2px dashed grey;
 				padding:2px;
 				text-align:center;
 			}
+			div.space{display:none;}
 		</style>
 	</head>
 	<body style="background:rgb(14,21,26)">
 		<br>
 		<span id=names></span>
-		<div class=container>
+		<div class=holder>
 			<fieldset>
 				<table>
 					<tr>
@@ -138,34 +144,21 @@
 				</table>
 			</fieldset>
 		</div>
-		<canvas id=cvs></canvas>
+		<div class=holder>
+			<div>
+				<canvas id=cvs></canvas>
+				<div id=nextsort>Next: ...</div>
+			</div>
+			<div>
+				<div class=topicname>Sorts<div class=space>&nbsp;</div><div class=holder><div id=sortsholder class=btnholder></div></div></div>
+				<div class=topicname>Merge<div class=space>&nbsp;</div><div class=holder><div id=mergesortsholder class=btnholder></div></div></div>
+				<div class=topicname>Quick<div class=space>&nbsp;</div><div class=holder><div id=quicksortsholder class=btnholder></div></div></div>
+				<div class=topicname>Cocktail<div class=space>&nbsp;</div><div class=holder><div id=cocktailsortsholder class=btnholder></div></div></div>
+				<div class=topicname>Recursive<div class=space>&nbsp;</div><div class=holder><div id=recursortsholder class=btnholder></div></div></div>
+				<div class=topicname>Iterative<div class=space>&nbsp;</div><div class=holder><div id=itersortsholder class=btnholder></div></div></div>
+			</div>
+		</div>
 		<br>
-		<table>
-			<tr class=titles>
-				<td>Sorts</td><td>Merge</td><td>Quick</td><td>Cocktail</td><td>Recursive</td><td>Iterative</td>
-			</tr>
-			<tr>
-				<td>
-					<div class=holder><div id=sortsholder class=btnholder></div></div>
-				</td>
-				<td>
-					<div class=holder><div id=mergesortsholder class=btnholder></div></div>
-				</td>
-				<td>
-					<div class=holder><div id=quicksortsholder class=btnholder></div></div>
-				</td>
-				<td>
-					<div class=holder><div id=cocktailsortsholder class=btnholder></div></div>
-				</td>
-				<td>
-					<div class=holder><div id=recursortsholder class=btnholder></div></div>
-				</td>
-				<td>
-					<div class=holder><div id=itersortsholder class=btnholder></div></div>
-				</td>
-			</tr>
-			<tr><td colspan=5 id=nextsort>Next: ...</td></tr>
-		</table>
 		<script>
 window.onresize=resize;
 window.onblur=function(){pause.checked=true}
@@ -3394,17 +3387,15 @@ function fordSort(){
 		for(let k=len/2;k>0;k--){
 			for(let i=q;i<len;i+=2*k){
 				let l=i;
-				let change = false;
+				let change=0;
 				while(l>0&&compareIndices(array,l,l-1)==-1){
 					rswap(array,l,l-1);
 					l-=2;
 					if(i>0)i--;
-					change=true;
+					change=1;
 				}
-				if(change)
-					i++;
-				else
-					i--;
+				if(change)i++;
+				else i--;
 			}
 		}
 		q=(q+1)&1;
@@ -3586,9 +3577,9 @@ function popPopSort(){
 }
 function inPlaceLSDRadixSort(){
 	let array=[...arr];
-	let pos = 0;
+	let pos=0;
 	let base=10;
-	let vregs = new Array(base-1);
+	let vregs=new Array(base-1);
 	let maxpower=maxLog(array,len,base);
 	for(let p=0;p<=maxpower;p++){
 		for(let i=0;i<vregs.length;i++)
@@ -3892,14 +3883,80 @@ function blockShellSort(){
 	while(--k>1)shellPass(array,0,len,ciura(k-1));
 	return[5,1]
 }
-function Sort(){
+function testSort(){
 	let array=[...arr];
-	
-	return[5,1]
-}
-function Sort(){
-	let array=[...arr];
-	
+	function shift(n,q){
+		while(q>0){
+			n/=base;
+			q--;
+		}
+		return n|0;
+	}
+	function ms(ar,a,b,l){
+		for(let i=0;i<l;i++)
+			rswap(ar,a+i,b+i);
+	}
+	function rot(ar,a,m,b){
+		let l=m-a,r=b-m;
+		while(l>0&&r>0){
+			if(r<l){
+				ms(ar,m-r,m,r);
+				b-=r;m-=r;l-=r;
+			}else{
+				ms(ar,a,m,l);
+				a+=l;m+=l;r-=l;
+			}
+		}
+	}
+	function bs(ar,a,b,d,p){
+		while(a<b){
+			let m=(a+b)/2|0;
+			if(getDigit(ar[m],p,base)>=d)b=m;
+			else a=m+1;
+		}
+		return a;
+	}
+	function merge(ar,a,m,b,da,db,p){
+		if(b-a<2||db-da<2)return;
+		let dm=(da+db)/2|0;
+		let m1=bs(ar,a,m,dm,p);
+		let m2=bs(ar,m,b,dm,p);
+		rot(ar,m1,m,m2);
+		m=m1+(m2-m);
+		merge(ar,m,m2,b,dm,db,p);
+		merge(ar,a,m1,m,da,dm,p);
+	}
+	function mergeSort(ar,a,b,p){
+		if(b-a<2)return;
+		let m=(a+b)/2|0;
+		mergeSort(ar,a,m,p);
+		mergeSort(ar,m,b,p);
+		merge(ar,a,m,b,0,base,p);
+	}
+	function dist(ar,a,b,p){
+		mergeSort(ar,a,b,p);
+		return bs(ar,a,b,1,p);
+	}
+	let base=4;
+	let q=maxLog(array,len,base);
+	let m=0,i=0,b=len;
+	while(i<len){
+		let p=b-i<1?i:dist(array,i,b,q);
+		if(q==0){
+			m+=base;
+			let t=m/base;
+			while(t%base==0){
+				t/=base;
+				q++;
+			}
+			i=b;
+			while(b<len&&shift(array[b],q+1)==shift(m,q+1))
+				b++;
+		}else{
+			b=p;
+			q--;
+		}
+	}
 	return[5,1]
 }
 function Sort(){
@@ -4002,8 +4059,7 @@ function s(m=0,i=0){
 			names.innerText="Shuffling...";
 			inputdisplay.innerText=""
 			if(i==0){
-				for(let fv=0;fv<len*.01&&start<count;fv++)swap(arr,start++,random()*len|0,1);
-				done=start>=count
+				for(let fv=0;fv<len*.01&&start<count;fv++,done=start>=count)swap(arr,start++,random()*len|0,1);
 			}else if(i==1){
 				for(let fv=0;fv<len/100;fv++){
 					d=start>=end
@@ -4017,8 +4073,7 @@ function s(m=0,i=0){
 				}
 				done=d
 			}else if(i==3){
-				for(let fv=0;fv<len*.01&&start<count;fv++,++start)random()>.8&&swap(arr,start-1,random()*start|0,1);
-				done=start>=count
+				for(let fv=0;fv<len*.01&&start<count;fv++,++start,done=start>=count)random()>.8&&swap(arr,start-1,random()*start|0,1);
 			}else if(i==4&&d){
 				d=0
 				let tmp=0,s1=1,shuf=setInterval(()=>{
@@ -4027,8 +4082,7 @@ function s(m=0,i=0){
 						if(random()>.8){
 							let j=tmp+maxVal(random()*len-tmp|0,0),k=setInterval(()=>{
 								for(let x=0;x<=len*.25|0;x++){
-									if(j<len-1-random()*tmp|0)
-										swap(arr,j,++j,1)
+									if(j<len-1-random()*tmp|0)swap(arr,j,++j,1)
 									else{
 										clearInterval(k)
 										tmp++
@@ -4037,9 +4091,7 @@ function s(m=0,i=0){
 									}
 								}
 							})
-						}
-						else
-							s1=1;
+						}else s1=1;
 					}else if(s1){
 						clearInterval(shuf)
 						done=1
@@ -4053,8 +4105,7 @@ function s(m=0,i=0){
 						if(random()>.8){
 							let j=minVal(random()*len+tmp|0,len-1)-tmp,k=setInterval(()=>{
 								for(let x=0;x<=len*.25|0;x++){
-									if(j>random()*tmp|0)
-										swap(arr,j,--j,1)
+									if(j>random()*tmp|0)swap(arr,j,--j,1)
 									else{
 										clearInterval(k)
 										tmp++
@@ -4063,9 +4114,7 @@ function s(m=0,i=0){
 									}
 								}
 							})
-						}
-						else
-							s1=1;
+						}else s1=1;
 					}else if(s1){
 						clearInterval(shuf)
 						done=1
@@ -4073,58 +4122,47 @@ function s(m=0,i=0){
 				})
 			}else if(i==6){
 				let tmp=[]
-				for(let fv=len-1;fv>1;fv-=2)
-					tmp[tmp.length]=arr.splice(fv,1)[0]
+				for(let fv=len-1;fv>1;fv-=2)tmp[tmp.length]=arr.splice(fv,1)[0]
 				arr=tmp.reverse().concat(arr)
 				done=1
 			}else if(i==7){
-				let half=len/2|0
-				let tmp=arr.splice(half,len)
+				let half=len/2|0,tmp=arr.splice(half,len)
 				arr=tmp.concat(arr)
 				done=1
 			}else if(i==8){
 				let tmp=[]
-				for(let fv=len-1;fv>1;fv-=2)
-					tmp[tmp.length]=arr.splice(fv,1)[0]
+				for(let fv=len-1;fv>1;fv-=2)tmp[tmp.length]=arr.splice(fv,1)[0]
 				arr=arr.concat(tmp)
 				done=1
 			}else if(i==9){
 				let e=0
-				while(e+2<len)e+=2
-				for(let start=0,end=e;start<end;start+=2,end-=2)
-					swap(arr,start,end)
+				while(e+2<len)e+=2;
+				for(let start=0,end=e;start<end;start+=2,end-=2)swap(arr,start,end)
 				done=1
 			}else if(i==10){
-				let rm=(sqrt(len)/4|0);
+				let rm=(sqrt(len)/4|0),temp=[...arr],c=len-1;
 				arr=arr.filter((e,i)=>!(++i%rm))
-				let temp=[...arr]
-				for(let i=0;i<rm;i++)
-					arr=arr.concat(temp)
+				for(let i=0;i<rm;i++)arr=arr.concat(temp)
 				arr=arr.sort((a,b)=>a-b).splice(0,len)
-				let c=len-1;
-				while(c)
-					swap(arr,c,random()*c--|0)
+				while(c)swap(arr,c,random()*c--|0)
 				done=1
 			}else if(i==11){
 				swap(arr,random()*len|0,random()*len|0,1)
 				done=1
 			}else if(i==12&&d){
 				d=0
-				let k1;
-				let n=len/2
+				let k1,n=len/2
 				k1=setInterval(()=>{
 					if(n>=1){
 						for(let x=0;x<=len|0;x++){
 							let b=1
 							while(n<=len/2&&b){
 								let leaf=2*n;
-								if(leaf<len&&arr[leaf-1]<arr[leaf])
-									leaf++;
+								if(leaf<len&&arr[leaf-1]<arr[leaf])leaf++;
 								if(arr[n-1]<arr[leaf-1]){
 									swap(arr,n-1,leaf-1,1);
 									n=leaf;
-								}
-								else b=0;
+								}else b=0;
 							}
 							n--
 						}
@@ -4135,18 +4173,11 @@ function s(m=0,i=0){
 				})
 			}else if(i==13&&d){
 				d=0
-				let c=2,
-					min=arr[0],
-					max=arr[0],
-					exp=1,
-					pass=0;
+				let c=2,min=arr[0],max=arr[0],exp=1,pass=0,k1,w1=1,k2;
 				for(let n=1;n<len;n++){
-					if(arr[n]<min)
-						min=arr[n];
-					if(arr[n]>max)
-						max=arr[n];
+					if(arr[n]<min)min=arr[n];
+					if(arr[n]>max)max=arr[n];
 				}
-				let k1,w1=1,k2
 				k1=setInterval(()=>{
 					if(w1){
 						w1=0;
@@ -4156,7 +4187,7 @@ function s(m=0,i=0){
 							for(n=0;n<len;n++)b[((arr[n]-min)/exp)%10|0]++;
 							for(n=1;n<10;n++)b[n]+=b[n-1];
 							for(n=len-1;n>=0;n--)output[--b[((arr[n]-min)/exp)%10|0]]=arr[n];
-							n=-1
+							n=-1;
 							while(n<len){
 								if(++n<len)
 									arr[n]=output[n];
@@ -4169,6 +4200,7 @@ function s(m=0,i=0){
 									clearInterval(k2);
 									clearInterval(k1);
 									done=1
+									d=1
 									break;
 								}
 							}
@@ -4353,6 +4385,7 @@ set(["Recursive Shircle Sort",recursiveShircleSort])
 set(["Merry-Go-Round Sort",merryGoRoundSort])
 set(["X Pattern Sort",XSort])
 set(["Block Shell Sort",blockShellSort])
+set(["test Sort",testSort])
 //set(["test Sort",testSort])
 sn.sort((a,b)=>a[0].localeCompare(b[0]))
 const inputs=[
@@ -4372,17 +4405,19 @@ const inputs=[
 	"Final Radix Pass",
 	"Sorted",
 ]
-let req=get("block shell")
-s(req)
+let req=get("test")
+s(req,13)
 function hold(e){
 	e.addEventListener("touchstart",v=>e.style.opacity=.5);
 	e.addEventListener("touchend",v=>e.style.opacity=1);
+	e.addEventListener("mousedown",v=>e.style.opacity=.5);
+	e.addEventListener("mouseup",v=>e.style.opacity=1);
+	e.addEventListener("mouseout",v=>e.style.opacity=1);
 }
 function appendTo(parent,text,func){
 	let a=document.createElement("div");
 	a.className="selectbtn";
 	a.textContent=text;
-	a.style.margin="3px";
 	hold(a)
 	a.onclick=function(){
 		queue=get(text)
@@ -4393,16 +4428,21 @@ function appendTo(parent,text,func){
 sn.forEach(e=>{
 	let name=e[0].toLowerCase();
 	appendTo(sortsholder,e[0]);
-	if(name.match("merge"))
-		appendTo(mergesortsholder,e[0]);
-	if(name.match("quick"))
-		appendTo(quicksortsholder,e[0]);
-	if(name.match("recur"))
-		appendTo(recursortsholder,e[0]);
-	if(name.match("itera"))
-		appendTo(itersortsholder,e[0]);
-	if(name.match("cocktail"))
-		appendTo(cocktailsortsholder,e[0]);
+	if(name.match("merge"))appendTo(mergesortsholder,e[0]);
+	if(name.match("quick"))appendTo(quicksortsholder,e[0]);
+	if(name.match("recur"))appendTo(recursortsholder,e[0]);
+	if(name.match("itera"))appendTo(itersortsholder,e[0]);
+	if(name.match("cocktail"))appendTo(cocktailsortsholder,e[0]);
+})
+Array.from(document.querySelectorAll("div.topicname")).map((e,i)=>{
+	let ch=document.querySelectorAll("div.btnholder")[i]
+	e.onclick=function(){
+		let h=parseFloat(window.getComputedStyle(ch).getPropertyValue("height"))==300
+		ch.style.height=(h?0:300)+"px";
+		ch.style.opacity=h?0:1;
+		ch.style.padding=(h?0:3)+"px 0px";
+		document.querySelectorAll("div.space")[i].style.display=h?"none":"block";
+	}
 })
 		</script>
 	</body>
