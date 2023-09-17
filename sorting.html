@@ -34,7 +34,7 @@
 				transition-timing-function:linear;
 				transition-duration:.2s;
 				border-radius:4px;
-				background:rgb(29,42,53);
+				background:#1d2a35;
 				border:3px black solid;
 				height:0px;
 				opacity:0;
@@ -44,7 +44,7 @@
 			}
 			div.selectbtn{
 				color:#fff;
-				background:rgb(4,170,109);
+				background:#04aa6d;
 				border-radius:10px;
 				padding:3px;
 				margin:3px;
@@ -59,7 +59,7 @@
 			div.space{display:none;}
 		</style>
 	</head>
-	<body style="background:rgb(14,21,26)">
+	<body bgcolor=#0e151a>
 		<br>
 		<span id=names></span>
 		<div class=holder>
@@ -178,6 +178,7 @@ const fps=(()=>{
 			elapsed=Date.now()
 			fps=frame
 			if(fps<30)markarray.checked=0;
+			if(fps>=55)markarray.checked=1;
 			fpsdisplay.innerText=frame
 			frame=0
 		}
@@ -5549,9 +5550,10 @@ class Shuffles{
 		return this.steps;
 	}
 }
+let shuf=new Shuffles()
 function s(m=0,i=0){
 	arr=create(count).sort((a,b)=>a-b);
-	let shuf=new Shuffles(),stp=shuf.start(arr,i),tck=0;
+	let stp=shuf.start(arr,i),tck=0;
 	swaps=0;writes=0;
 	let shuffling=setInterval(()=>{
 		tck++%5==0&&display(arr)
