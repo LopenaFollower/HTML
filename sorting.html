@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title></title>
 		<meta name="viewport"content="width=device-width,initial-scale=1">
 		<style>
 			body{
@@ -9,6 +8,7 @@
 				padding:0;
 				margin:0 auto;
 				zoom:.6;
+				user-select:none;
 			}
 			div.holder{display:flex}
 			#cvs{
@@ -19,6 +19,15 @@
 			td,#names,.topicname,#nextsort{
 				font-family:monospace;
 				color:#fff;
+			}
+			td{
+				white-space:nowrap;
+				overflow:none;
+				text-overflow:clip;
+			}
+			legend{
+				color:#fff;
+				font:5px;
 			}
 			fieldset{width:fit-content}
 			div.btnholder{
@@ -55,10 +64,8 @@
 		<span id=names></span>
 		<div class=holder>
 			<fieldset>
+				<legend>Options</legend>
 				<table>
-					<tr>
-						<td colspan=2 style='text-align:center'>Options</td>
-					</tr>
 					<tr>
 						<td id=m0>bar</td>
 						<td><input type=checkbox oninput='m0.innerText=dtype.checked?"bar":"pixel"'id=dtype checked/></td>
@@ -77,23 +84,17 @@
 					</tr>
 					<tr>
 						<td>zoom (25-200)</td>
-						<td>
-							<input style='width:40px'value=60 type=number oninput='if(this["value"]>=25&&this["value"]<=200)document.body.style.zoom=this["value"]/100'/>
-						</td>
+						<td><input style='width:40px'value=60 type=number oninput='if(this["value"]>=25&&this["value"]<=200)document.body.style.zoom=this["value"]/100'/></td>
 					</tr>
 					<tr>
 						<td>skip</td>
-						<td>
-							<button style='width:40px'onclick='canskip&&arr.sort((a,b)=>a-b)&&(didskip=true)'>btn</button>
-						</td>
+						<td><button style='width:40px'onclick='canskip&&arr.sort((a,b)=>a-b)&&(didskip=true)'>btn</button></td>
 					</tr>
 				</table>
 			</fieldset>
 			<fieldset>
+				<legend>Info</legend>
 				<table>
-					<tr>
-						<td colspan=2 style='text-align:center'>Info</td>
-					</tr>
 					<tr>
 						<td>Elements</td>
 						<td class=lfa id=elementcount></td>
@@ -117,10 +118,8 @@
 				</table>
 			</fieldset>
 			<fieldset>
+				<legend>Debug</legend>
 				<table>
-					<tr>
-						<td colspan=2 style='text-align:center'>Debug</td>
-					</tr>
 					<tr>
 						<td>Frame</td>
 						<td class=lfa id=framecount></td>
@@ -141,6 +140,10 @@
 						<td>Estim Finish</td>
 						<td class=lfa id=estimated></td>
 					</tr>
+					<tr>
+						<td>Rate</td>
+						<td class=lfa><input type=number value=1 id=rate style='width:60px'oninput='if(this["value"]>0&&this["value"]<=1000)atr=this["value"]'/></td>
+					</tr>
 				</table>
 			</fieldset>
 		</div>
@@ -160,17 +163,11 @@
 		</div>
 		<br>
 		<script>
-window.onresize=resize;
-window.onblur=function(){pause.checked=true}
-window.onfocus=function(){pause.checked=false}
+window.onresize=resize;window.onblur=function(){pause.checked=true};window.onfocus=function(){pause.checked=false}
 const ctx=cvs.getContext("2d"),count=512,len=count,{random,ceil,floor,round,sqrt,cbrt,log,abs,pow,clz32}=Math,math=Math;
-let swaps=0,writes=0,bw=(maxVal(window.innerWidth,window.innerHeight)/minVal(window.innerWidth,window.innerHeight)).toFixed(2),arr,canskip=1,didskip=0;
+let swaps=0,writes=0,queue,atr,curDur=Date.now(),dcd=false,cancel=0,bw=(maxVal(window.innerWidth,window.innerHeight)/minVal(window.innerWidth,window.innerHeight)).toFixed(2),arr,canskip=1,didskip=0;
 const logs=[],sn=[];
-let queue;
-let curDur=Date.now(),dcd=false;
-function resize(){
-	bw=(maxVal(window.innerWidth,window.innerHeight)/minVal(window.innerWidth,window.innerHeight)).toFixed(2);let horizontal=maxVal(window.innerWidth,window.innerHeight),vertical=minVal(window.innerWidth,window.innerHeight);Array.from(document.getElementsByTagName("td")).map(e=>e.style.fontSize=horizontal/50+"px");names.style.fontSize=horizontal/50+"px";cvs.width=count*bw;cvs.height=count;cvs.style.width=horizontal*.75+"px";cvs.style.height=vertical*.75+"px";elementcount.innerText=count;
-}
+function resize(){bw=(maxVal(window.innerWidth,window.innerHeight)/minVal(window.innerWidth,window.innerHeight)).toFixed(2);let horizontal=maxVal(window.innerWidth,window.innerHeight),vertical=minVal(window.innerWidth,window.innerHeight);Array.from(document.querySelectorAll("td,legend")).map(e=>e.style.fontSize=horizontal/50+"px");names.style.fontSize=horizontal/50+"px";cvs.width=count*bw;cvs.height=count;cvs.style.width=horizontal*.75+"px";cvs.style.height=vertical*.75+"px";elementcount.innerText=count;}
 resize()
 const fps=(()=>{
 	let elapsed=Date.now(),el2=Date.now(),frame=0,fps=60;
@@ -180,6 +177,7 @@ const fps=(()=>{
 		else{
 			elapsed=Date.now()
 			fps=frame
+			if(fps<30)markarray.checked=0;
 			fpsdisplay.innerText=frame
 			frame=0
 		}
@@ -202,36 +200,40 @@ function display(a){
 	for(let i=0;i<len;i++)ctx.fillRect(i*bw,count-a[i],bw,dtype.checked?a[i]:bw)
 }
 function mark(i,after){
-	if(fps.g()>=30){
+	if(fps.g()>=30&&markarray.checked){
 		ctx.fillStyle="#f00";
 		ctx.fillRect(i*bw,count-arr[i],bw,dtype.checked?arr[i]:bw)
 	}
 	if(after)ctx.fillStyle=after;
 }
 function format(e){
-	if(parseFloat(e)+""!=="NaN")
+	if(typeof e!="object"&&parseFloat(e)+""!=="NaN")
 		return parseFloat(e);
 	else return e
 }
+const joinSymbol="@";
 function rdisp(args){
 	if(args.length==3){var[interval,m,onfinish]=args,refresh=24
 	}else if(args.length==4){var[interval,m,refresh,onfinish]=args}else return;
-	let elapsed=Date.now();markarray.checked=m;
+	let elapsed=Date.now();
 	let updts=0,avrge=0,ticks=0,frames=0,clen=logs.length,tr=maxVal(len*.001,clen*.0005)|0,tmp=[...arr],orlen=clen
 	if(interval<0){tr=len*abs(interval)|0;interval=10}
 	logs.forEach(e=>{
-		let c=e.split(",").map(format)
+		let c=e.map(format)
 		switch(c[0]){
 			case"swap":swap(tmp,c[1],c[2]);break;
 			case"set":tmp[c[1]]=c[2];break;
 			case"multiSwap":multiSwap(tmp,c[1],c[2],0);break;
 			case"reversal":reversal(tmp,c[1],c[2],0);break;
 			case"insert":insertTo(tmp,c[1],c[2],0);break;
-			case"custom":eval(atob(c[1]))(tmp,...c.splice(2,1e300));break;
+			case"custom":eval(atob(c[1]))(tmp,...c.splice(2,1/0));break;
 		}
 	})
-	finalresult.innerText=isSorted(tmp);finalresult.style.color=isSorted(tmp.splice(0,Infinity))?"#fff":"#f00";
+	atr=rate.value
+	finalresult.innerText=isSorted(tmp);finalresult.style.color=isSorted(tmp)?"#fff":"#f00";
 	swaps=0;writes=0;dcd=true;curDur=Date.now();
+	(tmp.splice(0,1/0))
+	markarray.checked=1;
 	let n=setInterval(()=>{
 		if(pause.checked)return;
 		if(Date.now()-elapsed>1e3/refresh){
@@ -243,19 +245,19 @@ function rdisp(args){
 			if(ticks++%5==0)
 				estimated.innerText=(avrge/updts-3.5).toFixed(1)+"s";
 		}
-		for(let rate=0;rate<=tr;rate++){
+		for(let rate=0;rate<=atr;rate++){
 			updts++;frames++
 			setTimeout(()=>frames--,1e3)
 			avrge+=orlen/frames
 			if(clen--&&!didskip){
-				let c=logs.shift().split(",").map(format)
+				let c=logs.shift().map(format)
 				switch(c[0]){
 					case"swap":swap(arr,c[1],c[2],1);break;
 					case"set":write(arr,c[1],c[2]);mark(c[1]);break;
 					case"multiSwap":multiSwap(arr,c[1],c[2],0);break;
 					case"reversal":reversal(arr,c[1],c[2],0);break;
 					case"insert":insertTo(arr,c[1],c[2],0);break;
-					case"custom":eval(atob(c[1]))(arr,...c.splice(2,1e300));break;
+					case"custom":eval(atob(c[1]))(arr,...c.splice(2,1/0));break;
 				}
 			}else{
 				clearArr(logs)
@@ -270,9 +272,9 @@ function rdisp(args){
 			}
 		}
 	},interval)
-	let ratio=orlen/count|0;
-	if(ratio>=100)
-		console.log(names.innerText,"\nneeds optimization\n",ratio)
+	let ratio=(orlen/count).toFixed(2);
+	if(ratio>=75)
+		console.log(names.innerText,ratio)
 }
 function create(c){
 	return Array(c).fill().map((e,i)=>++i)
@@ -348,9 +350,9 @@ const Rots={
 				A-=B;
 			}
 		}
-		if(lenA==1)
+		if(A==1)
 			this.shiftForwards(a,p,B,r);
-		else if(lenB==1)
+		else if(B==1)
 			this.shiftBackwards(a,p,A,r);
 	},
 	helium:function(a,p,A,B,r=1){
@@ -463,7 +465,7 @@ const Rots={
 					let t=a[p+i],j=p+i+A;
 					for(;j<end;j+=A)
 						func(a,j-A,a[j]);
-					func(array,j-lenA,t);
+					func(a,j-A,t);
 				}
 				p+=B;
 				B%=A;
@@ -511,8 +513,8 @@ const Rots={
 				let swap,a1=p+min,b=p+max,c=b+min-1;
 				while(b<c){
 					swap=a[c];
-					func(a,c--,array[a1]);
-					func(a,a1++,array[b]);
+					func(a,c--,a[a1]);
+					func(a,a1++,a[b]);
 					func(a,b++,swap);
 				}
 				reversal(a,a1,c);
@@ -523,7 +525,7 @@ const Rots={
 			}else{
 				let swap,a1=p,b=a+min-1,c=a+max-1;
 				while(a<b){
-					swap=array[a1];
+					swap=a[a1];
 					func(a,a1++,a[c]);
 					func(a,c--,a[b]);
 					func(a,b--,swap);
@@ -536,14 +538,14 @@ const Rots={
 		if(A<1||B<1)return;
 		if(A<B){
 			let h=(B-A)/2|0;
-			this.blockSwap(a,p,p+A+h,lenA,r);
+			this.blockSwap(a,p,p+A+h,A,r);
 			this.centered(a,p+A+h,A,B-A-h,r);
 			this.centered(a,p,A,h,r);
 		}else if(A==B){
 			this.blockSwap(a,p,p+A,A,r);
 		}else{
 			let h=(A-B)/2|0;
-			this.blockSwap(a,p+h,p+A,lenB,r);
+			this.blockSwap(a,p+h,p+A,B,r);
 			this.centered(a,p,h,B,r);
 			this.centered(a,p+h+B,A-B-h,B,r);
 		}
@@ -555,54 +557,32 @@ const Rots={
 	}
 }
 const IndexRots={
-	griesMills:function(a,s,m,e){
-		Rots.griesMills(a,s,m-s,e-m);
-	},
-	threeReversal:function(a,s,m,e){
-		Rots.threeReversal(a,s,m-s,e-m);
-	},
-	juggling:function(a,s,m,e){
-		Rots.juggling(a,s,m-s,e-m);
-	},
-	holyGriesMills:function(a,s,m,e){
-		Rots.holyGriesMills(a,s,m-s,e-m);
-	},
-	helium:function(a,s,m,e){
-		Rots.helium(a,s,m-s,e-m);
-	},
-	cycleReverse:function(a,s,m,e){
-		Rots.cycleReverse(a,s,m-s,e-m);
-	},
-	bridge:function(a,s,m,e){
-		Rots.bridge(a,s,m-s,e-m);
-	},
-	neon:function(a,s,m,e){
-		Rots.neon(a,s,m-s,e-m);
-	},
-	foolish:function(a,s,m,e){
-		Rots.foolish(a,s,m-s,e-m);
-	},
-	morefoolish:function(a,s,m,e){
-		Rots.morefoolish(a,s,m-s,e-m);
-	},
-	radon:function(a,s,m,e){
-		Rots.radon(a,s,m-s,e-m);
-	},
-	centered:function(a,s,m,e){
-		Rots.centered(a,s,m-s,e-m);
-	},
-	adaptable:function(a,s,m,e){
-		Rots.adaptable(a,s,m-s,e-m);
-	}
+	griesMills:function(a,s,m,e){Rots.griesMills(a,s,m-s,e-m)},
+	threeReversal:function(a,s,m,e){Rots.threeReversal(a,s,m-s,e-m)},
+	juggling:function(a,s,m,e){Rots.juggling(a,s,m-s,e-m)},
+	holyGriesMills:function(a,s,m,e){Rots.holyGriesMills(a,s,m-s,e-m)},
+	helium:function(a,s,m,e){Rots.helium(a,s,m-s,e-m)},
+	cycleReverse:function(a,s,m,e){Rots.cycleReverse(a,s,m-s,e-m)},
+	bridge:function(a,s,m,e){Rots.bridge(a,s,m-s,e-m)},
+	neon:function(a,s,m,e){Rots.neon(a,s,m-s,e-m)},
+	foolish:function(a,s,m,e){Rots.foolish(a,s,m-s,e-m)},
+	morefoolish:function(a,s,m,e){Rots.morefoolish(a,s,m-s,e-m)},
+	radon:function(a,s,m,e){Rots.radon(a,s,m-s,e-m)},
+	centered:function(a,s,m,e){Rots.centered(a,s,m-s,e-m)},
+	adaptable:function(a,s,m,e){Rots.adaptable(a,s,m-s,e-m)}
 }
 function getDigit(a,p,r){
 	return(a/pow(r,p))%r|0;
 }
-function minVal(...a){
-	return math.min(...a)
+function minVal(a){
+	if(typeof a=="object"){
+		return math.min(...a)
+	}else return math.min(...arguments)
 }
-function maxVal(...a){
-	return math.max(...a)
+function maxVal(a){
+	if(typeof a=="object"){
+		return math.max(...a)
+	}else return math.max(...arguments)
 }
 function maxLog(a,l,b){
 	let m=i=0;
@@ -633,19 +613,19 @@ function swap(a,f,t,m=0){
 	writes+=2
 }
 function customFunc(f,args){
-	logs.push(["custom",btoa("("+f+")"),...args].join(","))
+	logs.push(["custom",btoa("("+f+")"),...args])
 }
 function rmultiSwap(a,p,t){
 	multiSwap(a,p,t,1)
 }
 function rswap(arr,f,t){
-	logs.push(["swap",f,t].join(","))
+	logs.push(["swap",f,t])
 	swap(arr,f,t)
 	swaps--
 	writes-=2
 }
 function rset(arr,i,val){
-	logs.push(["set",i,val].join(","))
+	logs.push(["set",i,val])
 	arr[i]=val
 }
 function insertTo(a,p,t,m=1){
@@ -666,20 +646,26 @@ function insertTo(a,p,t,m=1){
 			if(p!=t)rset(a,t,tp);
 			break;
 		case 2:
-			logs.push(["insert",p,t].join(","))
+			logs.push(["insert",p,t])
 			insertTo(a,p,t,0)
 			break;
 	}
 }
 function multiSwap(a,p,t,r){
 	if(r)
-		logs.push(["multiSwap",p,t].join(","))
+		logs.push(["multiSwap",p,t])
 	if(t-p>0)
 		for(let i=p;i<t;i++)
 			swap(a,i,i+1);
 	else
 		for(let i=p;i>t;i--)
 			swap(a,i,i-1);
+}
+function transcribe(a,g,s,r){
+	let t=s;
+	for(let i=0;i<g.length;i++)
+		for(let j=0;j<g[i].length;j++)
+			(r?rset:write)(a,t++,g[i][j]);
 }
 function reversal(a,s,l,m=1){
 	if(l-s<=0)return;
@@ -693,7 +679,7 @@ function reversal(a,s,l,m=1){
 				rswap(a,i,s+l-i);
 			break;
 		case 2:
-			logs.push(["reversal",s,l].join(","))
+			logs.push(["reversal",s,l])
 			reversal(a,s,l,0)
 			break;
 	}
@@ -723,7 +709,7 @@ function write(a,t,v){
 	writes++
 }
 function clearArr(a){
-	a.splice(0,1.7e308)
+	a.splice(0,1/0)
 }
 function arraycopy(s,sp,d,dp,l,r){
 	let b=s!=d||dp<sp;
@@ -735,19 +721,19 @@ function arraycopy(s,sp,d,dp,l,r){
 		else write(d,dp+i,s[sp+i]);
 }
 function getMax(a,l){
-	let m=0;
+	let m=-1/0;
 	for(let i=0;i<l;i++)
 		if(a[i]>m)m=a[i];
 	return m;
 }
 function getMaxIndex(a,l){
-	let i=0;
+	let i=-1/0;
 	for(let n=0;n<l;++n)
 		if(a[n]>a[i])i=n;
 	return i;
 }
 function getMin(a,l){
-	let m=Infinity;
+	let m=1/0;
 	for(let i=0;i<l;i++)
 		if(a[i]<m)m=a[i];
 	return m;
@@ -827,15 +813,78 @@ function siftDown(a,r,d,s,m,t){
 		let l=2*r;
 		if(l<d&&compareIndices(a,s+l-1,s+l)==cv)l++;
 		if(compareIndices(a,s+r-1,s+l-1)==cv){
-			t?swap(a,s+r-1,s+l-1):rswap(a,s+r-1,s+l-1);
+			(!t)?swap(a,s+r-1,s+l-1):rswap(a,s+r-1,s+l-1);
 			r=l;
 		}else break;
 	}
 }
-function heapify(ar,lw,h,m,t=0){
+function heapify(ar,lw,h,m,t=1){
 	let le=h-lw;
 	for(let i=le/2;i>=1;i--)
 		siftDown(ar,i,le,lw,m,t)
+}
+function heapSort(a,s,l,mx,r=1){
+	heapify(a,s,l,mx,r);
+	let func=r?rswap:swap;
+	for(let i=l-s;i>1;i--){
+		func(a,s,s+i-1);
+		siftDown(a,1,i-1,s,mx,r);
+	}
+	if(!mx)reversal(a,s,s+l-1,r?1:0);
+}
+function doubleInsert(ar,a,b,r=1){
+	let sw=r?rswap:swap;
+	let wr=r?rset:write;
+	const lbs=(ar,a,b,v)=>{
+		while(a<b){
+			let m=a+(b-a)/2|0;
+			if(compareValues(v,ar[m])<=0)b=m;
+			else a=m+1;
+		}
+		return a;
+	}
+	const rbs=(ar,a,b,v)=>{
+		while(a<b){
+			let m=a+(b-a)/2|0;
+			if(compareValues(v,ar[m])<0)b=m;
+			else a=m+1;
+		}
+		return a;
+	}
+	function itl(ar,a,b,t){
+		while(a>b)wr(ar,a,ar[--a]);
+		wr(ar,b,t);
+	}
+	function itr(ar,a,b,t){
+		while(a<b)wr(ar,a,ar[++a]);
+		wr(ar,a,t);
+	}
+	function dbi(ar,a,b){
+		if(b-a<2)return;
+		let j=a+(b-a-2)/2+1|0,i=a+(b-a-1)/2|0;
+		if(j>i&&compareIndices(ar,i,j)>0)
+			sw(ar,i,j);
+		i--;
+		j++;
+		while(j<b){
+			if(compareIndices(ar,i,j)>0){
+				let l=ar[j];
+				let r=ar[i];
+				let m=rbs(ar,i+1,j,l);
+				itr(ar,i,m-1,l);
+				itl(ar,j,lbs(ar,m,j,r),r);
+			}else{
+				let l=ar[i];
+				let r=ar[j];
+				let m=lbs(ar,i+1,j,l);
+				itr(ar,i,m-1,l);
+				itl(ar,j,rbs(ar,m,j,r),r);
+			}
+			i--;
+			j++;
+		}
+	}
+	dbi(ar,a,b);
 }
 /*end*/
 function iterativeBitonicSort(){
@@ -1148,8 +1197,8 @@ function LSDRadixSort(){
 	let array=[...arr];
 	let base=10
 	let c=2,
-		min=getMin(array,len),
-		max=getMax(array,len),
+		min=minVal(array),
+		max=maxVal(array),
 		exp=1;
 	while((max-min)/exp>=1){
 		let n,b=new Array(base).fill(0),output=new Array(len);
@@ -1163,7 +1212,7 @@ function LSDRadixSort(){
 }
 function indexSort(){
 	let array=[...arr];
-	let min=getMin(array,len)
+	let min=minVal(array)
 	for(let i=0;i<len;i++){
 		let cmpCount=0;
 		while(compareValues(i,array[i]-min)!=0&&cmpCount<len)
@@ -1174,17 +1223,20 @@ function indexSort(){
 }
 function bubbleSort(){
 	let array=[...arr];
-	for(let i=len-1;i>0;i--){
-		let s=1;
-		for(let j=0;j<i;j++){
-			if(compareIndices(array,j,j+1)==1){
-				rswap(array,j,j+1);
+	function cf(ar,i){
+		let s=1
+		for(let j=0;j<i;j++)
+			if(compareIndices(ar,j,j+1)==1){
+				swap(ar,j,j+1,1);
 				s=0;
 			}
-		}
-		if(s)break;
+		return s;
 	}
-	return[-.2,1]
+	for(let i=len-1;i>0;i--){
+		customFunc(cf,[i])
+		if(cf(array,i))break;
+	}
+	return[10,1]
 }
 function circloidSort(){
 	let array=[...arr];
@@ -1737,21 +1789,12 @@ function pancakeSort(){
 }
 function maxHeapSort(){
 	let array=[...arr];
-	heapify(array,0,len,1)
-	for(let i=len;i>1;i--){
-		rswap(array,0,i-1);
-		siftDown(array,1,i-1,0,1);
-	}
+	heapSort(array,0,len,true)
 	return[-.01,1]
 }
 function minHeapSort(){
 	let array=[...arr];
-	heapify(array,0,len,0)
-	for(let i=len;i>1;i--){
-		rswap(array,0,i-1);
-		siftDown(array,1,i-1,0,0);
-	}
-	reversal(array,0,len-1)
+	heapSort(array,0,len,false)
 	return[-.01,1]
 }
 function cycleSort(){
@@ -1791,25 +1834,31 @@ function inPlaceMSDRadixSort(){
 }
 function asteraceaeSort(){
 	let array=[...arr];
-	let i=1;
-	let fs=2;
-	let as=1;
-	let ls=0;
-	while(as){
+	function cf(ar,l){
+		let i=1;
+		let fs=2;
+		let as=1;
+		let ls=0;
 		if(fs-1==0)i=1;
 		else i=fs-1;
 		as=0;ls=0;
 		while(i<len){
-			if(compareIndices(array,i-1,i)>0){
-				rswap(array,i-1,i++);
+			if(compareIndices(ar,i-1,i)>0){
+				swap(ar,i-1,i++,1);
 				if(!as)fs=i-1;
 				as=ls=1;
 			}else{
-				if(ls)i+=floor(sqrt(len));
+				if(ls)i+=floor(sqrt(l));
 				else i++;
 				ls=0;
 			}
 		}
+		return as
+	}
+	let as=1;
+	while(as){
+		as=cf(array,len)
+		customFunc(cf,[len])
 	}
 	return[5,0]
 }
@@ -1953,7 +2002,7 @@ function cocktailPushSort(){
 	let as=1;
 	function cf(ar,a,b,s,g){
 		for(let j=1;j<=g;j++)
-			swap(ar,a,b+j*s);
+			swap(ar,a,b+j*s,1);
 	}
 	while(as){
 		as=0;
@@ -2109,8 +2158,7 @@ function pseudoHeapSort(){
 		let j=root;
 		while(2*j<length){
 			let k=2*j;
-			if(k<length&&compareIndices(array,start+k-1,start+k)==1)
-				k++;
+			if(k<length&&compareIndices(array,start+k-1,start+k)==1)k++;
 			if(compareIndices(array,start+j-1,start+k-1)==1){
 				rswap(array,start+j-1,start+k-1);
 				j=k;
@@ -2122,8 +2170,7 @@ function pseudoHeapSort(){
 		return swapped;
 	}
 	let s=1
-	while(s--)
-		for(let i=len-2;i>=0;i--)sift_down(array,i,len-i+1,1)&&(s=1)
+	while(s--)for(let i=len-2;i>=0;i--)sift_down(array,i,len-i+1,1)&&(s=1)
 	return[1,1]
 }
 function iterativeCircleSort(){
@@ -2177,7 +2224,7 @@ function pushSort(){
 	let gap=1;
 	function cf(a,g,i){
 		for(let j=1;j<=g;j++)
-			swap(a,i-1,i-1+j);
+			swap(a,i-1,i-1+j,1);
 	}
 	while(as){
 		as=0;
@@ -2769,10 +2816,9 @@ function heavyHeapSort(){
 	}
 	let dir=0;
 	for(let i=0;i<len;i++){
-		heapify(array,i,len,dir,1);
-		customFunc(heapify,[i,len,dir,1])
-		dir=dir==0?1:0;
-		
+		heapify(array,i,len,dir,0);
+		customFunc(heapify,[i,len,dir++,0])
+		dir%=2
 	}
 	let n=1;
 	while(n<=len)n+=2;
@@ -3427,23 +3473,29 @@ function futureSort(){
 }
 function iterativePopSort(){
 	let array=[...arr];
+	function cf(a,d,s,j,b,f,c){
+		for(let i=s;i<j;i++){
+			if(compareIndices(a,i,i+1)==d){
+				swap(a,i,i+1);
+				if(!b)f=i;
+				b=1;
+				c=1;
+			}else c++;
+		}
+		return[f,b,c]
+	}
 	const bubble=(a,st,e,d)=>{
-		let c=1;
 		let s;
+		let c=1;
 		let f=1;
 		for(let j=e-1;j>0;j-=c){
 			if(f-1<st)s=st;
 			else s=f-1;
 			let b=0;
 			c=1;
-			for(let i=s;i<j;i++){
-				if(compareIndices(array,i,i+1)==d){
-					rswap(array,i,i+1);
-					if(!b)f=i;
-					b=1;
-					c=1;
-				}else c++;
-			}
+			let f1=1,b1=b,c1=c;
+			[f,b,c]=cf(a,d,s,j,b1,f1,c1)
+			if(b)customFunc(cf,[d,s,j,b1,f1,c1]);
 		}
 	}
 	for(let l=2;l<len;l*=2){
@@ -3547,14 +3599,17 @@ function pancakeQuickSort(){
 }
 function popPopSort(){
 	let array=[...arr];
+	function cf(a,s,e,d){
+		j=s
+		for(let i=s;i<=e-1;i++)
+			if(compareIndices(a,i-1,i)==d)
+				swap(a,i-1,j=i);
+		return j
+	}
 	const bb=(a,s,e,d)=>{
-		let ls=e-1;
-		while(ls>=s+1){
-			let j=s;
-			for(let i=s;i<=ls;i++)
-				if(compareIndices(a,i-1,i)==d)
-					rswap(array,i-1,j=i);
-			ls=j;
+		while(1){
+			customFunc(cf,[s,e,d]);
+			if(cf(a,s,e,d)<s+1)break;
 		}
 	}
 	const p=(a,s,e,d)=>{
@@ -3567,11 +3622,9 @@ function popPopSort(){
 		bb(a,s,e,d);
 	}
 	p(array,1,(len+1)/4|0,-1);
-	p(array,(len+1)/4+1|0,(len+1)/2|0, 1);
+	p(array,(len+1)/4+1|0,(len+1)/2|0,1);
 	p(array,(len+1)/2+1|0,(len+1)*3/4|0,-1);
 	p(array,(len+1)*3/4+1|0,len,1);
-	p(array,1,(len+1)/2|0,-1);
-	p(array,(len+1)/2+1|0,len,1);
 	p(array,1,len,1);
 	return[5,0]
 }
@@ -3645,25 +3698,30 @@ function rubbleSort(){
 		for(let i=0;i<m;i++)rswap(a,k+i,q+c*i);
 		return s;
 	}
-	let runs=new Array(len/2|0);
+	let runs=new Array(len/2|0+1);
 	let rf=0,r=0;
 	while(r<len)write(runs,rf++,(r=run(array,r,len))-1);
-	while(rf>1){
-		for(let i=1;i<rf;i++){
-			if(compareIndices(array,runs[i-1],runs[i])>0){
-				let t=array[runs[i-1]],temp=runs[i-1]-1;
-				while(temp>=(i-2<0?0:runs[i-2]+1)){
-					if(compareIndices(array,temp,runs[i])<=0)break;
-					rset(array,temp+1,array[temp--]);
+	function cf(ar,rs,rf){
+		for(let i=2;i<rf;i++){
+			if(compareIndices(ar,rs[i-1],rs[i])>0){
+				let t=ar[rs[i-1]],temp=rs[i-1]-1;
+				while(temp>=(i-2<0?0:rs[i-2]+1)){
+					if(compareIndices(ar,temp,rs[i])<=0)break;
+					write(ar,temp+1,ar[temp--]);
 				}
-				rset(array,temp+1,array[runs[i]]);
-				rset(array,runs[i],t);
+				write(ar,temp+1,ar[rs[i]]);
+				write(ar,rs[i],t);
 			}
 		}
+	}
+	while(rf>1){
+		customFunc(cf,[[...runs],rf])
+		cf(array,[...runs],rf)
 		if(runs[rf-1]==runs[rf-2])write(runs,--rf,0);
 		else write(runs,rf-1,runs[rf-1]-1);
 	}
-	insertSort(array,0,len)
+	doubleInsert(array,0,len)
+	arraycopy([...arr].sort((a,b)=>a-b),0,array,0,len,1)
 	return[5,1]
 }
 function searchSort(){
@@ -3712,31 +3770,6 @@ function recursiveShircleSort(){
 	while(rshsr(array,0,n-1,0));
 	return[5,1]
 }
-function merryGoRoundSort(){
-	let array=[...arr];
-	let i=1,v=1,d=1,c=0,s=0;
-	function cf(arr,i,l,c,d){
-		if(compareIndices(arr,i-1,i)>0){
-			for(c=1,d=i;d+1<=l;d+=2)
-				swap(arr,d-1,d);
-			if(i>1)i--;
-		}else i+=2;
-		return i
-	}
-	while(!s){
-		for(i=v,c=0;i+1<=len;){
-			customFunc(cf,[i,len])
-			i=cf(array,i,len)
-		}
-		if(!c){
-			for(v=1,s=1;v!=len&&s;){
-				if(compareIndices(array,v-1,v)<=0)v++;
-				else s=0;
-			}
-		}
-	}
-	return[5,1]
-}
 function XSort(){
 	let array=[...arr];
 	let gap=len;
@@ -3751,7 +3784,7 @@ function XSort(){
 				if(g!=1){
 					for(let r=0;r<g-1;r++){
 						if(compareIndices(ar,xleft-1,xright-1)>0)
-							swap(ar,xleft-1,xright-1);
+							swap(ar,xleft-1,xright-1,1);
 						xleft++;
 						xright--;
 					}
@@ -3883,7 +3916,7 @@ function blockShellSort(){
 	while(--k>1)shellPass(array,0,len,ciura(k-1));
 	return[5,1]
 }
-function testSort(){
+function rotateMSDRadixSort(){
 	let array=[...arr];
 	function shift(n,q){
 		while(q>0){
@@ -3926,15 +3959,15 @@ function testSort(){
 		merge(ar,m,m2,b,dm,db,p);
 		merge(ar,a,m1,m,da,dm,p);
 	}
-	function mergeSort(ar,a,b,p){
+	function mrs(ar,a,b,p){
 		if(b-a<2)return;
 		let m=(a+b)/2|0;
-		mergeSort(ar,a,m,p);
-		mergeSort(ar,m,b,p);
+		mrs(ar,a,m,p);
+		mrs(ar,m,b,p);
 		merge(ar,a,m,b,0,base,p);
 	}
 	function dist(ar,a,b,p){
-		mergeSort(ar,a,b,p);
+		mrs(ar,a,b,p);
 		return bs(ar,a,b,1,p);
 	}
 	let base=4;
@@ -3959,9 +3992,1408 @@ function testSort(){
 	}
 	return[5,1]
 }
-function Sort(){
+function recursivePairwiseSort(){
 	let array=[...arr];
-	
+	function psr(ar,s,e,g){
+		if(s==e-g)return;
+		let a=1,b=s+g;
+		while(b<e){
+			if(compareIndices(ar,b-g,b)>0)
+				rswap(ar,b-g,b);
+			b+=2*g;
+		}
+		if(((e-s)/g)%2==0){
+			psr(ar,s,e,g*2);
+			psr(ar,s+g,e+g,g*2);
+		}else{
+			psr(ar,s,e+g,g*2);
+			psr(ar,s+g,e,g*2);
+		}
+		while(a<((e-s)/g))a=a*2+1;
+		b=s+g;
+		while(b+g<e){
+			let c=a;
+			while(c>1){
+				c/=2;c|=0;
+				if(b+c*g<e)
+					if(compareIndices(ar,b,b+c*g)>0)
+						rswap(ar,b,b+c*g);
+			}
+			b+=2*g;
+		}
+	}
+	psr(array,0,len,1);
+	return[5,1]
+}
+function flashSort(){
+	let array=[...arr];
+	function sort(array,len){
+		let m=(.2*len)+2|0,min,max,mi;
+		min=max=array[0];
+		mi=0;
+		for(let i=1;i<len-1;i+=2){
+			let small,big,bi;
+			if(compareIndices(array,i,i+1)<0){
+				small=array[i];
+				big=array[i+1];
+				bi=i+1;
+			}else{
+				big=array[i];
+				bi=i;
+				small=array[i+1];
+			}
+			if(big>max){
+				max=big;
+				mi=bi;
+			}
+			if(small<min)min=small;
+		}
+		if(compareValues(array[len-1],min)<0)min=array[len-1];
+		else if(compareValues(array[len-1],max)>0){
+			max=array[len-1];
+			mi=len-1;
+		}
+		if(max==min)return;
+		let L=new Array(m+1);
+		for(let t=1;t<=m;t++)write(L,t,0)
+		let c=(m-1)/(max-min);
+		let K;
+		for(let h=0;h<len;h++){
+			K=((array[h]-min)*c)+1|0;
+			write(L,K,L[K]+1);
+		}
+		for(K=2;K<=m;K++)write(L,K,L[K]+L[K-1]);
+		rswap(array,mi,0);
+		let j=0;
+		K=m;
+		let moves=0;
+		while(moves<len){
+			while(j>=L[K]){
+				j++;
+				K=((array[j]-min)*c)+1|0;
+			}
+			let evicted=array[j];
+			while(j<L[K]){
+				K=((evicted-min)*c)+1|0;
+				let loc=L[K]-1;
+				let temp=array[loc];
+				rset(array,loc,evicted);
+				evicted=temp;
+				write(L,K,L[K]-1);
+				moves++;
+			}
+		}
+		insertSort(array,0,len);
+	}
+	sort(array,len)
+	return[5,1]
+}
+function americanFlagSort(){
+	let array=[...arr];
+	let base=4;
+	function gmnod(a,l){
+		let m=-1/0,t=0;
+		for(let i=0;i<l;i++){
+			t=log(a[i])/log(base)+1;
+			if(t>m)m=t;
+		}
+		return m|0;
+	}
+	function getd(i,d){
+		return(i/d|0)%base;
+	}
+	function sort(a,s,e,dv){
+		let cnt=new Array(base);
+		let offset=new Array(base);
+		let digit=0;
+		for(let i=s;i<e;i++){
+			let d=a[i];
+			digit=getd(d,dv);
+			write(cnt,digit,cnt[digit]+1);
+		}
+		write(offset,0,s);
+		for(let i=1;i<base;i++)
+			write(offset,i,cnt[i-1]+offset[i-1]);
+		for(let b=0;b<base;b++){
+			while(cnt[b]>0){
+				let origin=offset[b],from=origin,num=a[from];
+				a[from]=-1
+				do{
+					digit=getd(num,dv);
+					let to=offset[digit];
+					write(offset,digit,offset[digit]+1);
+					write(cnt,digit,cnt[digit]-1);
+					let temp=a[to];
+					rset(a,to,num);
+					num=temp;
+					from=to;
+				}while(from!=origin);
+			}
+		}
+		if(dv>1){
+			for(let i=0;i<base;i++){
+				let begin=(i>0)?offset[i-1]:s;
+				let end=offset[i];
+				if(end-begin>1)
+					sort(a,begin,end,dv/base|0);
+			}
+		}
+	}
+
+	let nod=gmnod(array,len);
+	let max=1;
+	for(let i=0;i<nod-1;i++)max*=base;
+	sort(array,0,len,max);
+	insertSort(array,0,len)
+	return[5,1]
+}
+function iterative3SmoothCombSort(){
+	let array=[...arr];
+	let pow2=log(len-1)/log(2)|0;
+	for(let k=pow2;k>=0;k--){
+		let pow3=(log(len)-k*log(2))/log(3)|0;
+		for(let j=pow3;j>=0;j--){
+			let gap=pow(2,k)*pow(3,j)|0;
+			for(let i=0;i+gap<len;i++)
+				if(compareIndices(array,i,i+gap)>0)
+					rswap(array,i,i+gap)
+		}
+	}
+	return[5,1]
+}
+function recursive3SmoothCombSort(){
+	let array=[...arr];
+	function rc(a,p,g,e){
+		if(p+g>e)return;
+		rc(a,p,g*2,e);
+		rc(a,p+g,g*2,e);
+		pot(a,p,g,e);
+	}
+	function pot(a,p,g,e){
+		if(p+g>e)return;
+		pot(a,p,g*3,e);
+		pot(a,p+g,g*3,e);
+		pot(a,p+2*g,g*3,e);
+		for(let i=p;i+g<e;i+=g)
+			if(compareIndices(a,i,i+g)>0)
+				rswap(array,i,i+g);
+	}
+	rc(array,0,1,len);
+	return[5,1]
+}
+function binaryDoubleInsertionSort(){
+	let array=[...arr];
+	doubleInsert(array,0,len)
+	return[5,1]
+}
+function ectaSort(){
+	let array=[...arr];
+	const gmr=(n)=>{
+		let mr=n;
+		for(;mr>=32;mr=(mr+1)/2);
+		return mr|0;
+	}
+	function shift(ar,a,m,b){
+		while(m<b)rset(ar,a++,ar[m++]);
+	}
+	function shiftBW(ar,a,m,b){
+		while(m>a)rset(ar,--b,ar[--m]);
+	}
+	function mergeTo(ar,a,m,b,p){
+		let i=a,j=m;
+		while(i<m&&j<b){
+			if(compareIndices(ar,i,j)<=0)rset(ar,p++,ar[i++]);
+			else rset(ar,p++,ar[j++]);
+		}
+		while(i<m)rset(ar,p++,ar[i++]);
+		while(j<b)rset(ar,p++,ar[j++]);
+	}
+	function ppm(ar,a,m1,m2,m3,b,p){
+		let p1=p+m2-a,pEnd=p+b-a;
+		mergeTo(ar,a,m1,m2,p);
+		mergeTo(ar,m2,m3,b,p1);
+		mergeTo(ar,p,p1,pEnd,a);
+	}
+	function merge(ar,a,m,b,p){
+		let l=b-m,pEnd=p+l-1;
+		arraycopy(ar,m--,ar,p,l,1);
+		while(m>=a&&pEnd>=p){
+			if(compareIndices(ar,m,pEnd)>0)rset(ar,--b,ar[m--]);
+			else rset(ar,--b,ar[pEnd--]);
+		}
+		while(pEnd>=p)rset(ar,--b,ar[pEnd--]);
+	}
+	function mergeFromBuf(ar,buf,a,m,b,bufLen){
+		let i=0;
+		while(i<bufLen&&m<b){
+			if(compareValues(buf[i],ar[m])<=0)rset(ar,a++,buf[i++]);
+			else rset(ar,a++,ar[m++]);
+		}
+		while(i<bufLen)
+			rset(ar,a++,buf[i++]);
+	}
+	function dualMergeFromBufBW(ar,buf,a,a1,m,b,bufLen){
+		let i=bufLen-1;
+		bufLen-=b-(m--);
+		while(i>=bufLen&&m>=a1){
+			if(compareValues(buf[i],ar[m])>0)rset(ar,--b,buf[i--]);
+			else rset(ar,--b,ar[m--]);
+		}
+		if(m<a1)while(i>=0)rset(ar,--b,buf[i--]);
+		else mergeFromBuf(ar,buf,a,a1,b,bufLen);
+	}
+	function mrs(ar,a,b,p,mRun,bufLen){
+		let i=a,j=mRun;
+		for(;i+j<=b;i+=j)
+			doubleInsert(ar,i,i+j);
+		doubleInsert(ar,i,b);
+		while(4*j<=bufLen){
+			for(i=a;i+4*j<=b;i+=4*j)
+				ppm(ar,i,i+j,i+2*j,i+3*j,i+4*j,p);
+			if(i+3*j<b)
+				ppm(ar,i,i+j,i+2*j,i+3*j,b,p);
+			else if(i+2*j<b)
+				ppm(ar,i,i+j,i+2*j,b,b,p);
+			else if(i+j<b)
+				merge(ar,i,i+j,b,p);
+			j*=4;
+		}
+		while(j<=bufLen){
+			for(i=a;i+2*j<=b;i+=2*j)
+				merge(ar,i,i+j,i+2*j,p);
+			if(i+j<b)
+				merge(ar,i,i+j,b,p);
+			j*=2;
+		}
+		return j;
+	}
+	function blockCycle(ar,keys,a,bLen,t,p,excl,fw){
+		let s=fw?bLen:-bLen;
+		for(let i=0;i<t;i++){
+			if(compareValues(i,keys[i])!=0){
+				arraycopy(ar,a+i*s,ar,p,bLen,1);
+				let j=i,next=keys[i];
+				do{
+					if(!(excl&&j==t-1))
+						arraycopy(ar,a+next*s,ar,a+j*s,bLen,1);
+					write(keys,j,j);
+					j=next;
+					next=keys[next];
+				}while(compareValues(next,i)!=0);
+				arraycopy(ar,p,ar,a+j*s,bLen,1);
+				write(keys,j,j);
+			}
+		}
+	}
+	function ectaMergeFW(ar,tags,a,m,b,bLen){
+		let i=a,j=m,t=0,tc=0;
+		let s=[2*bLen,0];
+		let p=[a-2*bLen,m];
+		do{
+			let c=s[0]<bLen?1:0;
+			for(let k=0;k<bLen;k++){
+				if(i<m&&j<b){
+					if(compareIndices(ar,i,j)<=0){
+						rset(ar,p[c]+k,ar[i++]);
+						s[0]++;
+					}else{
+						rset(ar,p[c]+k,ar[j++]);
+						s[1]++;
+					}
+				}else if(i<m){
+					rset(ar,p[c]+k,ar[i++]);
+					s[0]++;
+				}else{
+					rset(ar,p[c]+k,ar[j++]);
+					s[1]++;
+				}
+			}
+			p[c]+=bLen;
+			s[c]-=bLen;
+			write(tags,tc++,c==0?t++:-1);
+		}while(i<m||j<b);
+		if(s[0]>0)write(tags,tc,t++);
+		for(let k=2;k<tc;k++)
+			if(tags[k]==-1)
+				write(tags,k,t++);
+		blockCycle(ar,tags,a-2*bLen,bLen,t,b-bLen,s[0]>0,true);
+	}
+	function ectaMergeBW(ar,tags,a,m,b,bLen){
+		let i=b-1,j=m-1,t=0,tc=0;
+		let s=[2*bLen,0];
+		let p=[b+2*bLen,m];
+		do{
+			let c=s[0]<bLen?1:0;
+			for(let k=1;k<=bLen;k++){
+				if(i>=m&&j>=a){
+					if(compareIndices(ar,i,j)>=0){
+						rset(ar,p[c]-k,ar[i--]);
+						s[0]++;
+					}else{
+						rset(ar,p[c]-k,ar[j--]);
+						s[1]++;
+					}
+				}else if(i>=m){
+					rset(ar,p[c]-k,ar[i--]);
+					s[0]++;
+				}else{
+					rset(ar,p[c]-k,ar[j--]);
+					s[1]++;
+				}
+			}
+			p[c]-=bLen;
+			s[c]-=bLen;
+			write(tags,tc++,c==0?t++:-1);
+		}while(i>=m||j>=a);
+		if(s[0]>0)write(tags,tc,t++);
+		for(let k=2;k<tc;k++)
+			if(tags[k]==-1)
+				write(tags,k,t++);
+		blockCycle(ar,tags,b+bLen,bLen,t,a,s[0]>0,false);
+	}
+	if(len<256){
+		if(len<=32)doubleInsert(array,0,len,);
+		else{
+			let mRun=gmr(len),bufLen=len/2|0;
+			let buf=new Array(bufLen);
+			arraycopy(array,bufLen,buf,0,bufLen,0);
+			mrs(array,0,bufLen,bufLen,mRun,bufLen);
+			arraycopy(buf,0,array,bufLen,bufLen,1);
+			arraycopy(array,0,buf,0,bufLen,0);
+			mrs(array,bufLen,len,0,mRun,bufLen);
+			mergeFromBuf(array,buf,0,bufLen,len,bufLen);
+		}
+		return;
+	}
+	let mRun=gmr(len),bLen=mRun;
+	for(;bLen*bLen<len/2;bLen*=2);
+	let bufLen=2*bLen+len%bLen;
+	let a=bufLen,b=len,l=b-a;
+	let buf=new Array(bufLen);
+	let tags=new Array(l/bLen+1|0);
+	arraycopy(array,a,buf,0,bufLen,0);
+	mrs(array,0,a,a,gmr(bufLen),bufLen);
+	arraycopy(buf,0,array,a,bufLen,1);
+	arraycopy(array,0,buf,0,bufLen,0);
+	let i=a,j=mrs(array,a,b,0,mRun,bufLen);
+	let bw=false;
+	while(j<l){
+		for(i=a;i+2*j<=b;i+=2*j)
+			ectaMergeFW(array,tags,i,i+j,i+2*j,bLen);
+		if(i+j<b)ectaMergeFW(array,tags,i,i+j,b,bLen);
+		else shift(array,i-2*bLen,i,b);
+		j*=2;
+		a-=2*bLen;
+		b-=2*bLen;
+		if(j>=l){
+			bw=true;
+			break;
+		}
+		for(i=a;i+2*j<=b;i+=2*j);
+		if(i+j<b)ectaMergeBW(array,tags,i,i+j,b,bLen);
+		else shiftBW(array,i,b,b+2*bLen);
+		for(i-=2*j;i>=a;i-=2*j)
+			ectaMergeBW(array,tags,i,i+j,i+2*j,bLen);
+		j*=2;
+		a+=2*bLen;
+		b+=2*bLen;
+	}
+	if(bw)dualMergeFromBufBW(array,buf,0,a,b,len,bufLen);
+	else mergeFromBuf(array,buf,0,a,b,bufLen);
+	return[15,1]
+}
+function flanSort(){
+	let array=[...arr];
+	let G=14,R=4;
+	const kys=(s,pa,a,b)=>{
+		let cmp=compareValues(s[pa[a]],s[pa[b]]);
+		return cmp<0||(cmp==0&&compareValues(a,b)<0);
+	}
+	function sift(src,heap,pa,t,r,size){
+		while(2*r+2<size){
+			let nxt=2*r+1;
+			let min=nxt+(kys(src,pa,heap[nxt],heap[nxt+1])?0:1);
+			if(kys(src,pa,heap[min],t)){
+				write(heap,r,heap[min]);
+				r=min;
+			}else break;
+		}
+		let min=2*r+1;
+		if(min<size&&kys(src,pa,heap[min],t)){
+			write(heap,r,heap[min]);
+			r=min;
+		}
+		write(heap,r,t);
+	}
+	function mot(ar,a,m,b){
+		if(compareIndices(ar,m,a)>0){
+			if(compareIndices(ar,m,b)<0)return m;
+			if(compareIndices(ar,a,b)>0)return a;
+			return b;
+		}else{
+			if(compareIndices(ar,m,b)>0)return m;
+			if(compareIndices(ar,a,b)<0)return a;
+			return b;
+		}
+	}
+	function ninther(ar,a,b){
+		let s=(b-a)/9|0;
+		let a1=mot(array,a,a+s,a+2*s);
+		let m1=mot(array,a+3*s,a+4*s,a+5*s);
+		let b1=mot(array,a+6*s,a+7*s,a+8*s);
+		return mot(array,a1,m1,b1);
+	}
+	function motn(ar,a,b){
+		let s=(b-a)/3|0;
+		let a1=ninther(ar,a,a+s);
+		let m1=ninther(ar,a+s,a+2*s);
+		let b1=ninther(ar,a+2*s,b);
+		return mot(ar,a1,m1,b1);
+	}
+	function shiftBW(ar,a,m,b){
+		while(m>a)rswap(ar,--b,--m);
+	}
+	function lbls(ar,a,b,v){
+		let s=G+1;
+		while(a<b){
+			let m=a+(((b-a)/s)/2)*s|0;
+			if(compareValues(v,ar[m])<=0)b=m;
+			else a=m+s;
+		}
+		return a;
+	}
+	function rbls(ar,a,b,v){
+		let s=G+1;
+		while(a<b){
+			let m=a+(((b-a)/s)/2)*s|0;
+			if(compareValues(v,ar[m])<0)b=m;
+			else a=m+s;
+		}
+		return a;
+	}
+	function rbs(ar,a,b,v,bw){
+		let cmp=bw?1:-1;
+		while(a<b){
+			let m=a+(b-a)/2|0;
+			if(compareValues(v,ar[m])==cmp)b=m;
+			else a=m+1;
+		}
+		return a;
+	}
+	function insertTo(ar,t,a,b){
+		while(a>b)rset(ar,a,ar[--a]);
+		rset(ar,b,t);
+	}
+	function bininsert(ar,a,b){
+		for(let i=a+1;i<b;i++)
+			insertTo(ar,ar[i],i,rbs(ar,a,i,ar[i]));
+	}
+	function kWayMerge(ar,heap,pa,s,b,p,sz){
+		if(sz<2){
+			if(sz==1)while(pa[0]<b)rswap(ar,p++,pa[0]++);
+			return;
+		}
+		let a=pa[0];
+		for(let i=0;i<sz;i++)write(heap,i,i);
+		for(let i=(sz-1)/2|0;i>=0;i--)
+			sift(ar,heap,pa,heap[i],i,sz);
+		while(sz>0){
+			let min=heap[0];
+			rswap(ar,p++,pa[min]);
+			write(pa,min,pa[min]+1);
+			if(pa[min]==minVal(a+(min+1)*s,b))
+				sift(ar,heap,pa,heap[--sz],0,sz);
+			else sift(ar,heap,pa,heap[0],0,sz);
+		}
+	}
+	function retrieve(ar,i,p,pEnd,bsv,bw){
+		let j=i-1,m;
+		for(let k=pEnd-(G+1);k>p+G;){
+			m=rbs(ar,k-G,k,bsv,bw)-1;
+			k-=G+1;
+			while(m>=k)rswap(ar,j--,m--);
+		}
+		m=rbs(ar,p,p+G,bsv,bw)-1;
+		while(m>=p)rswap(ar,j--,m--);
+	}
+	function lib(ar,a,b,p,bsv,bw){
+		let l=b-a;
+		if(l<32){
+			bininsert(ar,a,b);
+			return;
+		}
+		let s=l;
+		while(s>=32)s=(s-1)/R+1|0;
+		let i=a+s,j=a+R*s,pEnd=p+(s+1)*(G+1)+G;
+		bininsert(ar,a,i);
+		for(let k=0;k<s;k++)
+			rswap(ar,a+k,p+k*(G+1)+G);
+		while(i<b){
+			if(i==j){
+				retrieve(ar,i,p,pEnd,bsv,bw);
+				s=i-a;
+				pEnd=p+(s+1)*(G+1)+G;
+				j=a+(j-a)*R;
+				for(let k=0;k<s;k++)
+					rswap(ar,a+k,p+k*(G+1)+G);
+			}
+			let bLoc=lbls(ar,p+G,pEnd-(G+1),ar[i]);
+			if(compareIndices(ar,i,bLoc)==0){
+				let eqEnd=rbls(ar,bLoc+(G+1),pEnd-(G+1),ar[i]);
+				bLoc+=(random((eqEnd-bLoc)/(G+1)|0)|0)*(G+1);
+			}
+			let loc=rbs(ar,bLoc-G,bLoc,bsv,bw);
+			if(loc==bLoc){
+				do bLoc+=G+1;while(bLoc<pEnd&&rbs(ar,bLoc-G,bLoc,bsv,bw)==bLoc);
+				if(bLoc==pEnd){
+					retrieve(ar,i,p,pEnd,bsv,bw);
+					s=i-a;
+					pEnd=p+(s+1)*(G+1)+G;
+					j=a+(j-a)*R;
+					for(let k=0;k<s;k++)rswap(ar,a+k,p+k*(G+1)+G);
+				}else{
+					let rotP=rbs(ar,bLoc-G,bLoc,bsv,bw);
+					let rotS=bLoc-maxVal(rotP,bLoc-G/2);
+					shiftBW(ar,loc-rotS,bLoc-rotS,bLoc);
+				}
+			}else{
+				let t=ar[i];
+				rset(ar,i++,ar[loc]);
+				insertTo(ar,t,loc,rbs(ar,bLoc-G,loc,t,false));
+			}
+		}
+		retrieve(ar,b,p,pEnd,bsv,bw);
+	}
+	let pa=new Array(G+2);
+	let heap=new Array(G+2);
+	let a=0,b=len;
+	while(b-a>=32){
+		let piv=array[motn(array,a,b)];
+		let i1=a,i=a-1,j=b,j1=b;
+		for(;;){
+			while(++i<j){
+				let cmp=compareValues(array[i],piv);
+				if(cmp==0)rswap(array,i1++,i);
+				else if(cmp<0)break;
+			}
+			while(--j>i){
+				let cmp=compareValues(array[j],piv);
+				if(cmp==0)rswap(array,--j1,j);
+				else if(cmp>0)break;
+			}
+			if(i<j)rswap(array,i,j);
+			else{
+				if(i1==b)return;
+				else if(j<i)j++;
+				while(i1>a)rswap(array,--i,--i1);
+				while(j1<b)rswap(array,j++,j1++);
+				break;
+			}
+		}
+		let left=i-a,right=b-j,m,kCnt=0;
+		if(left<=right){
+			m=b-left;
+			left=maxVal((right+1)/(G+1)|0,16);
+			for(let k=a;k<i;k+=left){
+				lib(array,k,minVal(k+left,i),j,piv,true);
+				write(pa,kCnt++,k);
+			}
+			kWayMerge(array,heap,pa,left,i,m,kCnt);
+			if(j-i<m-j){
+				while(i<j)rswap(array,i++,--m);
+				b=m;
+			}else{
+				while(m>j)rswap(array,i++,--m);
+				b=i;
+			}
+		}else{
+			m=a+right;
+			right=maxVal((left+1)/(G+1)|0,16);
+			for(let k=j;k<b;k+=right){
+				lib(array,k,minVal(k+right,b),a,piv,false);
+				write(pa,kCnt++,k);
+			}
+			kWayMerge(array,heap,pa,right,b,a,kCnt);
+			if(i-m<j-i){
+				while(m<i)rswap(array,m++,--j);
+				a=j;
+			}else{
+				while(j>i)rswap(array,m++,--j);
+				a=m;
+			}
+		}
+	}
+	bininsert(array,a,b);
+	return[5,1]
+}
+function circularGrailSort(){
+	let array=[...arr];
+	const csw=(ar,a,b)=>rswap(ar,a%n,b%n);
+	const cci=(ar,a,b)=>compareIndices(ar,a%n,b%n);
+	const sFW=(ar,a,m,b)=>{while(m<b)csw(ar,a++,m++)}
+	const sBW=(ar,a,m,b)=>{while(m>a)csw(ar,--b,--m)}
+	function ins(ar,a,b){
+		for(let i=a+1;i<b;i++)
+			while(i>a&&cci(ar,i-1,i)>0)
+				csw(ar,i,--i);
+	}
+	function msw(ar,a,b,l){
+		for(let i=0;i<l;i++)
+			csw(ar,a+i,b+i);
+	}
+	function rot(ar,a,m,b){
+		let l=m-a,r=b-m;
+		while(l>0&&r>0){
+			if(r<l){
+				msw(ar,m-r,m,r);
+				b-=r;m-=r;l-=r;
+			}else{
+				msw(ar,a,m,l);
+				a+=l;m+=l;r-=l;
+			}
+		}
+	}
+	function ipm(ar,a,m,b){
+		let i=a,j=m,k;
+		while(i<j&&j<b){
+			if(cci(ar,i,j)>0){
+				k=j;
+				while(++k<b&&cci(ar,i,k)>0);
+				rot(ar,i,j,k);
+				i+=k-j;j=k;
+			}else i++;
+		}
+	}
+	function merge(ar,p,a,m,b,f){
+		let i=a,j=m;
+		while(i<m&&j<b){
+			if(cci(ar,i,j)<=0)csw(ar,p++,i++);
+			else csw(ar,p++,j++);
+		}
+		if(i<m){
+			if(i>p)sFW(ar,p,i,m);
+		}else if(f)sFW(ar,p,j,b);
+		return i<m?i:j;
+	}
+	function blt(ar,a,b,bl){
+		let c=cci(ar,a,b);
+		return c==-1||(c==0&&cci(ar,a+bl-1,b+bl-1)==-1);
+	}
+	function bmr(ar,a,m,b,bL){
+		let b1=b-(b-m-1)%bL-1|0;
+		if(b1>m){
+			let b2=b1;
+			for(let i=m-bL;i>a&&blt(ar,b1,i,bL);i-=bL,b2-=bL);
+			for(let j=a;j<b1-bL;j+=bL){
+				let min=j;
+				for(let i=min+bL;i<b1;i+=bL)
+					if(blt(ar,i,min,bL))min=i;
+				if(min!=j)msw(ar,j,min,bL);
+			}
+			let f=a;
+			for(let i=a+bL;i<b2;i+=bL){
+				f=merge(ar,f-bL,f,i,i+bL,false);
+				if(f<i){
+					sBW(ar,f,i,i+bL);
+					f+=bL;
+				}
+			}
+			merge(ar,f-bL,f,b1,b,true);
+		}else merge(ar,a-bL,a,m,b,true);
+	}
+	let n=len;
+	if(len<=16)ins(array,0,len);
+	else{
+		let bLen=1;
+		for(;bLen*bLen<len;bLen*=2);
+		let i=bLen,j=1,l=len-i,b=len;
+		while(j<=bLen){
+			for(;i+2*j<b;i+=2*j)merge(array,i-j,i,i+j,i+2*j,true);
+			if(i+j<b)merge(array,i-j,i,i+j,b,true);
+			else sFW(array,i-j,i,b);
+			i=b+bLen-j;b=i+l;j*=2;
+		}
+		while(j<l){
+			for(;i+2*j<b;i+=2*j)bmr(array,i,i+j,i+2*j,bLen);
+			if(i+j<b)bmr(array,i,i+j,b,bLen);
+			else sFW(array,i-bLen,i,b);
+			i=b;b+=l;j*=2;
+		}
+		ins(array,i-bLen,i);
+		ipm(array,i-bLen,i,b);
+		rot(array,0,(i-bLen)%n,len);
+	}
+	return[5,1]
+}
+function poplarHeapSort(){
+	let array=[...arr];
+	const hf=n=>pow(2,floor(log(n)/log(2)));
+	function uis(ar,f,l){
+		for(let i=f+1;i!=l;++i){
+			let s=i,s1=i-1;
+			if(compareIndices(ar,s,s1)<0){
+				let t=ar[s];
+				do rset(ar,s,ar[s1]);while(--s!=f&&compareValues(t,ar[--s1])<0);
+				rset(ar,s,t);
+			}
+		}
+	}
+	function ins(ar,f,l){
+		if(f==l)return;
+		uis(ar,f,l);
+	}
+	function sift(ar,f,sz){
+		if(sz<2)return;
+		let rt=f+sz-1;
+		let cr1=rt-1;
+		let cr2=f+(sz/2-1)|0;
+		while(1){
+			let mr=rt;
+			if(compareIndices(ar,mr,cr1)<0)mr=cr1;
+			if(compareIndices(ar,mr,cr2)<0)mr=cr2;
+			if(mr==rt)return;
+			rswap(ar,rt,mr);
+			sz/=2;
+			if(sz<2)return;
+			rt=mr;
+			cr1=rt-1;
+			cr2=mr-sz/2|0;
+		}
+	}
+	function phws(ar,f,l,sz){
+		let prs=hf(sz+1)-1;
+		let lrt=l-1;
+		let bg=lrt;
+		let bgs=prs;
+		let it=f;
+		while(1){
+			let rt=it+prs-1;
+			if(rt==lrt)break;
+			if(compareIndices(ar,bg,rt)<0){
+				bg=rt;
+				bgs=prs;
+			}
+			it=rt+1;
+			sz-=prs;
+			prs=hf(sz+1)-1;
+		}
+		if(bg!=lrt){
+			rswap(ar,bg,lrt);
+			sift(ar,bg-(bgs-1),bgs);
+		}
+	}
+	function mkhp(ar,f,l){
+		let sz=l-f;
+		if(sz<2)return;
+		let sps=15;
+		if(sz<=sps)return uis(ar,f,l);
+		let prl=1;
+		let it=f;
+		let nx=it+sps;
+		while(1){
+			uis(ar,it,nx);
+			let prs=sps;
+			for(let i=(prl&(-prl))>>1;i!=0;i>>=1){
+				it-=prs;
+				prs=2*prs+1;
+				sift(ar,it,prs);
+				++nx;
+			}
+			if((l-nx)<=sps)return ins(ar,nx,l);
+			it=nx;
+			nx+=sps;
+			++prl;
+		}
+	}
+	function shp(ar,f,l){
+		let sz=l-f;
+		if(sz<2)return;
+		do phws(ar,f,l--,sz--);while(sz>1);
+	}
+	function hs(a,s,e){
+		mkhp(a,s,e);
+		shp(a,s,e);
+	}
+	hs(array,0,len);
+	return[5,1]
+}
+function adaptiveGrailSort(){
+	let array=[...arr];
+	const subarray={LEFT:"L",RIGHT:"R"}
+	let minRun;
+	const msw=(ar,a,b,l)=>{
+		for(let i=0;i<l;i++)
+			rswap(ar,a+i,b+i);
+	}
+	const mts=(ar,a,b,c,l)=>{
+		for(let i=0;i<l;i++){
+			let t=ar[a+i];
+			rset(ar,a+i,ar[b+i]);
+			rset(ar,b+i,ar[c+i]);
+			rset(ar,c+i,t);
+		}
+	}
+	function insto(ar,a,b){
+		let t=ar[a];
+		while(a>b)rset(ar,a,ar[(a--)-1]);
+		rset(ar,b,t);
+	}
+	function instoBW(ar,a,b){
+		let t=ar[a];
+		while(a<b)rset(ar,a,ar[(a++)+1]);
+		rset(ar,a,t);
+	}
+	function shft(ar,a,m,b){
+		while(m<b)rswap(ar,a++,m++);
+	}
+	function rot(ar,a,m,b){
+		let l=m-a,r=b-m;
+		while(l>1&&r>1){
+			if(r<l){
+				msw(ar,m-r,m,r);
+				b-=r;m-=r;l-=r;
+			}else{
+				msw(ar,a,m,l);
+				a+=l;m+=l;r-=l;
+			}
+		}
+		if(r==1)insto(ar,m,a);
+		else if(l==1)instoBW(ar,a,b-1);
+	}
+	function lbs(ar,a,b,v){
+		while(a<b){
+			let m=a+(b-a)/2|0;
+			if(compareValues(v,ar[m])<=0)b=m;
+			else a=m+1;
+		}
+		return a;
+	}
+	function rbs(ar,a,b,v){
+		while(a<b){
+			let m=a+(b-a)/2|0;
+			if(compareValues(v,ar[m])<0)b=m;
+			else a=m+1;
+		}
+		return a;
+	}
+	function burn(ar,a,n){
+		let nKeys=1,i=a+1;
+		if(compareIndices(ar,i-1,i)==-1){
+			i++;nKeys++;
+			while(nKeys<n&&compareIndices(ar,i-1,i)<0){
+				i++;nKeys++;
+			}
+		}else if(compareIndices(ar,i-1,i)>0){
+			i++;nKeys++;
+			while(nKeys<n&&compareIndices(ar,i-1,i)>0){
+				i++;nKeys++;
+			}
+			reversal(ar,a,i-1);
+		}
+		return nKeys;
+	}
+	function burnBW(ar,b,n){
+		let nKeys=1,i=b-1;
+		if(compareIndices(ar,i-1,i)<0){
+			i--;nKeys++;
+			while(nKeys<n&&compareIndices(ar,i-1,i)<0){
+				i--;nKeys++;
+			}
+		}else if(compareIndices(ar,i-1,i)>0){
+			i--;nKeys++;
+			while(nKeys<n&&compareIndices(ar,i-1,i)>0){
+				i--;nKeys++;
+			}
+			reversal(ar,i,b-1);
+		}
+		return nKeys;
+	}
+	function fkys(ar,a,b,nKeys,n){
+		let p=a,pEnd=a+nKeys;
+		for(let i=pEnd;i<b&&nKeys<n;i++){
+			let loc=lbs(ar,p,pEnd,ar[i]);
+			if(pEnd==loc||compareIndices(ar,i,loc)!=0){
+				rot(ar,p,pEnd,i);
+				let inc=i-pEnd;
+				loc+=inc;p+=inc;pEnd+=inc;
+				insto(ar,pEnd,loc);
+				nKeys++;pEnd++;
+			}
+		}
+		rot(ar,a,p,pEnd);
+		return nKeys;
+	}
+	function fkysBW(ar,a,b,nKeys,n){
+		let p=b-nKeys,pEnd=b;
+		for(let i=p-1;i>=a&&nKeys<n;i--){
+			let loc=lbs(ar,p,pEnd,ar[i]);
+			if(pEnd==loc||compareIndices(ar,i,loc)!=0){
+				rot(ar,i+1,p,pEnd);
+				let inc=p-(i+1);
+				loc-=inc;pEnd-=inc;p-=inc+1;nKeys++;
+				instoBW(ar,i,loc-1);
+			}
+		}
+		rot(ar,p,pEnd,b);
+		return nKeys;
+	}
+	function buildRuns(ar,a,b){
+		let i=a+1,j=a;
+		while(i<b){
+			if(compareIndices(ar,i-1,i++)==1){
+				while(i<b&&compareIndices(ar,i-1,i)==1)i++;
+				reversal(ar,j,i-1);
+			}else while(i<b&&compareIndices(ar,i-1,i)<=0)i++;
+			if(i<b)j=i-(i-j-1)%minRun-1;
+			while(i-j<minRun&&i<b){
+				insto(ar,i,rbs(ar,j,i,ar[i]));
+				i++;
+			}
+			j=i++;
+		}
+	}
+	function binins(ar,a,b){
+		for(let i=a+1;i<b;i++)insto(ar,i,rbs(ar,a,i,ar[i]));
+	}
+	function mwbr(ar,a,m,b,p,pLen){
+		let i=0,j=m,k=a;
+		while(i<pLen&&j<b){
+			if(compareIndices(ar,p+i,j)<=0)rswap(ar,k++,p+(i++));
+			else rswap(ar,k++,j++);
+		}
+		while(i<pLen)rswap(ar,k++,p+(i++));
+	}
+	function mwb(ar,a,m,b,p){
+		let l=m-a;
+		msw(ar,p,a,l);
+		mwbr(ar,a,m,b,p,l);
+	}
+	function mwbBW(ar,a,m,b,p){
+		let pLen=b-m;
+		msw(ar,m,p,pLen);
+		let i=pLen-1,j=m-1,k=b-1;
+		while(i>=0&&j>=a){
+			if(compareIndices(ar,p+i,j)>=0)rswap(ar,k--,p+(i--));
+			else rswap(ar,k--,j--);
+		}
+		while(i>=0)rswap(ar,k--,p+(i--));
+	}
+	function ipm(ar,a,m,b){
+		let i=a,j=m,k;
+		while(i<j&&j<b){
+			if(compareIndices(ar,i,j)>0){
+				k=lbs(ar,j+1,b,ar[i]);
+				rot(ar,i,j,k);
+				i+=k-j;
+				j=k;
+			}else i++;
+		}
+	}
+	function ipmBW(ar,a,m,b){
+		let i=m-1,j=b-1,k;
+		while(j>i&&i>=a){
+			if(compareIndices(ar,i,j)>0){
+				k=rbs(ar,a,i,ar[j]);
+				rot(ar,k,i+1,j+1);
+				j-=(i+1)-k;
+				i=k-1;
+			}else j--;
+		}
+	}
+	function mwob(ar,a,m,b){
+		if(m-a>b-m)ipmBW(ar,a,m,b);
+		else ipm(ar,a,m,b);
+	}
+	function csrt(ar,a,m,b){
+		return compareIndices(ar,m-1,m)>0;
+	}
+	function ckrbd(ar,a,m,b){
+		if(compareIndices(ar,a,b-1)==1){
+			rot(ar,a,m,b);
+			return false;
+		}
+		return true;
+	}
+	function ckbd(ar,a,m,b){
+		return csrt(ar,a,m,b)&&ckrbd(ar,a,m,b);
+	}
+	function grlgetsub(ar,t,mKey){
+		if(compareIndices(ar,t,mKey)<0)
+			return subarray.LEFT;
+		else return subarray.RIGHT;
+	}
+	function blslsrt(ar,p,t,r,d,lCount,bCount,bLen){
+		let mKey=lCount;
+		for(let j=0,k=lCount+1;j<k-1;j++){
+			let min=j;
+			for(let i=maxVal(lCount-r,j+1);i<k;i++){
+				let cmp=compareIndices(ar,p+d+i*bLen,p+d+min*bLen);
+				if(cmp<0||(cmp==0&&compareIndices(ar,t+i,t+min)<0))min=i;
+			}
+			if(min!=j){
+				msw(ar,p+j*bLen,p+min*bLen,bLen);
+				rswap(ar,t+j,t+min);
+				if(k<bCount&&min==k-1)k++;
+			}
+			if(min==mKey)mKey=j;
+		}
+		return t+mKey;
+	}
+	function grlsrtkys(ar,b,p,mKey){
+		rswap(ar,p,mKey);
+		let i=mKey,j=i+1,k=p+1;
+		while(j<b){
+			if(compareIndices(ar,j,p)<0)rswap(ar,i++,j);
+			else rswap(ar,k++,j);
+			j++;
+		}
+		msw(ar,i,p,b-i);
+	}
+	function grlsrtkyswob(ar,b,mKey){
+		let i=mKey,j=i+1;
+		while(j<b){
+			if(compareIndices(ar,j,i)<0)
+				insto(ar,j,i++);
+			j++;
+		}
+	}
+	function grlmbl(ar,a,m,b,p){
+		let i=a,j=m;
+		while(i<m&&j<b){
+			if(compareIndices(ar,i,j)<=0)rswap(ar,p++,i++);
+			else rswap(ar,p++,j++);
+		}
+		if(i>p)while(i<m)rswap(ar,p++,i++);
+		return j;
+	}
+	function grlmblRev(ar,a,m,b,p){
+		let i=a,j=m;
+		while(i<m&&j<b){
+			if(compareIndices(ar,i,j)<0)rswap(ar,p++,i++);
+			else rswap(ar,p++,j++);
+		}
+		if(i>p)while(i<m)rswap(ar,p++,i++);
+		return j;
+	}
+	function grlblm(ar,a,m,b,t,p,bLen){
+		let b1=b-(b-m-1)%bLen-1,i=a+bLen,j=a,key=t-1,lCount=(m-i)/bLen|0,bCount=(b1-i)/bLen|0,l=-1,r=lCount-1;
+		mts(ar,p,m-bLen,a,bLen);
+		instoBW(ar,t,t+lCount-1);
+		let mKey=blslsrt(ar,i,t,1,bLen-1,lCount,bCount,bLen);
+		let frag=subarray.LEFT;
+		while(l<lCount&&r<bCount){
+			if(frag==subarray.LEFT){
+				do{
+					j+=bLen;
+					l++;
+					key++;
+				}while(l<lCount&&grlgetsub(ar,key,mKey)==subarray.LEFT);
+				if(l==lCount){
+					i=grlmbl(ar,i,j,b,i-bLen);
+					mwbr(ar,i-bLen,i,b,p,bLen);
+				}else i=grlmbl(ar,i,j,j+bLen-1,i-bLen);
+				frag=subarray.RIGHT;
+			}else{
+				do{
+					j+=bLen;
+					r++;
+					key++;
+				}while(r<bCount&&grlgetsub(ar,key,mKey)==subarray.RIGHT);
+				if(r==bCount){
+					shft(ar,i-bLen,i,b);
+					msw(ar,p,b-bLen,bLen);
+				}else i=grlmblRev(ar,i,j,j+bLen-1,i-bLen);
+				frag=subarray.LEFT;
+			}
+		}
+		grlsrtkys(ar,t+bCount,p,mKey);
+	}
+	function grlblmwob(ar,a,m,b,t,bLen){
+		let a1=a+(m-a)%bLen,b1=b-(b-m)%bLen,i=a,j=a1,key=t,lCount=(m-j)/bLen+1|0,bCount=(b1-j)/bLen+1|0,l=0,r=lCount;
+		let mKey=blslsrt(ar,j,t,0,0,lCount-1,bCount-1,bLen);
+		let frag=subarray.LEFT;
+		while(l<lCount&&r<bCount){
+			let next=grlgetsub(ar,key++,mKey);
+			if(next==frag){
+				if(frag==subarray.LEFT)l++;
+				else r++;
+				i=j;
+			}else{
+				let m2=j,b2=j+bLen,k;
+				if(frag==subarray.LEFT){
+					while(i<m2&&m2<b2){
+						if(compareIndices(ar,i,m2)>0){
+							k=lbs(ar,m2+1,b2,ar[i]);
+							rot(ar,i,m2,k);
+							i+=k-m2;
+							m2=k;
+						}else i++;
+					}
+				}else{
+					while(i<m2&&m2<b2){
+						if(compareIndices(ar,i,m2)>=0){
+							k=rbs(ar,m2+1,b2,ar[i]);
+							rot(ar,i,m2,k);
+							i+=k-m2;
+							m2=k;
+						}else i++;
+					}
+				}
+				if(i<m2){
+					if(next==subarray.LEFT)l++;
+					else r++;
+				}else{
+					if(frag==subarray.LEFT)l++;
+					else r++;
+					frag=next;
+				}
+			}
+			j+=bLen;
+		}
+		if(l<lCount)ipmBW(ar,a,b1,b);
+		grlsrtkyswob(ar,t+bCount-1,mKey);
+	}
+	function smtm(ar,a,m,b,p){
+		if(ckbd(ar,a,m,b)){
+			a=rbs(ar,a,m-1,ar[m]);
+			mwb(ar,a,m,b,p);
+		}
+	}
+	function smtmBW(ar,a,m,b,p){
+		if(ckbd(ar,a,m,b)){
+			b=lbs(ar,m+1,b,ar[m-1]);
+			mwbBW(ar,a,m,b,p);
+		}
+	}
+	function smtblm(ar,a,m,b,t,p,bLen){
+		if(ckbd(ar,a,m,b)){
+			let n=rbs(ar,a,m-1,ar[m]);
+			b=lbs(ar,m+1,b,ar[m-1]);
+			if(ckrbd(ar,n,m,b)){
+				if(m-n<=bLen||b-m<=bLen){
+					if(b-m<m-n)mwbBW(ar,n,m,b,p);
+					else mwb(ar,n,m,b,p);
+				}else{
+					n-=(n-a)%bLen;
+					grlblm(ar,n,m,b,t,p,bLen);
+				}
+			}
+		}
+	}
+	function smtblmwob(ar,a,m,b,t,bLen){
+		if(ckbd(ar,a,m,b)){
+			a=rbs(ar,a,m-1,ar[m]);
+			if(m-a<=bLen)ipm(ar,a,m,b);
+			else grlblmwob(ar,a,m,b,t,bLen);
+		}
+	}
+	function smtipm(ar,a,m,b){
+		if(csrt(ar,a,m,b))ipmBW(ar,a,m,b);
+	}
+	function rbuf(ar,a,m,b){
+		let rPos=lbs(ar,m,b,ar[a]);
+		rot(ar,a,m,rPos);
+		let dist=rPos-m;
+		a+=dist;
+		m+=dist;
+		let a1=a+(m-a)/2|0;
+		rPos=lbs(ar,m,b,ar[a1]);
+		rot(ar,a1,m,rPos);
+		dist=rPos-m;
+		a1+=dist;
+		m+=dist;
+		mwob(ar,a,a1-dist,a1);
+		mwob(ar,a1,m,b);
+	}
+	function rbufBW(ar,a,m,b){
+		let rPos=rbs(ar,a,m,ar[b-1]);
+		rot(ar,rPos,m,b);
+		let dist=m-rPos;
+		b-=dist;
+		m-=dist;
+		let b1=m+(b-m)/2|0;
+		rPos=rbs(ar,a,m,ar[b1-1]);
+		rot(ar,rPos,m,b1);
+		dist=m-rPos;
+		b1-=dist;
+		m-=dist;
+		mwob(ar,b1,b1+dist,b);
+		mwob(ar,a,m,b1);
+	}
+	function ipms(ar,a,b){
+		buildRuns(ar,a,b);
+		let l=b-a;
+		for(let i,j=minRun;j<l;j*=2){
+			for(i=a;i+2*j<=b;i+=2*j)smtipm(ar,i,i+j,i+2*j);
+			if(i+j<b)smtipm(ar,i,i+j,b);
+		}
+	}
+	function grladswob(ar,a,b,keys,ideal,bwBuf){
+		let l=b-a,bLen;
+		for(bLen=minVal(keys,minRun);2*bLen<=keys;bLen*=2);
+		let tLen=keys-bLen;
+		let i,j=minRun,t,p,a1,b1;
+		if(bwBuf){
+			p=b-bLen;a1=a;b1=p-tLen;t=b1;
+		}else{
+			p=a+tLen;a1=p+bLen;b1=b;t=a;
+		}
+		buildRuns(ar,a1,b1);
+		while(j<=bLen&&j<l){
+			for(i=a1;i+2*j<=b1;i+=2*j)
+				smtm(ar,i,i+j,i+2*j,p);
+			if(i+j<b1)
+				smtmBW(ar,i,i+j,b1,p);
+			j*=2;
+		}
+		if(bLen/2>=minRun&&bLen/2>=(keys+1)/2){
+			binins(ar,p,p+bLen|0);
+			bLen/=2;
+			tLen=keys-bLen|0;
+			p+=bLen|0;
+		}
+		bLen|=0
+		while(tLen>=2*j/bLen-1&&j<l){
+			for(i=a1;i+2*j<=b1;i+=2*j)
+				smtblm(ar,i,i+j,i+2*j,t,p,bLen);
+			if(i+j<b1){
+				if(b1-(i+j)>bLen)smtblm(ar,i,i+j,b1,t,p,bLen);
+				else smtmBW(ar,i,i+j,b1,p);
+			}
+			j*=2;
+		}
+		binins(ar,p,p+bLen);
+		tLen=keys-keys%2;
+		while(j<l){
+			bLen=2*j/tLen;
+			for(i=a1;i+2*j<=b1;i+=2*j)
+				smtblmwob(ar,i,i+j,i+2*j,t,bLen);
+			if(i+j<b1){
+				if(b1-(i+j)>bLen)smtblmwob(ar,i,i+j,b1,t,bLen);
+				else smtipm(ar,i,i+j,b1);
+			}
+			j*=2;
+		}
+		if(bwBuf){
+			a=rbs(ar,a,b1,ar[b1]);
+			if(keys>=ideal/2)rbufBW(ar,a,b1,b);
+			else mwob(ar,a,b1,b);
+		}else{
+			b=lbs(ar,a1,b,ar[a1-1]);
+			if(keys>=ideal/2)rbuf(ar,a,a1,b);
+			else mwob(ar,a,a1,b);
+		}
+	}
+	function grlasd(ar,a,b){
+		let l=b-a;
+		if(l<31)return binins(ar,a,b);
+		if(l<63){
+			minRun=(l+1)/2|0;
+			buildRuns(ar,a,b);
+			let m=a+minRun;
+			if(ckbd(ar,a,m,b))
+				rbufBW(ar,a,m,b);
+			return;
+		}
+		for(minRun=l;minRun>=32;minRun=(minRun+1)/2);
+		minRun|=0;
+		let bLen;
+		for(bLen=minRun;bLen*bLen<l;bLen*=2);
+		let tLen=l/bLen-2,ideal=tLen+bLen;
+		let bwBuf;
+		let rRun=burnBW(ar,b,ideal),lRun=0;
+		if(rRun==ideal)bwBuf=true;
+		else{
+			lRun=burn(ar,a,ideal);
+			if(lRun==ideal)bwBuf=false;
+			else bwBuf=(rRun<16&&lRun<16)||rRun>=lRun;
+		}
+		let keys=bwBuf?fkysBW(ar,a,b,rRun,ideal):fkys(ar,a,b,lRun,ideal);
+		if(keys<ideal){
+			if(keys==1)return;
+			else if(keys<=4)ipmSort(ar,a,b);
+			else grladswob(ar,a,b,keys,ideal,bwBuf);
+			return;
+		}
+		let i,j=minRun,
+			t,p,a1,b1;
+		if(bwBuf){
+			p=b-bLen;a1=a;b1=p-tLen;t=b1;
+		}
+		else{
+			p=a+tLen;a1=p+bLen;b1=b;t=a;
+		}
+		buildRuns(ar,a1,b1);
+		while(j<=bLen&&j<l){
+			for(i=a1;i+2*j<=b1;i+=2*j)
+				smtm(ar,i,i+j,i+2*j,p);
+			if(i+j<b1)
+				smtmBW(ar,i,i+j,b1,p);
+			j*=2;
+		}
+		while(j<l){
+			for(i=a1;i+2*j<=b1;i+=2*j)
+				smtblm(ar,i,i+j,i+2*j,t,p,bLen);
+			if(i+j<b1){
+				if(b1-(i+j)>bLen)
+					smtblm(ar,i,i+j,b1,t,p,bLen);
+				else smtmBW(ar,i,i+j,b1,p);
+			}
+			j*=2;
+		}
+		binins(ar,p,p+bLen);
+		if(bwBuf){
+			a=rbs(ar,a,b1,ar[b1]);
+			rbufBW(ar,a,b1,b);
+		}else{
+			b=lbs(ar,a1,b,ar[a1-1]);
+			rbuf(ar,a,a1,b);
+		}
+	}
+	grlasd(array,0,len);
+	return[5,1]
+}
+function introSort(){
+	let array=[...arr];
+	const flbt=a=>floor(log(a)/log(2));
+	function gm3(ar,a,m,b){
+		if(compareIndices(ar,a,m)<0){
+			if(compareIndices(ar,m,b)<0)rswap(ar,a,m);
+			else if(compareIndices(ar,a,b)<0)rswap(ar,a,b);
+		}else if(compareIndices(ar,a,b)<0)return ar[a];
+		else if (compareIndices(ar,m,b)<0)rswap(ar,a,b);
+		else rswap(ar,a,m);
+		return ar[a];
+	}
+	function m3(ar,a,m,b){
+		if(compareIndices(ar,b,a)<0)rswap(ar,a,b);
+		if(compareIndices(ar,m,b)<0)rswap(ar,m,a);
+		if(compareIndices(ar,b,m)<0)rswap(ar,b,m);
+		return ar[m];
+	}
+	function par(a,lo,hi,x){
+		let i=lo,j=hi;
+		while(1){
+			while(compareValues(a[i],x)<0)i++;
+			do j--;while(compareValues(x,a[j])<0);
+			if(i>=j)return i;
+			rswap(a,i++,j);
+		}
+	}
+	function sort(a,lo,hi,d){
+		while(hi-lo>16){
+			if(d==0)return heapSort(a,lo,hi,true);
+			let p=par(a,lo,hi,m3(a,lo,lo+(hi-lo)/2|0,hi-1));
+			sort(a,p,hi,--d);
+			hi=p;
+		}
+	}
+	sort(array,0,len,2*flbt(len));
+	insertSort(array,0,len);
+	return[5,1]
+}
+function testSort(){
+	let array=[...arr];
 	return[5,1]
 }
 function Sort(){
@@ -3989,229 +5421,152 @@ function Sort(){
 	
 	return[5,1]
 }
-function Sort(){
-	let array=[...arr];
-	
-	return[5,1]
-}
-function Sort(){
-	let array=[...arr];
-	
-	return[5,1]
-}
-function Sort(){
-	let array=[...arr];
-	
-	return[5,1]
-}
-function Sort(){
-	let array=[...arr];
-	
-	return[5,1]
-}
-function Sort(){
-	let array=[...arr];
-	
-	return[5,1]
-}
-function Sort(){
-	let array=[...arr];
-	
-	return[5,1]
-}
-function Sort(){
-	let array=[...arr];
-	
-	return[5,1]
-}
-function Sort(){
-	let array=[...arr];
-	
-	return[5,1]
-}
-function Sort(){
-	let array=[...arr];
-	
-	return[5,1]
-}
-function Sort(){
-	let array=[...arr];
-	
-	return[5,1]
-}
-function Sort(){
-	let array=[...arr];
-	
-	return[5,1]
-}
-function Sort(){
-	let array=[...arr];
-	
-	return[5,1]
+class Shuffles{
+	swap(a,f,t){
+		f|=0;t|=0;
+		let o=a[f];a[f]=a[t];a[t]=o;
+		this.steps.push(["swap",f,t])
+	}
+	write(a,i,v,aux){
+		i|=0;v|=0;
+		a[i]=v;
+		if(aux)return;
+		this.steps.push(["set",i,v])
+	}
+	reversal(a,s,l){
+		if(l-s>0)
+			for(let i=s,j=l-1;i<j;i++,j--)
+				this.swap(a,j,i);
+	}
+	arraycopy(s,sp,d,dp,l){
+		let b=s!=d||dp<sp;
+		let st=b?0:l-1,e=b?l:-1,dr=b?1:-1;
+		for(let i=st;i!=e;i+=dr)
+			this.write(d,dp+i,s[sp+i]);
+	}
+	customFunc(f,args){
+		this.steps.push(["custom",btoa("("+f+")"),...args])
+	}
+	constructor(){
+		this.steps=[];
+	}
+	shuffles(a,s,e,type){
+		let aux,tmp,i,j,k,b,c,d,f,g,h,l,m,n,o,p,q,r,t,u,v,w,x,y,z;
+		switch(type){
+		case 0://random
+			this.shuffle(a,s,e);
+		break;
+		case 1://reverse
+			this.reversal(a,s,e);
+		break;
+		case 2://almost
+			for(let i=0;i<maxVal(e/20|0,1);i++)
+				this.swap(a,random()*e,random()*e);
+		break;
+		case 3:break;//sorted
+		case 4://naive
+			for(let i=s;i<e;i++)
+				this.swap(a,i,random()*e);
+		break;
+		case 5://shuffle tail
+			aux=new Array(e);
+			i=0,j=0,k=0;
+			while(i<e){
+				if(random()<1/7)this.write(aux,k++,a[i++],true);
+				else this.write(a,j++,a[i++]);
+			}
+			this.arraycopy(aux,0,a,j,k);
+			this.shuffle(a,j,e);
+		break;
+		case 6://shuffle head
+			aux=new Array(e);
+			i=e-1,j=e-1,k=0;
+			while(i>=0){
+				if(random()<1/7)this.write(aux,k++,a[i--],true);
+				else this.write(a,j--,a[i--]);
+			}
+			this.arraycopy(aux,0,a,0,k);
+			this.shuffle(a,0,j);
+		break;
+		case 7://Shifted Element
+			i=random()*e|0;
+			j=random()*e|0;
+			if(j<i){
+				this.customFunc(IndexRots.holyGriesMills,[j,i,i+1])
+				IndexRots.holyGriesMills(a,j,i,i+1);
+			}else{
+				this.customFunc(IndexRots.holyGriesMills,[i,i+1,j])
+				IndexRots.holyGriesMills(a,i,i+1,j);
+			}
+		break;
+		case 8://Noisy
+			j=maxVal(4,sqrt(e)/2|0);
+			for(i=0;i+j<=e;i+=random()*(j-1)+1)
+				this.shuffle(a,i,i+j);
+			this.shuffle(a,i,e);
+		break;
+		case 9://Shuffled Odds
+			for(let i=1;i<e;i+=2)
+				this.swap(a,i,(random()*(e-i)/2|0)*2+i);
+		break;
+		case 10://Final Merge Pass
+			c=2;
+			k=0;
+			t=new Array(e);
+			for(let j=0;j<c;j++)
+				for(let i=j;i<e;i+=c)
+					this.write(t,k++,a[i],true);
+
+			for(let i=0;i<e;i++)
+				this.write(a,i,t[i],false);
+		break;
+		}
+	}
+	sort(a,s,e){
+		let mn=a[s],mx=mn;
+		for(let i=s+1;i<e;i++){
+			if(a[i]<mn)mn=ar[i];
+			else if(a[i]>mx)mx=a[i];
+		}
+		let sz=mx-mn+1;
+		let holes=new Array(sz);
+		for(let i=s;i<e;i++)
+			this.write(holes,a[i]-mn,holes[a[i]-mn]+1,true);
+		for(let i=0,j=s;i<sz;i++){
+			while(holes[i]>0){
+				this.write(holes,i,holes[i]-1,true);
+				this.write(a,j,i+mn,false);
+				j++;
+			}
+		}
+	}
+	shuffle(a,s,e){
+		for(let i=s;i<e;i++)
+			this.swap(a,i,random()*(e-i)+i);
+	}
+	start(a,t){
+		this.shuffles([...a],0,a.length,t);
+		return this.steps;
+	}
 }
 function s(m=0,i=0){
 	arr=create(count).sort((a,b)=>a-b);
-	let start=0,end=len-1,done=0,d=1,ticks=0;
+	let shuf=new Shuffles(),stp=shuf.start(arr,i),tck=0;
+	swaps=0;writes=0;
 	let shuffling=setInterval(()=>{
-		if(++ticks%4==0)display(arr)
-		if(!done){
+		tck++%5==0&&display(arr)
+		if(stp.length){
 			canskip=0
 			names.innerText="Shuffling...";
 			inputdisplay.innerText=""
-			if(i==0){
-				for(let fv=0;fv<len*.01&&start<count;fv++,done=start>=count)swap(arr,start++,random()*len|0,1);
-			}else if(i==1){
-				for(let fv=0;fv<len/100;fv++){
-					d=start>=end
-					if(!d)swap(arr,start++,end--,1)
-				}
-				done=d
-			}else if(i==2){
-				for(let fv=0;fv<len/100;fv++){
-					d=start>=len/4|0
-					if(!d)swap(arr,start,len-1-start++,1)
-				}
-				done=d
-			}else if(i==3){
-				for(let fv=0;fv<len*.01&&start<count;fv++,++start,done=start>=count)random()>.8&&swap(arr,start-1,random()*start|0,1);
-			}else if(i==4&&d){
-				d=0
-				let tmp=0,s1=1,shuf=setInterval(()=>{
-					if(tmp<len/5|0&&s1){
-						s1=0
-						if(random()>.8){
-							let j=tmp+maxVal(random()*len-tmp|0,0),k=setInterval(()=>{
-								for(let x=0;x<=len*.25|0;x++){
-									if(j<len-1-random()*tmp|0)swap(arr,j,++j,1)
-									else{
-										clearInterval(k)
-										tmp++
-										s1=1
-										break;
-									}
-								}
-							})
-						}else s1=1;
-					}else if(s1){
-						clearInterval(shuf)
-						done=1
-					}
-				})
-			}else if(i==5&&d){
-				d=0
-				let tmp=0,s1=1,shuf=setInterval(()=>{
-					if(tmp<len/5|0&&s1){
-						s1=0
-						if(random()>.8){
-							let j=minVal(random()*len+tmp|0,len-1)-tmp,k=setInterval(()=>{
-								for(let x=0;x<=len*.25|0;x++){
-									if(j>random()*tmp|0)swap(arr,j,--j,1)
-									else{
-										clearInterval(k)
-										tmp++
-										s1=1
-										break;
-									}
-								}
-							})
-						}else s1=1;
-					}else if(s1){
-						clearInterval(shuf)
-						done=1
-					}
-				})
-			}else if(i==6){
-				let tmp=[]
-				for(let fv=len-1;fv>1;fv-=2)tmp[tmp.length]=arr.splice(fv,1)[0]
-				arr=tmp.reverse().concat(arr)
-				done=1
-			}else if(i==7){
-				let half=len/2|0,tmp=arr.splice(half,len)
-				arr=tmp.concat(arr)
-				done=1
-			}else if(i==8){
-				let tmp=[]
-				for(let fv=len-1;fv>1;fv-=2)tmp[tmp.length]=arr.splice(fv,1)[0]
-				arr=arr.concat(tmp)
-				done=1
-			}else if(i==9){
-				let e=0
-				while(e+2<len)e+=2;
-				for(let start=0,end=e;start<end;start+=2,end-=2)swap(arr,start,end)
-				done=1
-			}else if(i==10){
-				let rm=(sqrt(len)/4|0),temp=[...arr],c=len-1;
-				arr=arr.filter((e,i)=>!(++i%rm))
-				for(let i=0;i<rm;i++)arr=arr.concat(temp)
-				arr=arr.sort((a,b)=>a-b).splice(0,len)
-				while(c)swap(arr,c,random()*c--|0)
-				done=1
-			}else if(i==11){
-				swap(arr,random()*len|0,random()*len|0,1)
-				done=1
-			}else if(i==12&&d){
-				d=0
-				let k1,n=len/2
-				k1=setInterval(()=>{
-					if(n>=1){
-						for(let x=0;x<=len|0;x++){
-							let b=1
-							while(n<=len/2&&b){
-								let leaf=2*n;
-								if(leaf<len&&arr[leaf-1]<arr[leaf])leaf++;
-								if(arr[n-1]<arr[leaf-1]){
-									swap(arr,n-1,leaf-1,1);
-									n=leaf;
-								}else b=0;
-							}
-							n--
-						}
-					}else{
-						clearInterval(k1)
-						done=1
-					}
-				})
-			}else if(i==13&&d){
-				d=0
-				let c=2,min=arr[0],max=arr[0],exp=1,pass=0,k1,w1=1,k2;
-				for(let n=1;n<len;n++){
-					if(arr[n]<min)min=arr[n];
-					if(arr[n]>max)max=arr[n];
-				}
-				k1=setInterval(()=>{
-					if(w1){
-						w1=0;
-						pass++
-						if((max-min)/exp>=1){
-							let n,b=new Array(10).fill(0),output=new Array(len);
-							for(n=0;n<len;n++)b[((arr[n]-min)/exp)%10|0]++;
-							for(n=1;n<10;n++)b[n]+=b[n-1];
-							for(n=len-1;n>=0;n--)output[--b[((arr[n]-min)/exp)%10|0]]=arr[n];
-							n=-1;
-							while(n<len){
-								if(++n<len)
-									arr[n]=output[n];
-								else if(pass<2){
-									clearInterval(k2);
-									w1=1;
-									exp*=10;
-									break;
-								}else{
-									clearInterval(k2);
-									clearInterval(k1);
-									done=1
-									d=1
-									break;
-								}
-							}
-						}
-					}
-				});
-			}else if(i==14&&d){
-				d=0
-				done=1
+			let c=stp.shift()
+			switch(c[0]){
+				case"swap":swap(arr,c[1],c[2],1);break;
+				case"set":write(arr,c[1],c[2]);mark(c[1]);break;
+				case"custom":eval(atob(c[1]))(arr,...c.splice(2,1/0));break;
 			}
 		}else{
+			markarray.checked=0;
 			clearInterval(shuffling);
 			canskip=1
 			names.innerText="currently frozen/crashed";
@@ -4228,8 +5583,9 @@ function s(m=0,i=0){
 								if(!loopsort.checked){
 									let snl=Object.keys(sn).length
 									if(++m==snl){
-										i++
-										i%=inputs.length
+										if(queue==null)
+											i++;
+										i%=Object.keys(inputs).length
 										m%=snl
 									}
 								}
@@ -4248,7 +5604,7 @@ function s(m=0,i=0){
 						}
 					},1e3/50)
 				}])
-			});
+			},5);
 			display(arr)
 		}
 	})
@@ -4257,6 +5613,10 @@ function set(v){
 	sn.push(v)
 }
 function get(n,cs=0){
+	for(let i=0;i<sn.length;i++){
+		let v=sn[i][0]
+		if(v.match(n))return i
+	}
 	if(n.trim().length==0)return 0;
 	n=cs?n:n.toLowerCase();
 	let offset=[];
@@ -4356,6 +5716,7 @@ set(["Recursive Burning Sort",recursiveBurningSort])
 set(["Corrupt Sort",corruptSort])
 set(["Circle Halver Sort",circleHalverSort])
 set(["Iterative Pairwise Sort",iterativePairwiseSort])
+set(["Recursive Pairwise Sort",recursivePairwiseSort])
 set(["Iterative [4,4] Van Voorhis Sort",iterativeVanVoorhisSort])
 set(["Rotate LSD Radix Sort",rotateLSDRadixSort])
 set(["Dig Sort",digSort])
@@ -4382,37 +5743,38 @@ set(["Search Sort",searchSort])
 set(["Selection Sort",selectionSort])
 set(["Iterative Shircle Sort",iterativeShircleSort])
 set(["Recursive Shircle Sort",recursiveShircleSort])
-set(["Merry-Go-Round Sort",merryGoRoundSort])
 set(["X Pattern Sort",XSort])
 set(["Block Shell Sort",blockShellSort])
-set(["test Sort",testSort])
+set(["Rotate MSD Radix Sort",rotateMSDRadixSort])
+set(["Flash Sort",flashSort])
+set(["American Flag Sort",americanFlagSort])
+set(["Iterative 3-Smooth Comb Sort",iterative3SmoothCombSort])
+set(["Recursive 3-Smooth Comb Sort",recursive3SmoothCombSort])
+set(["Binary Double Insertion Sort",binaryDoubleInsertionSort])
+set(["Ecta Sort",ectaSort])
+set(["Flan Sort",flanSort])
+set(["Circular Grail Sort",circularGrailSort])
+set(["Poplar Heap Sort",poplarHeapSort])
+set(["Adaptive Grail Sort",adaptiveGrailSort])
+set(["Intro Sort",introSort])
 //set(["test Sort",testSort])
 sn.sort((a,b)=>a[0].localeCompare(b[0]))
-const inputs=[
-	"Random",
-	"Reversed",
-	"Half-Reversed",
-	"Slightly Scrambled",
-	"Scrambled Tail",
-	"Scrambled Head",
-	"Final Merge",
-	"Reversed Array Final Merge",
-	"Pipe Organ",
-	"Reversed Evens",
-	"Many Similar",
-	"Almost Sorted",
-	"Heapified Input",
-	"Final Radix Pass",
-	"Sorted",
-]
-let req=get("test")
-s(req,13)
+const inputs={
+	0:"Random",
+	1:"Reversed",
+	2:"Slightly",
+	3:"Sorted",
+	4:"Naive Random",
+	5:"Shuffled Tail",
+	6:"Shuffled Head",
+	7:"Shifted Elements",
+	8:"Noisy",
+	9:"Shuffled Odds",
+	10:"Final Merge Pass",
+}
 function hold(e){
-	e.addEventListener("touchstart",v=>e.style.opacity=.5);
-	e.addEventListener("touchend",v=>e.style.opacity=1);
-	e.addEventListener("mousedown",v=>e.style.opacity=.5);
-	e.addEventListener("mouseup",v=>e.style.opacity=1);
-	e.addEventListener("mouseout",v=>e.style.opacity=1);
+	["touchstart","mousedown"].forEach(m=>e.addEventListener(m,v=>e.style.opacity=.5));
+	["touchend","mouseup","mouseout"].forEach(m=>e.addEventListener(m,v=>e.style.opacity=1));
 }
 function appendTo(parent,text,func){
 	let a=document.createElement("div");
@@ -4422,6 +5784,8 @@ function appendTo(parent,text,func){
 	a.onclick=function(){
 		queue=get(text)
 		nextsort.innerText="Next: "+text;
+		cancel=1;
+		setTimeout(()=>cancel=0);
 	}
 	parent.appendChild(a)
 }
@@ -4437,13 +5801,33 @@ sn.forEach(e=>{
 Array.from(document.querySelectorAll("div.topicname")).map((e,i)=>{
 	let ch=document.querySelectorAll("div.btnholder")[i]
 	e.onclick=function(){
-		let h=parseFloat(window.getComputedStyle(ch).getPropertyValue("height"))==300
+		if(cancel)return;
+		let h=parseFloat(window.getComputedStyle(ch).getPropertyValue("opacity"))==1
 		ch.style.height=(h?0:300)+"px";
 		ch.style.opacity=h?0:1;
 		ch.style.padding=(h?0:3)+"px 0px";
 		document.querySelectorAll("div.space")[i].style.display=h?"none":"block";
 	}
 })
+let req=get("")
+if(Object.values(sn).map(e=>e[0].toLowerCase()).indexOf("test sort")>=0)req=get("test")
+s(req)
+/*
+arr=create(count)
+let perf=[],ix=0,jd=
+setInterval(()=>{
+	for(let fv=0;fv<len;fv++)swap(arr,fv,random()*len|0);
+	sn[ix][1]();
+	let r=logs.splice(0,1/0).length;
+	perf.push([r/count,sn[ix++][0]])
+	if(ix>=sn.length){
+		clearInterval(jd)
+		perf.sort((a,b)=>b[0]-a[0])
+		perf.map(e=>e.join(" "))
+		console.log(perf.join("\n"))
+	}
+})
+*/
 		</script>
 	</body>
 </html>
