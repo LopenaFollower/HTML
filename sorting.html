@@ -75,12 +75,16 @@
 						<td><input type=checkbox id=loopsort /></td>
 					</tr>
 					<tr>
+						<td>pause</td>
+						<td><input type=checkbox id=pause /></td>
+					</tr>
+					<tr>
 						<td>mark</td>
 						<td><input type=checkbox id=markarray checked/></td>
 					</tr>
 					<tr>
-						<td>pause</td>
-						<td><input type=checkbox id=pause /></td>
+						<td>next shuffle</td>
+						<td><input type=checkbox id=nextshuffle /></td>
 					</tr>
 					<tr>
 						<td>zoom (25-200)</td>
@@ -114,6 +118,10 @@
 					<tr>
 						<td>Input</td>
 						<td id=inputdisplay></td>
+					</tr>
+					<tr>
+						<td>Input</td>
+						<td id=inputdisplay2></td>
 					</tr>
 				</table>
 			</fieldset>
@@ -195,6 +203,480 @@ const fps=(()=>{
 })();
 const isSorted=a=>a.every((e,i)=>!i||a[i-1]<=e);
 const rangeSorted=(a,s,e)=>a.every((v,i)=>!i||a[i-1]<=v||i>=e);
+class Shuffles{
+	swap(a,f,t,aux){
+		f|=0;t|=0;
+		let o=a[f];a[f]=a[t];a[t]=o;
+		if(aux)return;
+		this.steps.push(["swap",f,t])
+	}
+	write(a,i,v,aux){
+		i|=0;v|=0;
+		a[i]=v;
+		if(aux)return;
+		this.steps.push(["set",i,v])
+	}
+	reversal(a,s,l,aux){
+		if(l-s>0)
+			for(let i=s,j=l-1;i<j;i++,j--)
+				this.swap(a,j,i,aux);
+	}
+	arraycopy(s,sp,d,dp,l,aux){
+		let b=s!=d||dp<sp;
+		let st=b?0:l-1,e=b?l:-1,dr=b?1:-1;
+		for(let i=st;i!=e;i+=dr)
+			this.write(d,dp+i,s[sp+i],aux);
+	}
+	multiSwap(a,p,t,aux){
+		if(t-p>0)for(let i=p;i<t;i++)this.swap(a,i,i+1,aux);
+		else for(let i=p;i>t;i--)this.swap(a,i,i-1,aux);
+	}
+	customFunc(f,args){
+		this.steps.push(["custom",btoa("("+f+")"),...args])
+	}
+	siftDown(a,r,d,s,m,aux){
+		let cv=m?-1:1;
+		while(r<=d/2){
+			let l=2*r;
+			if(l<d&&compareIndices(a,s+l-1,s+l)==cv)l++;
+			if(compareIndices(a,s+r-1,s+l-1)==cv){
+				this.swap(a,s+r-1,s+l-1,aux)
+				r=l;
+			}else break;
+		}
+	}
+	heapify(ar,lw,h,m,aux){
+		let le=h-lw;
+		for(let i=le/2;i>=1;i--)
+			this.siftDown(ar,i,le,lw,m,aux)
+	}
+	constructor(){
+		this.steps=[];
+	}
+	shuffles(a,s,e,type){
+		let aux,len,max,rot,sz,min,base,exp,mask,counts,mid,tmp=new Array(e),i,j,k,b,c,d,f,g,h,l,m,n,o,p,q,r,t,u,v,w,x,y,z;
+		switch(type){
+		case 0://random
+			this.shuffle(a,s,e);
+		break;
+		case 1://reverse
+			this.reversal(a,s,e);
+		break;
+		case 2://almost
+			for(let i=0;i<maxVal(e/20|0,1);i++)
+				this.swap(a,random()*e,random()*e);
+		break;
+		case 3://sorted
+			this.sort(a,s,e)
+		break;
+		case 4://naive
+			for(let i=s;i<e;i++)
+				this.swap(a,i,random()*e);
+		break;
+		case 5://shuffle tail
+			i=0,j=0,k=0;
+			while(i<e){
+				if(random()<1/7)this.write(tmp,k++,a[i++],true);
+				else this.write(a,j++,a[i++]);
+			}
+			this.arraycopy(tmp,0,a,j,k);
+			this.shuffle(a,j,e);
+		break;
+		case 6://shuffle head
+			i=e-1,j=e-1,k=0;
+			while(i>=0){
+				if(random()<1/7)this.write(tmp,k++,a[i--],true);
+				else this.write(a,j--,a[i--]);
+			}
+			this.arraycopy(tmp,0,a,0,k);
+			this.shuffle(a,0,j);
+		break;
+		case 7://Shifted Element
+			i=random()*e|0;
+			j=random()*e|0;
+			if(j<i){
+				this.customFunc(IndexRots.holyGriesMills,[j,i,i+1])
+				IndexRots.holyGriesMills(a,j,i,i+1);
+			}else{
+				this.customFunc(IndexRots.holyGriesMills,[i,i+1,j])
+				IndexRots.holyGriesMills(a,i,i+1,j);
+			}
+		break;
+		case 8://Noisy
+			j=maxVal(4,sqrt(e)/2|0);
+			for(i=0;i+j<=e;i+=random()*(j-1)+1)
+				this.shuffle(a,i,i+j);
+			this.shuffle(a,i,e);
+		break;
+		case 9://Shuffled Odds
+			for(let i=1;i<e;i+=2)
+				this.swap(a,i,(random()*(e-i)/2|0)*2+i);
+		break;
+		case 10://Final Merge Pass
+			c=2;k=0
+			for(let j=0;j<c;j++)
+				for(let i=j;i<e;i+=c)
+					this.write(tmp,k++,a[i],true);
+			for(let i=0;i<e;i++)
+				this.write(a,i,tmp[i]);
+		break;
+		case 11://Shuffled Final Merge
+			this.shuffle(a,s,e)
+			m=e/2|0;
+			this.sort(a,s,m)
+			this.sort(a,m+1,e)
+		break;
+		case 12://Shuffled Half
+			this.shuffle(a,s,e)
+			this.sort(a,s,e/2|0)
+		break;
+		case 13://Partitioned 
+			this.sort(a,s,e)
+			this.shuffle(a,s,e/2|0)
+			this.shuffle(a,e/2|0,e)
+		break;
+		case 14://Sawtooth
+			c=4;k=0;
+			for(let j=0;j<c;j++)
+				for(let i=j;i<e;i+=c)
+					this.write(tmp,k++,a[i],true);
+			for(let i=0;i<e;i++)
+				this.write(a,i,tmp[i]);
+		break;
+		case 15://Pipe Organ
+			for(let i=0,j=0;i<e;i+=2)
+				tmp[j++]=a[i];
+			for(let i=1,j=e;i<e;i+=2)
+				tmp[--j]=a[i];
+			for(let i=0;i<e;i++)
+				this.write(a,i,tmp[i]);
+		break;
+		case 16://Final Bitonic Pass
+			this.reversal(a,0,e);
+			for(let i=0,j=0;i<e;i+=2)
+				tmp[j++]=a[i];
+			for(let i=1,j=e;i<e;i+=2)
+				tmp[--j]=a[i];
+			for(let i=0;i<e;i++)
+				this.write(a,i,tmp[i]);
+		break;
+		case 17://Interlaced
+			this.arraycopy(a,0,tmp,0,e,true);
+			l=1;r=e-1;
+			for(let i=1;i<e;i++)
+				if(i%2==0)this.write(a,i,tmp[l++]);
+				else this.write(a,i,tmp[r--]);
+		break;
+		case 18://Double Layered
+			for(let i=0;i<e/2;i+=2)
+				this.swap(a,i,e-i-1);
+		break;
+		case 19://Final Radix Pass
+			len=e
+			len-=e%2;
+			mid=e/2;
+			tmp=new Array(mid);
+			for(let i=0;i<mid;i++)
+				this.write(tmp,i,a[i],true);
+			for(let i=mid,j=0;i<e;i++,j+=2){
+				this.write(a,j,a[i]);
+				this.write(a,j+1,tmp[i-mid]);
+			}
+		break;
+		case 20://Real Final Radix
+			base=10;c=2;min=minVal(a);max=maxVal(a);exp=1;p=0;
+			while((max-min)/exp>=1&&p++<2){
+				b=new Array(base).fill(0),o=new Array(e);
+				for(n=0;n<e;n++)b[((a[n]-min)/exp)%base|0]++;
+				for(n=1;n<base;n++)b[n]+=b[n-1];
+				for(n=e-1;n>=0;n--)o[--b[((a[n]-min)/exp)%base|0]]=a[n];
+				for(n=0;n<e;n++)this.write(a,n,o[n]);
+				exp*=10;
+			}
+		break;
+		case 21://Recursive Final Radix
+			w=(a,p,l,g)=>{
+				if(l<2)return;
+				let m2=l%2;
+				l-=m2;
+				let mid=l/2|0;
+				let temp=new Array(mid);
+				for(let i=p,j=0;i<p+g*mid;i+=g,j++)
+					this.write(temp,j,a[i],true);
+				for(let i=p+g*mid,j=p,k=0;i<p+g*l;i+=g,j+=2*g,k++){
+					this.write(a,j,a[i]);
+					this.write(a,j+g,temp[k]);
+				}
+				w(a,p,mid+m2,2*g);
+				w(a,p+g,mid,2*g);
+			}
+			w(a,0,e,1);
+		break;
+		case 22://Half Rotation
+			b=0,m=(e+1)/2|0;
+			if(e%2==0)while(m<e)this.swap(a,b++,m++);
+			else{
+				tmp=a[b];
+				while(m<e){
+					this.write(a,b++,a[m]);
+					this.write(a,m++,a[b]);
+				}
+				this.write(a,b,tmp);
+			}
+		break;
+		case 23://Half Reversed
+			this.reversal(a,0,e);
+			this.reversal(a,e/4|0,e-e/4|0);
+		break;
+		case 24://Logarithmic Slopes
+			for(let i=0;i<e;i++)this.write(tmp,i,a[i],true);
+			for(let i=1;i<e;i++){
+				let lg=log(i)/log(2)|0;
+				let pw=pow(2,lg);
+				let vl=tmp[2*(i-pw)+1];
+				this.write(a,i,vl);
+			}
+		break;
+		case 25://Heapified
+			this.heapify(a,0,e,1)
+		break;
+		case 26://Triangular Heapified
+			s=(a,e,r)=>{
+				const trt=v=>sqrt((8*v+1)-1)/2|0;
+				let t=a[r];
+				let ln=trt(r);
+				let l=r+ln+1;
+				let ri=l+1;
+				while(l<e){
+					if(ri>=e){
+						if(compareValues(a[l],t)>0)
+							this.write(a,r,a[l]);
+						break;
+					}
+					let mx=compareIndices(a,l,ri)>=0?l:ri;
+					if(compareValues(a[mx],t)>0){
+						this.write(a,r,a[mx]);
+						r=mx;
+						ln=trt(r);
+						l=r+ln+1;
+						ri=l+1;
+						continue;
+					}
+					break;
+				}
+				this.write(a,r,t);
+			}
+			for(let i=e-1;i>=0;i--)
+				s(a,e,i);
+		break;
+		case 27://Circle Pass
+			this.shuffle(a,0,e);
+			n=1;
+			for(;n<e;n*=2);
+			let csrout=(a,o,i,e)=>{
+				if(o==i)return;
+				let h=i;
+				let l=o;
+				let m=(i-o)/2|0;
+				while(o<i){
+					if(i<e&&compareIndices(a,o,i)>0)
+						this.swap(a,o,i);
+					o++;i--;
+				}
+				csrout(a,l,l+m,e);
+				if(l+m+1<e)csrout(a,l+m+1,h,e);
+			}
+			csrout(a,0,n-1,e);
+		break;
+		case 28://Final Pairwise Pass
+			this.shuffle(a,0,e);
+			tmp.fill(0)
+			for(let i=1;i<e;i+=2)
+				if(compareIndices(a,i-1,i)>0)
+					this.swap(a,i-1,i);
+			for(let m=0;m<2;m++){
+				for(let k=m;k<e;k+=2)
+					this.write(tmp,a[k],tmp[a[k]]+1,true);
+				i=0,j=m;
+				while(1){
+					while(i<e&&tmp[i]==0)i++;
+					if(i>=e)break;
+					this.write(a,j,i);
+					j+=2;
+					this.write(tmp,i,tmp[i]-1,true);
+				}
+			}
+		break;
+		case 29://Recursive Reversal
+			r=(ar,a,b)=>{
+				if(b-a<2)return;
+				this.reversal(ar,a,b-1);
+				let m=(a+b)/2|0;
+				r(ar,a,m);
+				r(ar,m,b);
+			}
+			r(a,0,e+1);
+		break;
+		case 30://Gray Code Fractal
+			r=(ar,a,b,d)=>{
+				if(b-a<3)return;
+				let m=(a+b)/2|0;
+				if(d)this.reversal(ar,a,m-1);
+				else this.reversal(ar,m,b-1);
+				r(ar,a,m,0);
+				r(ar,m,b,1);
+			}
+			r(a,0,e+1,0);
+		break;
+		case 31://Sierpinski Triangle
+			t=(tm,a,b)=>{
+				if(b-a<2)return;
+				if(b-a== 2){
+					tm[a+1]++;
+					return;
+				}
+				let h=(b-a)/3|0,t1=(a+a+b)/3|0,t2=(a+b+b+2)/3|0;
+				for(let i=a;i<t1;i++)tm[i]+=h;
+				for(let i=t1;i<t2;i++)tm[i]+=2*h;
+				t(tm,a,t1);
+				t(tm,t1,t2);
+				t(tm,t2,b);
+			}
+			t(tmp.fill(0),0,e);
+			aux=[...a];
+			for(let i=0;i<e;i++)
+				this.write(a,i,aux[tmp[i]]);
+		break;
+		case 32://Triangular
+			tmp.fill(0);
+			j=0,k=2;
+			max=0;
+			for(let i=1;i<e;i++,j++){
+				if(i==k){
+					j=0;
+					k*=2;
+				}
+				tmp[i]=tmp[j]+1;
+				if(tmp[i]>max)max=tmp[i];
+			}
+			counts=new Array(max+1).fill(0);			
+			for(let i=0;i<e;i++)
+				counts[tmp[i]]++;
+			for(let i=1;i<counts.length;i++)
+				counts[i]+=counts[i-1];
+			for(let i=e-1;i>=0;i--)
+				tmp[i]=--counts[tmp[i]];
+			aux=[...a];
+			for(let i=0;i<e;i++)
+				this.write(a,i,aux[tmp[i]]);
+		break;
+		case 33://QuickSort Adversary
+			for(let j=e-e%2-2,i=j-1;i>=0;i-=2,j--)
+				this.swap(a,i,j);
+		break;
+		case 34://Grailsort Adversary
+			rot=(ar,a,m,b)=>{
+				this.reversal(ar,a,m-1);
+				this.reversal(ar,m,b-1);
+				this.reversal(ar,a,b-1);
+			}
+			p=(ar,a,b,bL)=>{
+				let len=b-a,b1=b-len%bL,len1=b1-a;
+				if(len1<=2*bL)return;
+				let m=bL;
+				while(2*m<len)m*=2;
+				m+=a;
+				if(b1-m<bL)p(ar,a,m,bL);
+				else{
+					m=a+b1-m;
+					rot(ar,m-(bL-2),b1-(bL-1),b1);
+					this.multiSwap(ar,a,m);
+					rot(ar,a,m,b1);
+					m=a+b1-m;
+					p(ar,a,m,bL);
+					p(ar,m,b,bL);
+				}
+			}
+			if(e<17)this.reversal(a,0,e-1);
+			else{
+				b=1;
+				while(b*b<e)b*=2;
+				n=(e-1)/b+1|0;
+				k=b+n;
+				this.shuffle(a,0,e);
+				this.sort(a,0,k);
+				this.reversal(a,0,k-1);
+				this.sort(a,k,c);
+				p(a,k,e,b);
+			}
+		break;
+		case 35://Modulo
+			for(let i=1;i<e;i++)
+				if((i*2)%e!=i)this.swap(a,i,(i*2)%e);
+		break;
+		case 36://Cubic
+			y=x=>(1/(e/2)**2)*x**3|0;
+			for(k=0,i=-(e/2|0);i<e/2|0;i++,k++)
+				this.write(a,k,y(i)+e/2)
+			this.shuffle(a,0,e)
+		break;
+		case 37://Bit Reversal
+			len=1<<(log(e)/log(2)|0);
+			p=len==e;
+			tmp=[...a];
+			for(let i=0;i<len;i++)a[i]=i;
+			m=0;
+			d=len>>1,b=d+(d>>1);			
+			for(let i=1;i<len-1;i++){
+				let j=d;
+				for(
+					let k=i,n=b;
+					(k&1)==0;
+					j-=n,k>>=1,n>>=1
+				);
+				m+=j;
+				if(m>i)this.swap(a,i,m);
+			}
+			if(!p){
+				for(let i=len;i<e;i++)
+					this.write(a,i,a[i-len]);
+				aux=new Array(len).fill(0);
+				for(let i=0;i<e;i++)
+					aux[a[i]]++;
+				for(let i=1;i<aux.length;i++)
+					aux[i]+=aux[i-1];
+				for(let i=e-1;i>=0;i--)
+					this.write(a,i,--aux[a[i]]);
+			}
+			x=[...a];
+			for(let i=0;i<e;i++)
+				this.write(a,i,tmp[x[i]]);
+		break;
+		}
+	}
+	sort(a,s,e){
+		let min=a[s],max=min;
+		for(let i=s+1;i<e;i++)
+			if(a[i]<min)min=a[i];
+			else if(a[i]>max)max=a[i];
+		let size=max-min+1;
+		let holes=new Array(size).fill(0);
+		for(let i=s;i<e;i++)
+			holes[a[i]-min]++
+		for(let i=0,j=s;i<size;i++)
+			while(holes[i]-->0)
+				this.write(a,j++,i+min);
+	}
+	shuffle(a,s,e){
+		for(let i=s;i<e;i++)
+			this.swap(a,i,random()*(e-i)+i);
+	}
+	start(a,t){
+		this.shuffles([...a],0,a.length,t);
+		return this.steps;
+	}
+}
+let shuf=new Shuffles()
 function display(a){
 	ctx.clearRect(0,0,cvs.width,cvs.height)
 	ctx.fillStyle="#fff";
@@ -279,6 +761,11 @@ function rdisp(args){
 }
 function create(c){
 	return Array(c).fill().map((e,i)=>++i)
+}
+function rotateText(t){
+	let aux=t.split("");
+	t=aux.splice(-1).concat(aux).join("")
+	return t
 }
 /* Sauces: 
 * https://github.com/Gaming32/ArrayV/blob/main/src/main/java/io/github/arrayv/sorts/
@@ -586,8 +1073,8 @@ function maxVal(a){
 	}else return math.max(...arguments)
 }
 function maxLog(a,l,b){
-	let m=i=0;
-	for(;i<l;i++){
+	let m=0,i;
+	for(i=0;i<l;i++){
 		let v=a[i];
 		if(v>m)m=v;
 	}
@@ -664,9 +1151,28 @@ function multiSwap(a,p,t,r){
 }
 function transcribe(a,g,s,r){
 	let t=s;
-	for(let i=0;i<g.length;i++)
+	for(let i=0;i<g.length;i++){
 		for(let j=0;j<g[i].length;j++)
 			(r?rset:write)(a,t++,g[i][j]);
+		g[i]=[]
+	}
+}
+function fancyTranscribe(a,e,regs){
+	let aux=new Array(e);
+	let aux2=new Array(e).fill(false);
+	let rad=regs.length;
+	transcribe(aux,regs,0);
+	for(let i=0;i<e;i++){
+		let reg=i%rad;
+		let pos=(reg*(e/rad))+(i/rad)|0;
+		if(!aux2[pos]){
+			rset(a,pos,aux[pos]);
+			aux2[pos]=true;
+		}
+	}
+	for(let i=0;i<e;i++)
+		if(!aux2[i])
+			rset(a,i,aux[i]);
 }
 function reversal(a,s,l,m=1){
 	if(l-s<=0)return;
@@ -1196,18 +1702,16 @@ function recursiveWeaveSort(){
 }
 function LSDRadixSort(){
 	let array=[...arr];
-	let base=10
-	let c=2,
-		min=minVal(array),
-		max=maxVal(array),
-		exp=1;
-	while((max-min)/exp>=1){
-		let n,b=new Array(base).fill(0),output=new Array(len);
-		for(n=0;n<len;n++)b[((array[n]-min)/exp)%base|0]++;
-		for(n=1;n<base;n++)b[n]+=b[n-1];
-		for(n=len-1;n>=0;n--)output[--b[((array[n]-min)/exp)%base|0]]=array[n];
-		for(n=0;n<len;n++)rset(array,n,output[n]);
-		exp*=10;
+	let base=10;
+	let hp=maxLog(array,len,base);
+	let vregs=new Array(base);
+	for(let i=0;i<base;i++)vregs[i]=[];
+	for(let p=0;p<=hp;p++){
+		for(let i=0;i<len;i++){
+			let dig=getDigit(array[i],p,base);
+			vregs[dig].push(array[i]);
+		}
+		fancyTranscribe(array,len,vregs,base*.8|0);
 	}
 	return[0,1]
 }
@@ -5393,173 +5897,297 @@ function introSort(){
 	insertSort(array,0,len);
 	return[5,1]
 }
-function testSort(){
+function triangularHeapSort(){
 	let array=[...arr];
-	return[5,1]
-}
-function Sort(){
-	let array=[...arr];
-	
-	return[5,1]
-}
-function Sort(){
-	let array=[...arr];
-	
-	return[5,1]
-}
-function Sort(){
-	let array=[...arr];
-	
-	return[5,1]
-}
-function Sort(){
-	let array=[...arr];
-	
-	return[5,1]
-}
-function Sort(){
-	let array=[...arr];
-	
-	return[5,1]
-}
-class Shuffles{
-	swap(a,f,t){
-		f|=0;t|=0;
-		let o=a[f];a[f]=a[t];a[t]=o;
-		this.steps.push(["swap",f,t])
-	}
-	write(a,i,v,aux){
-		i|=0;v|=0;
-		a[i]=v;
-		if(aux)return;
-		this.steps.push(["set",i,v])
-	}
-	reversal(a,s,l){
-		if(l-s>0)
-			for(let i=s,j=l-1;i<j;i++,j--)
-				this.swap(a,j,i);
-	}
-	arraycopy(s,sp,d,dp,l){
-		let b=s!=d||dp<sp;
-		let st=b?0:l-1,e=b?l:-1,dr=b?1:-1;
-		for(let i=st;i!=e;i+=dr)
-			this.write(d,dp+i,s[sp+i]);
-	}
-	customFunc(f,args){
-		this.steps.push(["custom",btoa("("+f+")"),...args])
-	}
-	constructor(){
-		this.steps=[];
-	}
-	shuffles(a,s,e,type){
-		let aux,tmp,i,j,k,b,c,d,f,g,h,l,m,n,o,p,q,r,t,u,v,w,x,y,z;
-		switch(type){
-		case 0://random
-			this.shuffle(a,s,e);
-		break;
-		case 1://reverse
-			this.reversal(a,s,e);
-		break;
-		case 2://almost
-			for(let i=0;i<maxVal(e/20|0,1);i++)
-				this.swap(a,random()*e,random()*e);
-		break;
-		case 3:break;//sorted
-		case 4://naive
-			for(let i=s;i<e;i++)
-				this.swap(a,i,random()*e);
-		break;
-		case 5://shuffle tail
-			aux=new Array(e);
-			i=0,j=0,k=0;
-			while(i<e){
-				if(random()<1/7)this.write(aux,k++,a[i++],true);
-				else this.write(a,j++,a[i++]);
+	const trt=v=>sqrt((8*v+1)-1)/2|0;
+	function sd(a,e,r){
+		let t=a[r];
+		let ln=trt(r);
+		let l=r+ln+1;
+		let ri=l+1;
+		while(l<e){
+			if(ri>=e){
+				if(compareValues(a[l],t)>0)
+					rset(a,r,a[l]);
+				break;
 			}
-			this.arraycopy(aux,0,a,j,k);
-			this.shuffle(a,j,e);
-		break;
-		case 6://shuffle head
-			aux=new Array(e);
-			i=e-1,j=e-1,k=0;
-			while(i>=0){
-				if(random()<1/7)this.write(aux,k++,a[i--],true);
-				else this.write(a,j--,a[i--]);
+			let mx=compareIndices(a,l,ri)>=0?l:ri;
+			if(compareValues(a[mx],t)>0){
+				rset(a,r,a[mx]);
+				r=mx;
+				ln=trt(r);
+				l=r+ln+1;
+				ri=l+1;
+				continue;
 			}
-			this.arraycopy(aux,0,a,0,k);
-			this.shuffle(a,0,j);
-		break;
-		case 7://Shifted Element
-			i=random()*e|0;
-			j=random()*e|0;
-			if(j<i){
-				this.customFunc(IndexRots.holyGriesMills,[j,i,i+1])
-				IndexRots.holyGriesMills(a,j,i,i+1);
+			break;
+		}
+		rset(a,r,t);
+	}
+	function trheap(a,l){
+		for(let i=l-1;i>=0;i--)
+			sd(a,l,i);
+	}
+	trheap(array,len);
+	for(let i=1;i<len-1;i++){ 
+		rswap(array,0,len-i);
+		sd(array,len-i,0);
+	}
+	if(compareIndices(array,0,1)>0)rswap(array,0,1);
+	return[5,1]
+}
+function laziestStableSort(){
+	let array=[...arr];
+	const insto=(ar,a,b)=>{
+		let t=ar[a];
+		while(a>b)rset(ar,a,ar[--a]);
+		rset(ar,b,t);
+	}
+	const msw=(ar,a,b,l)=>{
+		for(let i=0;i<l;i++)
+			rswap(ar,a+i,b+i);
+	}
+	const rot=(ar,a,m,b)=>{
+		let l=m-a,r=b-m;
+		while(l>0&&r>0){
+			if(r<l){
+				msw(ar,m-r,m,r);
+				b-=r;m-=r;l-=r;
 			}else{
-				this.customFunc(IndexRots.holyGriesMills,[i,i+1,j])
-				IndexRots.holyGriesMills(a,i,i+1,j);
-			}
-		break;
-		case 8://Noisy
-			j=maxVal(4,sqrt(e)/2|0);
-			for(i=0;i+j<=e;i+=random()*(j-1)+1)
-				this.shuffle(a,i,i+j);
-			this.shuffle(a,i,e);
-		break;
-		case 9://Shuffled Odds
-			for(let i=1;i<e;i+=2)
-				this.swap(a,i,(random()*(e-i)/2|0)*2+i);
-		break;
-		case 10://Final Merge Pass
-			c=2;
-			k=0;
-			t=new Array(e);
-			for(let j=0;j<c;j++)
-				for(let i=j;i<e;i+=c)
-					this.write(t,k++,a[i],true);
-
-			for(let i=0;i<e;i++)
-				this.write(a,i,t[i],false);
-		break;
-		}
-	}
-	sort(a,s,e){
-		let mn=a[s],mx=mn;
-		for(let i=s+1;i<e;i++){
-			if(a[i]<mn)mn=ar[i];
-			else if(a[i]>mx)mx=a[i];
-		}
-		let sz=mx-mn+1;
-		let holes=new Array(sz);
-		for(let i=s;i<e;i++)
-			this.write(holes,a[i]-mn,holes[a[i]-mn]+1,true);
-		for(let i=0,j=s;i<sz;i++){
-			while(holes[i]>0){
-				this.write(holes,i,holes[i]-1,true);
-				this.write(a,j,i+mn,false);
-				j++;
+				msw(ar,a,m,l);
+				a+=l;m+= l;r-=l;
 			}
 		}
 	}
-	shuffle(a,s,e){
-		for(let i=s;i<e;i++)
-			this.swap(a,i,random()*(e-i)+i);
+	const lbs=(ar,a,b,v)=>{
+		while(a<b){
+			let m=a+(b-a)/2|0;
+			if(compareValues(v,ar[m])<=0)b=m;
+			else a=m+1;
+		}
+		return a;
 	}
-	start(a,t){
-		this.shuffles([...a],0,a.length,t);
-		return this.steps;
+	const rbs=(ar,a,b,v)=>{
+		while(a<b){
+			let m=a+(b-a)/2|0;
+			if(compareValues(v,ar[m])<0)b=m;
+			else a=m+1;
+		}
+		return a;
 	}
+	const les=(ar,a,b,v)=>{
+		let i=1;
+		while(a-1+i<b&&compareValues(v,ar[a-1+i])>0)i*=2;
+		return lbs(ar,a+i/2|0,minVal(b,a-1+i),v);
+	}
+	const binsert=(ar,a,b)=>{
+		for(let i=a+1;i<b;i++)
+			insto(ar,i,rbs(ar,a,i,ar[i]));
+	}
+	const ipm=(ar,a,m,b)=>{
+		let i=a,j=m,k;
+		while(i<j&&j<b){
+			if(compareIndices(ar,i,j)>0){
+				k=les(ar,j+1,b,ar[i]);
+				rot(ar,i,j,k);
+				i+=k-j;j=k;
+			}else i++;
+		}
+	}
+	let l=len;
+	if(l<=16)binsert(array,0,len);
+	else{
+		let i,blockLen=maxVal(16,sqrt(l)|0);
+		for(i=0;i+2*blockLen<len;i+=blockLen)
+			binsert(array,i,i+blockLen);
+		binsert(array,i,len);
+		while(i-blockLen>=0){
+			ipm(array,i-blockLen,i,len);
+			i-=blockLen;
+		}
+	}
+	return[5,1]
 }
-let shuf=new Shuffles()
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
+function Sort(){
+	let array=[...arr];
+	
+	return[5,1]
+}
 function s(m=0,i=0){
 	arr=create(count).sort((a,b)=>a-b);
 	let stp=shuf.start(arr,i),tck=0;
 	swaps=0;writes=0;
+	names.innerText="Shuffling...";
 	let shuffling=setInterval(()=>{
 		tck++%5==0&&display(arr)
+		tck%15==0&&(names.innerText=rotateText(names.innerText))
 		if(stp.length){
 			canskip=0
-			names.innerText="Shuffling...";
 			inputdisplay.innerText=""
 			let c=stp.shift()
 			switch(c[0]){
@@ -5575,6 +6203,7 @@ function s(m=0,i=0){
 			setTimeout(()=>{
 				names.innerText=sn[m][0]+" ("+(m+1)+"/"+Object.keys(sn).length+")";
 				inputdisplay.innerText=inputs[i]
+				inputdisplay2.innerText=1+i+" / "+Object.keys(inputs).length
 				rdisp([...sn[m][1](),function(){
 					didskip=0
 					display(arr)
@@ -5591,6 +6220,19 @@ function s(m=0,i=0){
 										m%=snl
 									}
 								}
+								if(nextshuffle.checked){
+									i++
+									if((i%=Object.keys(inputs).length)==0){
+										m++
+										if(queue!=null){
+											m=queue+1;
+											queue=null;
+											nextsort.innerText="Next: ...";
+										}
+									}
+									s(--m,i)
+									return;
+								}
 								if(queue==null){
 									s(m,i)
 								}else{
@@ -5604,7 +6246,7 @@ function s(m=0,i=0){
 							mark(++z+1,"lime")
 							ctx.fillRect(z*bw,count-arr[z],bw,arr[z])
 						}
-					},1e3/50)
+					},1e3/45)
 				}])
 			},5);
 			display(arr)
@@ -5616,8 +6258,8 @@ function set(v){
 }
 function get(n,cs=0){
 	for(let i=0;i<sn.length;i++){
-		let v=sn[i][0]
-		if(v.match(n))return i
+		let v=sn[i][0].toLowerCase();
+		if(v==n.toLowerCase())return i
 	}
 	if(n.trim().length==0)return 0;
 	n=cs?n:n.toLowerCase();
@@ -5759,6 +6401,8 @@ set(["Circular Grail Sort",circularGrailSort])
 set(["Poplar Heap Sort",poplarHeapSort])
 set(["Adaptive Grail Sort",adaptiveGrailSort])
 set(["Intro Sort",introSort])
+set(["Triangular Heap Sort",triangularHeapSort])
+set(["Laziest Stable Sort",laziestStableSort])
 //set(["test Sort",testSort])
 sn.sort((a,b)=>a[0].localeCompare(b[0]))
 const inputs={
@@ -5769,10 +6413,37 @@ const inputs={
 	4:"Naive Random",
 	5:"Shuffled Tail",
 	6:"Shuffled Head",
-	7:"Shifted Elements",
+	7:"Shifted Element",
 	8:"Noisy",
 	9:"Shuffled Odds",
 	10:"Final Merge Pass",
+	11:"Shuffled Final Merge",
+	12:"Shuffled Half",
+	13:"Partitioned",
+	14:"Sawtooth",
+	15:"Pipe Organ",
+	16:"Final Bitonic Pass",
+	17:"Interlaced",
+	18:"Double Layered",
+	19:"Final Radix Pass",
+	20:"Real Final Radix",
+	21:"Recursive Final Radix",
+	22:"Half Rotation",
+	23:"Half Reversed",
+	24:"Logarithmic Slopes",
+	25:"Heapified",
+	26:"Triangular Heapified",
+	27:"Circle Pass",
+	28:"Final Pairwise Pass",
+	29:"Recursive Reversal",
+	30:"Gray Code Fractal",
+	31:"Sierpinski Triangle",
+	32:"Triangular",
+	33:"Quicksort Adversary",
+	34:"Grailsort Adversary",
+	35:"Modulo",
+	36:"Cubic",
+	37:"Bit Reversal"
 }
 function hold(e){
 	["touchstart","mousedown"].forEach(m=>e.addEventListener(m,v=>e.style.opacity=.5));
@@ -5811,9 +6482,9 @@ Array.from(document.querySelectorAll("div.topicname")).map((e,i)=>{
 		document.querySelectorAll("div.space")[i].style.display=h?"none":"block";
 	}
 })
-let req=get("")
+let req=get("lazy")
 if(Object.values(sn).map(e=>e[0].toLowerCase()).indexOf("test sort")>=0)req=get("test")
-s(req)
+s(req,37)
 /*
 arr=create(count)
 let perf=[],ix=0,jd=
