@@ -33,36 +33,23 @@
 		<div class="frac">
 			<span contenteditable id=num>100</span>
 			<span id=sigma>&Sigma;</span>
-			<span contenteditable id=den>0</span>
+			<span contenteditable id=den>1</span>
 		</div>
-		<span contenteditable id=happen>i</span> = <span id=result></span><br><br>
+		<span contenteditable id=happen>x</span> = <span id=result></span><br><br>
 		<button onclick='it()'>Iterate</button>
 		<script>
 var n,l;
 const{tan,tanh,atan,atan2,atanh,cos,cosh,acos,acosh,sin,sinh,asin,asinh,sqrt,pow,cbrt,abs}=Math
-fact=function(a){
-	a=parseInt(eval(a))
-	let r=a;
-	if(a>0){
-		while(--a){
-			r*=a
-		}
-	}else if(a<0){
-		return undefined
-	}else{
-		r=1
-	}
-	return r
+function fact(n){
+	if(n==0||n==1)return 1;
+	if(n<0)return undefined;
+	return n*fact(--n)
 }
-setInterval(()=>{
-	try{
-		l=eval(num.innerText);
-		n=eval(den.innerText);
-	}catch(e){}
-})
 function it(){
+	l=eval(num.innerText);
+	n=eval(den.innerText);
 	let sum=0;
-	for(let i=n;i<=l;i++)
+	for(let x=n;x<=l;x++)
 		sum+=parseFloat(eval(happen.innerText));
 	result.innerText=sum
 }

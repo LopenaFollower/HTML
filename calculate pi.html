@@ -11,6 +11,7 @@
 		</style>
 	</head>
 	<body onbeforeunload="save()">
+		<pre id=digit></pre>
 		<button onclick="save()">download</button><div id=len></div><br>
 		<script>
 if(!localStorage.getItem("pi_formula")){
@@ -19,11 +20,7 @@ if(!localStorage.getItem("pi_formula")){
 if(!localStorage.getItem("pi")){
 	localStorage.setItem("pi","3.")
 }
-let stored=localStorage.getItem("pi_formula").split(",")
-var q=BigInt(stored[0]),
-	r=BigInt(stored[1]),
-	t=BigInt(stored[2]),
-	i=BigInt(stored[3]);
+var[q,r,t,i]=localStorage.getItem("pi_formula").split(",").map(e=>BigInt(e));
 function calc_pi(){
 	u=3n*i;
 	u=6n+3n*u**2n+u*9n;
@@ -35,7 +32,13 @@ function calc_pi(){
 	return Number(d)
 }
 setInterval(()=>{
-	for(let index=0;index<5;index++)localStorage.setItem("pi",localStorage.getItem("pi")+calc_pi());
+	for(let index=0;index<5;index++){
+		let d=calc_pi();
+		digit.innerText+=d
+		if(digit.innerText.length>=50)
+			digit.innerText=""
+		localStorage.setItem("pi",localStorage.getItem("pi")+d);
+	}
 })
 setInterval(()=>{
 	len.innerText=localStorage.getItem("pi").length
@@ -44,7 +47,7 @@ function save(){
 	let link=document.createElement("a");
 	let pi=localStorage.getItem("pi")
 	link.href=URL.createObjectURL(new Blob([pi],{type:"text/plain"}));
-	link.download=pi.length.toLocaleString()+" chars of pi.txt";
+	link.download=(pi.length-1).toLocaleString()+" chars of pi.txt";
 	link.click();
 	URL.revokeObjectURL(link.href);
 }

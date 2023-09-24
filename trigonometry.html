@@ -112,17 +112,9 @@ String.prototype.insert=function(str,index){
 };
 var x=0,y=0,z=0,a=0,b=0,c=0,focused=false;
 const{tan,tanh,atan,atan2,atanh,cos,cosh,acos,acosh,sin,sinh,asin,asinh,sqrt,pow,cbrt,abs}=Math
-const fact=function(a){
-	a=parseInt(eval(a))
-	let r=a;
-	if(a>0){
-		while(--a)r*=a;
-	}else if(a<0){
-		while(++a)r*=a;
-	}else{
-		return 1
-	}
-	return r
+function fact(a){
+	if(a==0)return 1;
+	else return a*fact(--a)
 }
 function add(e,t,r=""){
 	if(t=="num"||t=="op"||t=="reg"||t=="variable"){
