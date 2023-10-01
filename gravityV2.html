@@ -54,9 +54,7 @@ function fall(e){
 			force.x=abs(force.x*.5)
 			vel.x=((-abs(vel.x)*.75)*dec|0)/dec;
 			if(vel.x>=-gravity.x){
-				force.x*=.05
-				if(force.x<=.1)
-					vel.x=0
+				force.x*=.1
 			}
 		}
 		if(pos.x<0){
@@ -65,10 +63,12 @@ function fall(e){
 			force.x=-abs(force.x*.5)
 			vel.x=((abs(vel.x)*.75)*dec|0)/dec;
 			if(vel.x>=-gravity.x){
-				force.x*=.05
-				if(force.x>=.1)
-					vel.x=0
+				force.x*=.1
 			}
+		}
+		if(abs(vel.x)<.01){
+			vel.x=0
+			force.x=0
 		}
 		RAF=requestAnimationFrame(anim);
 		if(pos.y>=600){
