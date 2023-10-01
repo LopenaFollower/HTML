@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+			body{
+				margin:0;
+			}
+		</style>
+	</head>
+	<body>
+		<div id=velo></div>
+		<div id=forc></div>
+		<div id=posi></div>
+		<canvas id=cvs></canvas>
+		<script>
+function vector(x,y){return{x:x,y:y}}
+function add(v1,v2){v1.x+=v2.x;v1.y+=v2.y;}
+function scale(v1,num){v1.x*=num;v1.y*=num;}
+function getMass(u,a){return(u*a)/10;}
+function ca(force,mass){return vector(force.x/mass,force.y/mass)}
+function c(l=5){
+	return new Array(l).fill("").map(e=>String.fromCharCode(Math.random()*2**16)).join("");
+}
+const abs=Math.abs;
+function rnd(n,d=2){
+	return parseFloat(n.toFixed(d))
+}
+function fall(e){
+	let RAF,pos=vector(0,0),floorP=200,wallR=window.innerWidth,vel=vector(0,0),force=vector(25,0),gravity=vector(0,.1)
+	function anim(){
+		add(vel,gravity);
+		add(pos,vel);
+		let{width,height}=e.getBoundingClientRect()
+		velo.innerText=Object.values(vel).map(e=>rnd(e)).join(", ")
+		forc.innerText=Object.values(force).map(e=>rnd(e)).join(", ")
+		posi.innerText=Object.values(pos).map(e=>rnd(e)).join(", ")
+		add(vel,ca(force,getMass(5,width*height/2)));
+		let g=floorP-height,w=wallR-width;
+		if(pos.y>=g){
+			pos.y=g-(pos.y-g);
+			let dec=1e2;
+			vel.y=((-abs(vel.y)*.75)*dec|0)/dec;
+			if(vel.y>=-gravity.y){
+				vel.y=0;
+				pos.y=g-gravity.y;
+				//floorP=1/0;
+			}
+		}
+		if(pos.x>=w){
+			pos.x=w-(pos.x-w);
+			let dec=1e2;
+			force.x=abs(force.x*.5)
+			vel.x=((-abs(vel.x)*.75)*dec|0)/dec;
+			if(vel.x>=-gravity.x){
+				force.x*=.05
+				if(force.x<=.1)
+					vel.x=0
+			}
+		}
+		if(pos.x<0){
+			pos.x=1;
+			let dec=1e2;
+			force.x=-abs(force.x*.5)
+			vel.x=((abs(vel.x)*.75)*dec|0)/dec;
+			if(vel.x>=-gravity.x){
+				force.x*=.05
+				if(force.x>=.1)
+					vel.x=0
+			}
+		}
+		RAF=requestAnimationFrame(anim);
+		if(pos.y>=600){
+			document.body.removeChild(e)
+			cancelAnimationFrame(RAF)
+			setTimeout(()=>cr("div","Allain John Sojor"),100)
+		}
+		e.style.transform="translate("+(pos.x|0)+"px,"+(pos.y|0)+"px)";
+	};
+	RAF=requestAnimationFrame(anim);
+};
+//for(let i=0;i<5;i++)
+cr("div","Allain John Sojor");
+function cr(t,v){
+	let a=document.createElement(t);
+	a.innerText=v;
+	a.style.position="fixed";
+	document.body.appendChild(a)
+	fall(a)
+}
+		</script>
+	</body>
+</html>
