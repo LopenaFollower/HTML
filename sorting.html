@@ -7674,80 +7674,65 @@ function testSort(){
 		rTP=pI-lol;
 		if(lL!=0){
 			if(lof!=0){
-				arraycopy(ar,p+ rTP, ar, p + rTP - rBL, lol, 1, true, x);
-
-				rTP = pI;
-				lol = rBL * aBC;
-				lof = 0;
-			}
-			else {
-				lol += rBL * aBC;
-			}
-			this.sqmlwb(ar, p + rTP, lol, lL, 0 - rBL, x);
-		}
-		else {
-			Writes.arraycopy(ar, p + rTP, ar, p + rTP - rBL, lol, 1, true, x);
-		}
+				arraycopy(ar,p rTP,ar,p+rTP-rBL,lol,x);
+				rTP=pI;lol=rBL*aBC;lof=0;
+			}else lol+=rBL*aBC;
+			sqmlwb(ar,p+rTP,lol,lL,-rBL,x);
+		}else arraycopy(ar,p+rTP,ar,p+rTP-rBL,lol,x);
 	}
-
-	// build blocks of length buildLen
-	// input: [-buildLen,-1] elements are buffer
-	// output: first buildLen elements are buffer, blocks 2 * buildLen and last subblock sorted
-	private void sqrtBuildBlocks(int[] ar, int p, int len, int buildLen, boolean x) {
-		int extraDist, part;
-
-		for(int dist = 1; dist < len; dist += 2) {
-			extraDist = 0;
-			if(Reads.compareValues(ar[p + (dist - 1)], ar[p + dist]) > 0) extraDist = 1;
-
-			Writes.write(ar, p + dist - 3, ar[p + dist - 1 + extraDist], 1, true, x);
-			Writes.write(ar, p + dist - 2, ar[p + dist - extraDist], 1, true, x);
+	function sBBls(ar,p,ln,bL,x){
+		let eD,pt;
+		for(let d=1;d<ln;d+=2){
+			eD=0;
+			if(compareIndices(ar,p+(d-1),p+d)>0)eD=1;
+			write(ar,p+d-3,ar[p+d-1+eD],x);
+			write(ar,p+d-2,ar[p+d-eD],x);
 		}
-		if(len % 2 != 0) Writes.write(ar, p + len - 3, ar[p + len - 1], 1, true, x);
+		if(ln % 2 != 0) Writes.write(ar,p + ln - 3,ar[p + ln - 1],1,true,x);
 
 		p -= 2;
 
-		for(part = 2; part < buildLen; part *= 2) {
+		for(pt = 2; pt < bL; pt *= 2) {
 			int left = 0;
-			int right = len - 2 * part;
+			int right = ln - 2 * pt;
 
 			while(left <= right) {
-				this.sqmlwb(ar, p + left, part, part, 0 - part, x);
-				left += 2 * part;
+				this.sqmlwb(ar,p + left,pt,pt,0 - pt,x);
+				left += 2 * pt;
 			}
 
-			int rest = len - left;
+			int rest = ln - left;
 
-			if(rest > part) {
-				this.sqmlwb(ar, p + left, part, rest - part, 0 - part, x);
+			if(rest > pt) {
+				this.sqmlwb(ar,p + left,pt,rest - pt,0 - pt,x);
 			}
 			else {
-				while(left < len) Writes.write(ar, p + left - part, ar[p + left++], 1, true, x);
+				while(left < ln) Writes.write(ar,p + left - pt,ar[p + left++],1,true,x);
 			}
 
-			p -= part;
+			p -= pt;
 		}
-		int restToBuild = len % (2 * buildLen);
-		int leftOverPos = len - restToBuild;
+		int restToBuild = ln % (2 * bL);
+		int leftOverPos = ln - restToBuild;
 
-		if(restToBuild <= buildLen) {
-			Writes.arraycopy(ar, p + leftOverPos, ar, p + leftOverPos + buildLen, restToBuild, 1, true, x);
+		if(restToBuild <= bL) {
+			Writes.arraycopy(ar,p + leftOverPos,ar,p + leftOverPos + bL,restToBuild,1,true,x);
 		}
-		else this.sqmr(ar, p + leftOverPos, buildLen, restToBuild - buildLen, buildLen, x);
+		else this.sqmr(ar,p + leftOverPos,bL,restToBuild - bL,bL,x);
 
 		while(leftOverPos > 0) {
-			leftOverPos -= 2 * buildLen;
-			this.sqmr(ar, p + leftOverPos, buildLen, buildLen, buildLen, x);
+			leftOverPos -= 2 * bL;
+			this.sqmr(ar,p + leftOverPos,bL,bL,bL,x);
 		}
 	}
 
-	// keys are on the left of arr. Blocks of length buildLen combined. We'll combine them in pairs
-	// buildLen and numKeys are powers of 2. (2 * buildLen / rBL) keys are guaranteed
-	private void sqrtCombineBlocks(int[] ar, int p, int len, int buildLen, int rBL, int[] tags, boolean x) {
-		int combineLen = len / (2 * buildLen);
-		int leftOver = len % (2 * buildLen);
+	// keys are on the left of arr. Blocks of length bL2 combined. We'll combine them in pairs
+	// bL2 and numKeys are powers of 2. (2 * bL2 / rBL) keys are guaranteed
+	private void sqrtCombineBlocks(int[] ar,int p,int len,int bL,int rBL,int[] tags,boolean x) {
+		int combineLen = len / (2 * bL);
+		int leftOver = len % (2 * bL);
 
-		if(leftOver <= buildLen) {
+		if(leftOver <= bL) {
 			len -= leftOver;
 			leftOver = 0;
 		}
@@ -7757,13 +7742,13 @@ function testSort(){
 		for(int i = 0; i <= combineLen; i++) {
 			if(i == combineLen && leftOver == 0) break;
 
-			int blockPos = p + i * 2 * buildLen;
-			int bC = (i == combineLen ? leftOver : 2 * buildLen) / rBL;
+			int blockPos = p + i * 2 * bL;
+			int bC = (i == combineLen ? leftOver : 2 * bL) / rBL;
 
 			int tagIndex = bC + (i == combineLen ? 1 : 0);
-			for(int j = 0; j <= tagIndex; j++) Writes.write(tags, j, j, 1, true, true);
+			for(int j = 0; j <= tagIndex; j++) Writes.write(tags,j,j,1,true,true);
 
-			int mK = buildLen / rBL;
+			int mK = bL / rBL;
 
 			for(tagIndex = 1; tagIndex < bC; tagIndex++) {
 				leftIndex = tagIndex - 1;
@@ -7775,8 +7760,8 @@ function testSort(){
 				}
 
 				if(leftIndex != tagIndex - 1) {
-					this.msw(ar, blockPos + (tagIndex - 1) * rBL, blockPos + leftIndex * rBL, rBL, x);
-					this.swap(tags, tagIndex - 1, leftIndex, true);
+					this.msw(ar,blockPos + (tagIndex - 1) * rBL,blockPos + leftIndex * rBL,rBL,x);
+					this.swap(tags,tagIndex - 1,leftIndex,true);
 				}
 			}
 			int aBC = 0;
@@ -7790,16 +7775,16 @@ function testSort(){
 					aBC++;
 				}
 			}
-			this.smbflwb(tags, mK, ar, blockPos, bC - aBC, rBL, aBC, lL, x);
+			this.smbflwb(tags,mK,ar,blockPos,bC - aBC,rBL,aBC,lL,x);
 		}
-		for(leftIndex = len - 1; leftIndex >= 0; leftIndex--) Writes.write(ar, p + leftIndex, ar[p + leftIndex - rBL], 1, true, x);
+		for(leftIndex = len - 1; leftIndex >= 0; leftIndex--) Writes.write(ar,p + leftIndex,ar[p + leftIndex - rBL],1,true,x);
 	}
 
-	private void sqrtCommonSort(int[] ar, int p, int len, int[] extBuf, int extBufPos, int[] tags, boolean x) {
+	private void sqrtCommonSort(int[] ar,int p,int len,int[] extBuf,int extBufPos,int[] tags,boolean x) {
 		insertSorter = new InsertionSort(this.arrayVisualizer);
 
 		if(len <= 16) {
-			this.insertSort(ar, p, len, x);
+			this.insertSort(ar,p,len,x);
 			Highlights.clearAllMarks();
 			return;
 		}
@@ -7807,24 +7792,24 @@ function testSort(){
 		int bL = 1;
 		while((bL * bL) < len) bL *= 2;
 
-		Writes.arraycopy(ar, p, extBuf, extBufPos, bL, 1, true, x);
+		Writes.arraycopy(ar,p,extBuf,extBufPos,bL,1,true,x);
 
-		this.sqrtCommonSort(extBuf, extBufPos, bL, ar, p, tags, !x);
+		this.sqrtCommonSort(extBuf,extBufPos,bL,ar,p,tags,!x);
 
-		this.sqrtBuildBlocks(ar, p + bL, len - bL, bL, x);
+		this.sBBls(ar,p + bL,len - bL,bL,x);
 
-		int buildLen = bL;
+		int bL2 = bL;
 
-		while(len > (buildLen *= 2)) {
-			this.sqrtCombineBlocks(ar, p + bL, len - bL, buildLen, bL, tags, x);
+		while(len > (bL2 *= 2)) {
+			this.sqrtCombineBlocks(ar,p + bL,len - bL,bL2,bL,tags,x);
 		}
-		this.sqmd(ar, p + bL, extBuf, extBufPos, len - bL, bL, x);
+		this.sqmd(ar,p + bL,extBuf,extBufPos,len - bL,bL,x);
 
 		Highlights.clearAllMarks();
 	}
 
 	@Override
-	public void runSort(int[] array, int len, int bucketCount) {
+	public void runSort(int[] array,int len,int bucketCount) {
 		int bufferLen = 1;
 
 		while(bufferLen * bufferLen < len) bufferLen *= 2;
@@ -7833,7 +7818,7 @@ function testSort(){
 		int[] extBuf = Writes.createExternalArray(bufferLen);
 		int[] tags = Writes.createExternalArray(numKeys);
 
-		this.sqrtCommonSort(array, 0, len, extBuf, 0, tags, false);
+		this.sqrtCommonSort(array,0,len,extBuf,0,tags,false);
 
 		Writes.deleteExternalArray(extBuf);
 		Writes.deleteExternalArray(tags);
