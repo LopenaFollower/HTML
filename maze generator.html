@@ -18,12 +18,12 @@ var{restart,settings}=(function(){
 	let map=[],
 		canvas=document.querySelector("canvas"),
 		color={wall:"#222a33",path:"#fff"},
-		pathSize=2,//2
+		pathSize=1,//2
 		wallSize=1,//1
 		ctx=canvas.getContext("2d"),
 		off=pathSize/2+wallSize,
-		height=274,//274
-		width=148,//148
+		height=270,//274
+		width=150,//148
 		head=[0,0],
 		loopTimeout;
 	function init(){
@@ -70,7 +70,7 @@ var{restart,settings}=(function(){
 			map[(dir[1]+head[1])*2][(dir[0]+head[0])*2]=true;
 			map[dir[1]+head[1]*2][dir[0]+head[0]*2]=true;
 			ctx.stroke();
-			loopTimeout=setTimeout(loop);
+			loopTimeout=setTimeout(loop,5);
 		}
 	}
 	loop();

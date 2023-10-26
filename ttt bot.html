@@ -62,7 +62,7 @@ function arent(a,...b){
 	return a!==b[0]&&b.every(e=>e==b[0])
 }
 function place(id,s){
-	if(s==bot&&moveCnt>0){
+	if(id&&s==bot&&moveCnt>0){
 		let n={"1,1":"tL","1,2":"tM","1,3":"tR","2,1":"L","2,2":"M","2,3":"R","3,1":"lL","3,2":"lM","3,3":"lR"}
 		let a="["+JSON.stringify(read())+",\""+n[id.toString()]+"\"]";
 		//storage[storage.length]=a

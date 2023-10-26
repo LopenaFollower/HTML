@@ -13,7 +13,7 @@
 				background-color:#000;
 				color:#fff;
 				z-index:100;
-				opacity:0.7;
+				opacity:0.9;
 			}
 			#trail{
 				position:fixed;
@@ -22,14 +22,14 @@
 			}
 		</style>
 	</head>
-	<body>
+	<body bgcolor=#000>
 		<canvas id=trail></canvas>
 		<div id=dvd>DVD</div>
 		<script>
 const rgb=(r=>{r={s:1,r:0xff,g:0,b:0,rg:![],gg:[],bg:![],rl:![],gl:![],bl:![],fetch:function(f="rgb"){return f.length==3?"rgb("+this[f[0]]+","+this[f[1]]+","+this[f[2]]+")":"rgb("+this.r+","+this.g+","+this.b+")"}};setInterval((m=255,f=![],t=[])=>{r.r>m&&(r.rg=f,r.r=m);r.g>m&&(r.gg=f,r.g=m);r.b>m&&(r.bg=f,r.b=m);r.r<0&&(r.rl=f,r.r=0);r.g<0&&(r.gl=f,r.g=0);r.b<0&&(r.bl=f,r.b=0);r.r==m&&r.g==0&&r.b==0&&(r.gg=t);r.r==m&&r.g==m&&r.b==0&&(r.rl=t);r.r==0&&r.g==m&&r.b==0&&(r.bg=t);r.r==0&&r.g==m&&r.b==m&&(r.gl=t);r.r==0&&r.g==0&&r.b==m&&(r.rg=t);r.r==m&&r.g==0&&r.b==m&&(r.bl=t);r.rg&&(r.r+=r.s);r.gg&&(r.g+=r.s);r.bg&&(r.b+=r.s);r.rl&&(r.r-=r.s);r.gl&&(r.g-=r.s);r.bl&&(r.b-=r.s)});return r})()
-var size=window.innerWidth/10+"px",step=210;dvd.style.lineHeight=size;dvd.style.width=size;dvd.style.height=size;dvd.style.fontSize=parseInt(size)/2+"px";trail.width=window.innerWidth;trail.height=window.innerHeight;
+var size=window.innerWidth/10+"px",step=10;dvd.style.lineHeight=size;dvd.style.width=size;dvd.style.height=size;dvd.style.fontSize=parseInt(size)/2+"px";trail.width=window.innerWidth;trail.height=window.innerHeight;
 const dirs=[[1,1],[-1,1],[1,-1],[-1,-1]];
-let dir=0,fps=1e3/10;
+let dir=0,fps=0;
 function set(e,v){
 	if(e=="s"){
 		step=v
@@ -38,23 +38,24 @@ function set(e,v){
 		fps=v
 	}
 }
+let f0=0;colors=[["blue","yellow"],["red","lime"],["orange","lavender"]],cpair=0;
 function move(d){
 	let a=dvd.style,
 		x=dirs[d][0]*step,
 		y=dirs[d][1]*step;
 	a.left=parseInt(a.left||0)+x+"px";
 	a.top=parseInt(a.top||0)+y+"px";
-	let s=5;
+	let s=step,m=2;
 	let ctx=trail.getContext("2d")
-	ctx.fillStyle=rgb.fetch()
-	ctx.fillRect(parseInt(a.left||0)+parseInt(dvd.style.width)/2-s/2,parseInt(a.top||0)+parseInt(dvd.style.height)/2-s/2,s,s)
+	ctx.fillStyle=colors[cpair][f0++%2];
+	ctx.fillRect(parseInt(a.left||0)+parseInt(dvd.style.width)/2-s/2,parseInt(a.top||0)+parseInt(dvd.style.height)/2-s/2,s*m,s*m)
 }
 let cd=true;
 setInterval(()=>{
 	if(cd){
-		cd=false;
+		//cd=false;
 		let mx=window.innerWidth-parseInt(dvd.style.width),
-			my=window.innerHeight-parseInt(dvd.style.height),
+			my=(window.innerHeight-parseInt(dvd.style.height))*.7,
 			x=parseInt(dvd.style.left),
 			y=parseInt(dvd.style.top);
 		dvd.style.WebkitTransitionDuration=fps+"ms";
@@ -62,6 +63,7 @@ setInterval(()=>{
 			console.log("corner");
 			dir=dirs.reverse().map(e=>e.toString()).indexOf(dirs.reverse()[dir].toString())
 		}else{
+			let t=dir;
 			(y<=0&&dir==3)&&(dir=1);
 			(x>=mx&&dir==0)&&(dir=1);
 			(y<=0&&dir==2)&&(dir=0);
@@ -70,11 +72,17 @@ setInterval(()=>{
 			(y>=my&&dir==0)&&(dir=2);
 			(x>=mx&&dir==2)&&(dir=3);
 			(y>=my&&dir==1)&&(dir=3);
+			if(dir!=t)cpair++;
+			cpair%=colors.length
 		}
 		move(dir);
-		setTimeout(()=>cd=true,fps)
+		//setTimeout(()=>cd=true,fps)
 	}
 });
+function setOpacity(n){
+	if(n>1||n<0)return;
+	dvd.style.opacity=n
+}
 		</script>
 	</body>
 </html>

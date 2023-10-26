@@ -58,12 +58,12 @@ function it(is=250000){
 		its++
 		let x=Math.random()*2-1,
 			y=Math.random()*2-1;
-		/*if(i%(is/100)===0){
+		if(i%(is/100)===0){
 			ctx.beginPath();
 			ctx.rect(x*scale-1,y*scale-1,2,2);
 			ctx.fillStyle=sqrt(x**2+y**2)<=1?"#0d0":"rgba(200,0,0,.5)"
 			ctx.fill()
-		}*/
+		}
 		sqrt(x**2+y**2)<1&&c++
 	}
 }
@@ -72,7 +72,7 @@ function re(rate){
 	_re=setInterval(()=>{
 		ctx.clearRect(0,0,1000,1000)
 		ctx.beginPath();
-		ctx.arc(0,0,scale,0,2*Math.PI);
+		ctx.arc(0,0,scale,0,8*(c/its));
 		ctx.stroke()
 		let o1=its
 		setTimeout(()=>{
@@ -89,9 +89,7 @@ function re(rate){
 		denominator.innerText=its.toLocaleString()
 	},1e3/rate)
 }
-setInterval((f=0xff)=>{
-	it()
-});
+setInterval(it);
 (function(a){
 	let past=a,
 		frame=0,

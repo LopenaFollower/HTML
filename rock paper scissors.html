@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+			div{
+				display:flex;
+				zoom:2;
+				justify-content:space-between;
+			}
+			#yourch,#botch{zoom:2;}
+			center>div>span{
+				transition-timing-function:linear;
+				transition-duration:.2s;
+				border:1px solid black;
+			}
+		</style>
+	</head>
+	<center>
+		Score: <span id=score>&nbsp;</span><br><br>
+		<div style='width:50%'>
+			<span onclick='ch(0)'>🪨</span>
+			<span onclick='ch(1)'>📃</span>
+			<span onclick='ch(2)'>✂️</span>
+		</div><br>
+		you <span id=yourch>&nbsp;</span><br><br>
+		bot <span id=botch>&nbsp;</span><br>
+		<h3 id=result></h3>
+	</center>
+	<body>
+		<script>
+const symbols=["🪨","📃","✂️"];
+const rsym={"🪨":0,"📃":1,"✂️":2}
+let can_pick=true,scor=0
+function ch(t){
+	if(!can_pick)return;
+	can_pick=false;
+	yourch.innerText=symbols[t]
+	setTimeout(pk,Math.random()*400+100)
+}
+function flattenObj(obj, parent, res = []){
+	for(let key in obj){
+		let propName = parent ? parent + '.' + key : key;
+		if(typeof obj[key] == 'object'){
+			flattenObj(obj[key], propName, res);
+		} else {
+			res.push(propName+": "+obj[key]);
+		}
+	}
+	return res;
+}
+function survived(){
+	scor++
+	result.innerText="Survive";
+}
+function lose(){
+	result.innerText="death";
+	scor--
+	//pick one private information
+}
+function pk(){
+	let bot=symbols[Math.random()*3|0];
+	let plr=yourch.innerText
+	botch.innerText=bot
+	if(plr==bot)result.innerText="Tie";
+	else if(rsym[plr]+2==rsym[bot])survived();
+	else if(rsym[bot]>rsym[plr]||(rsym[plr]==2&&rsym[bot]==0))lose();
+	else survived();
+	setTimeout(()=>{
+		botch.innerText="";
+		yourch.innerText="";
+		result.innerText="";
+		can_pick=true;
+	},500)
+}
+setInterval(()=>{
+	let a=Array.from(document.querySelectorAll("center>div>span"))
+	a.forEach(e=>{
+		e.style.backgroundColor=can_pick?"white":"grey";
+	});
+	score.innerText=scor
+})
+
+		</script>
+	</body>
+</html>

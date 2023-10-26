@@ -20,7 +20,7 @@
 		<div id=time></div>
 		<div id=cratio></div>
 		<script>
-var start,end,cur="",range=5e4;
+var start,end,cur="";
 function simplify(f){
 	f=f.toString().replace(" ","")
 	var numerator=parseFloat(f.split("/")[0]),
@@ -46,27 +46,27 @@ function yes(i,m){
 	switch(m){
 		case"0":
 			let l=i.length-2
-			let d0=(()=>{r0="1";for(let ñ=0;ñ<l;ñ++){r0+="0"};return parseInt(r0)})()
+			let d0=Number("1"+[...Array(i.length-2).keys()].map(e=>"0").join(""))
 			i=i*d0
 			display(simplify(i+"/"+d0).join("/"))
 			break;
 		case"1":
-			let d1=range,n1=0,interval=
-			setInterval(()=>{
-				let d_Old=d1+50
-				for(d1=0;d1<=d_Old;d1++){
-					cur=n1+"/"+d1
-					if((n1/d1).toString()==i){
-						clearInterval(interval1)
-						return display(simplify(n1+"/"+d1).join("/"))
+			let range1=Number("1"+[...Array(i.length-2).keys()].map(e=>"0").join("")),st1=false
+			for(let d=1;d<=range1;d++){
+				if(st1)break;
+				for(let n=1;n<=range1;n++){
+					if(st1)break;
+					cur=n+"/"+d
+					if((n/d).toString()==i){
+						display(simplify(n+"/"+d).join("/"))
+						st1=true;
 					}else if((Date.now()-start)/1000>60){
-						clearInterval(interval1)
 						display("try regular")
-						return alert("timeout "+(Date.now()-start)/1000+"s")
+						alert("timeout "+(Date.now()-start)/1000+"s")
+						st1=true;
 					}
 				}
-				n1++
-			})
+			}
 			break;
 		case"2":
 			let w=parseInt(i)
@@ -75,22 +75,22 @@ function yes(i,m){
 				sequence+=sequence;
 			}
 			i=eval(w+"."+sequence).toString()
-			let d2=range,n2=0,interval2=
-			setInterval(()=>{
-				let d_Old=d2+50
-				for(d2=0;d2<=d_Old;d2++){
-					cur=n2+"/"+d2
-					if((n2/d2).toString()==i){
-						clearInterval(interval2)
-						return display(simplify(n2+"/"+d2).join("/"))
+			let range2=Number("1"+[...Array((w+"").length-1).keys()].map(e=>"0").join("")),st2=false
+			for(let n=0;n<=range2;n++){
+				if(st2)break;
+				for(let d=0;d<=range2;d++){
+					if(st2)break;
+					cur=n+"/"+d
+					if((n/d).toString()==i){
+						display(simplify(n+"/"+d).join("/"))
+						st2=true;
 					}else if((Date.now()-start)/1000>60){
-						clearInterval(interval2)
 						display("try regular")
-						return alert("timeout "+(Date.now()-start)/1000+"s")
+						alert("timeout "+(Date.now()-start)/1000+"s")
+						st2=true;
 					}
 				}
-				n2++
-			})
+			}
 			break;
 	}
 }

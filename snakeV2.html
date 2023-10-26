@@ -47,13 +47,13 @@
 				width:fit-content;
 				height:auto;
 				opacity:.5;
-				padding:10px;
+				padding:15px;
 				margin:5px;
 				border-radius:20%;
 				display:none;
 				z-index:2;
 			}
-			.mobile_btn{
+			#mobile_ui>button{
 				position:relative;
 				width:50px;
 				height:50px;
@@ -89,11 +89,11 @@
 			</div>
 		</div>
 		<div id=mobile_ui>
-			<button class="mobile_btn"onclick='if(_){move("left")}'> ← </button>
-			<button class="mobile_btn"onclick='if(_){move("up")}'> ↑ </button>
-			<button class="mobile_btn"onclick='if(_){move("down")}'> ↓ </button>
-			<button class="mobile_btn"onclick='if(_){move("right")}'> → </button>
-			<button class="mobile_btn"onclick='if($("blur").get("display")=="none"){$("blur").set("display","flex");od=direction;direction=null;_=false}else{$("blur").set("display","none");_=true;direction=od}'>s</button>
+			<button onclick='if(_){move("left")}'> ← </button>
+			<button onclick='if(_){move("up")}'> ↑ </button>
+			<button onclick='if(_){move("down")}'> ↓ </button>
+			<button onclick='if(_){move("right")}'> → </button>
+			<button onclick='if($("blur").get("display")=="none"){$("blur").set("display","flex");od=direction;direction=null;_=false}else{$("blur").set("display","none");_=true;direction=od}'>s</button>
 		</div>
 		<script>
 const m={

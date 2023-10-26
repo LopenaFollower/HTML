@@ -8,8 +8,7 @@
 	</head>
 	<body>
 		<input oninput='toMorse(this.value.toLowerCase())'/>
-		<pre id=d></pre>
-		<pre id=e></pre>
+		<input type=checkbox id=ck />
 		<script>
 const list={
 	a:".-",
@@ -42,21 +41,47 @@ const list={
 const reverseList=Object.fromEntries(Object.entries(list).map(([k,v])=>[v,k]))
 function toMorse(str){
 	str=str.split("");
-	let r1="";
-	let r2="";
+	let r=[];
 	for(let i=0;i<str.length;i++){
 		if(list[str[i]]){
-			r1+=list[str[i]]+" ";
+			r.push(list[str[i]]);
 		}else if(str[i]===" "){
-			r1+=" / ";
+			r.push("/");
 		}else{
-			r1+=str[i]+" ";
+			r.push(str[i]);
 		}
 	}
-	r1=r1.trim();
-	d.textContent=r1
-	str=r1.split("");
+	r=r.join(" ");
+	d.textContent=r
+	str=r.split("");
 }
+let aud=0;
+function sound(fr){
+	if(!ck.checked)return;
+	if(!aud)aud=new AudioContext();
+	let o=aud.createOscillator()
+	o.frequency.value=fr;o.start();o.stop(aud.currentTime+.1)
+	let n=aud.createGain()
+	n.gain.value=.1;n.gain.linearRampToValueAtTime(0,aud.currentTime+.1)
+	o.connect(n);n.connect(aud.destination)
+}
+setInterval(()=>{
+	for(let i=750;i<1000;i+=5){
+		sound(i)
+		if(Math.random()>.2)continue;
+		sound(i)
+	}
+},250);
+/*
+let pnt=Object.values(list)
+let strt=""
+for(let i=0;i<pnt.length;i++){
+	let n=Object.keys(list)[i];
+	strt+="void "+n+"(){"+
+	pnt[i].replaceAll(".","sh();").replaceAll("-","ln();")+""+
+	"};\n"
+}
+console.log(strt)*/
 		</script>
 	</body>
 </html>

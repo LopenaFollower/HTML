@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+		</style>
+	</head>
+	<body>
+		<input oninput='let num=this.value;d.innerText="\nPrime factors of "+Number(num)+":\n"+primeFactors(num).join(" * ")'/>
+		<span id=d></span>
+		<script>
+function primeFactors(n){
+	try{
+		n=eval(n)|0
+		if(n>5e10)return["Number too large"];
+		let fs=[],d;
+		for(d=2;n>=2;d++){
+			if(n%d==0){
+				fs.push(d);
+				n/=d--;
+			}
+		}
+		return fs;
+	}catch(e){return[e]}
+}
+		</script>
+	</body>
+</html>

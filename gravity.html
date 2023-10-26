@@ -50,12 +50,12 @@ setInterval(()=>{
 	canvas.width=side;
 	canvas.height=side;
 	draw();
-	scale(velocity,.995);
+	scale(velocity,.99995);
 	if(Math.abs(velocity.x)<0.01){
 		velocity.x=0
 		gravity=vector(0,0);
 	}
-	if(Math.abs(velocity.y)<0.01){
+	if(Math.abs(velocity.y)<.1){
 		velocity.y=0
 		gravity=vector(0,0);
 	}
@@ -66,6 +66,8 @@ function get_sector(p){
 		gravity=vector(0,0);
 		return"mid"
 	}
+	gravity=vector(0,1)
+	return
 	if(p.x<midpoint.x&&p.y<midpoint.y){
 		gravity=vector(1,1);
 		return"A"

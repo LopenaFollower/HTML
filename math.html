@@ -94,7 +94,7 @@ function solve(t1,t2){
 		if(eval(rR)<1){
 			r=solve(t2.join(" "),t1.join(" "))
 			if(eval(r[0])>1){
-				r[1]=r[1]/eval(r[0])
+				r[1]/=eval(r[0])
 				r[0]/=eval(r[0])
 			}
 			return r
@@ -159,7 +159,7 @@ function solve(t1,t2){
 		if(eval(rR)<1){
 			r=solve(t2,t1)
 			if(eval(r[0])>1){
-				r[1]=r[1]/eval(r[0])
+				r[1]/=eval(r[0])
 				r[0]/=eval(r[0])
 			}
 			return r
@@ -210,8 +210,7 @@ function proper_sqrt(e){
 				if(isInteger(sqrt(pair[le_index].split(",")[0]))){
 					return sqrt(pair[le_index].split(",")[0])+"&radic;"+pair[le_index].split(",")[1];
 				}else{
-					le_index++
-					return sqrt(pair[le_index].split(",")[0])+"&radic;"+pair[le_index].split(",")[1];
+					return sqrt(pair[++le_index].split(",")[0])+"&radic;"+pair[le_index].split(",")[1];
 				}
 			}
 			if(pair.length==1){
