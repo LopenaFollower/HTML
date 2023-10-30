@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>approximate n</title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+		</style>
+	</head>
+	<body>
+		<input id=inp></input>
+		<button onclick='approx(inp.value)'>approx</button><button onclick='stopped=true'>stop</button><br>
+		<p id=raw></p>
+		<p id=a></p>
+		<p id=dur></p>
+		<script>
+const{sqrt,cbrt,E,PI,sin,cos,tan,asin,acos,atan,sinh,cosh,tanh,asinh,acosh,atanh,log,log1p,log2,log10,pow,exp,expm1,clz32}=Math;
+let prog=false,frac=[1,1],s,stopped=false;
+function approx(n){
+	if(prog)return;
+	raw.innerText="";
+	s=performance.now();
+	try{
+		n=eval(n);
+		prog=true;
+		frac=[1,1]
+		let i=setInterval(()=>{
+			for(let q=0;q<5e6;q++){
+				if(frac[0]/frac[1]<n)frac[0]++
+				if(frac[0]/frac[1]>n)frac[1]++
+				if(frac[0]/frac[1]==n||stopped){
+					clearInterval(i);
+					prog=false;stopped=false;
+					a.innerText=frac.join("/");
+					raw.innerText=frac[0]/frac[1];
+					dur.innerText=(performance.now()-s|0)/1000+"s";
+					break;
+				}
+			}
+		});
+	}catch(e){}
+}
+(function(){
+	let e=Date.now(),f=0;
+	const update=()=>{
+		let r=24;
+		if(Date.now()-e<=1e3/r)f+=r
+		else{
+			e=Date.now();f=0;
+			if(prog)a.innerText=frac.join(" / ");
+		}
+		requestAnimationFrame(update)
+	}
+	requestAnimationFrame(update)
+})();
+		</script>
+	</body>
+</html>
