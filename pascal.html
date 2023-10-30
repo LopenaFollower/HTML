@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>binomial theorem</title>
+		<style>
+			td{
+				width:50px;
+				height:50px;
+				line-height:50px;
+				text-align:center;
+				font-size:0.5px;
+			}
+			table{border-collapse:collapse;float:center;}
+			#cont{width:max-content;}
+        </style>
+	</head>
+	<body>
+		font size:<input type=number oninput="Array.from(document.getElementsByTagName('td')).forEach(e=>{e.style.fontSize=this.value+'px'})"/>
+		<div>
+			<center id=cont>
+				<table border=1>
+					<tbody>
+						<tr id=row0>
+							<td colspan=2147483647 class=n1>1</td>
+						</tr>
+					</tbody>
+				</table>
+			</center>
+		</div>
+		<script>
+const $=(_)=>{return document.querySelector(_);}
+var a=1,
+interval=setInterval(()=>{
+	var tb=document.createElement("table"),
+	tr=document.createElement("tr");
+	tr.id="row"+a;
+	tb.border=1
+	$("#cont").appendChild(tb)
+	tb.appendChild(tr)
+	for(let b=1;b<=a+1;b++){
+		if(!$("#row"+(a-1)+">.n"+(b-1))){
+			let td=document.createElement("td");
+			td.colSpan=2147483647;
+			td.className="n1";
+			td.innerText=1;
+			tr.appendChild(td)
+		}else{
+			let td=document.createElement("td");
+			td.colSpan=2147483647;
+			td.className="n"+b;
+			tr.appendChild(td)
+			td.innerText=(parseInt($("#row"+(a-1)+">.n"+(b-1)).innerText)+(parseInt($("#row"+(a-1)+">.n"+(b))?.innerText)||0))
+		}
+	}
+	a++
+	if(a>50)clearInterval(interval);
+},50);
+		</script>
+	</body>
+</html>

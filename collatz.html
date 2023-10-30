@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+			body{zoom:.95}
+			#cont{overflow-x:scroll;width:fit-content}
+			canvas{position:fixed;border:1px black solid}
+			#graph{z-index:0}
+			#num{
+				background-color:rgba(0,0,0,0);
+				z-index:1;
+			}
+			fieldset{width:fit-content}
+		</style>
+	</head>
+	<body>
+		<table>
+			<tr><td>show values</td><td><input type=checkbox id=sn checked /></td></tr>
+			<tr><td>log</td><td><input type=checkbox id=ulg /></td></tr>
+			<tr><td>base</td><td><input id=bse></input></td></tr>
+			<tr><td>num</td><td><input id=inp></input></td><td><button onclick='inp.value++'>+</button></td><td><button onclick='inp.value--'>-</button></td></tr>
+		</table>
+		<fieldset>
+			<legend>info</legend>
+			<table>
+				<tr><td>highest</td><td id=dh></td></tr>
+				<tr><td>iterations</td><td id=its></td></tr>
+			</table>
+		</fieldset><br>
+		<div id=cont>
+			<canvas id=graph></canvas>
+			<canvas id=num></canvas>
+		</div>
+		<script>
+function logn(n,x){
+	return Math.log(x)/Math.log(n);
+}
+function main(i=1,b=false){
+	let n=[1,2,3],s=0;
+	if(Number(i)>1e14)b=true;
+	if(b){
+		n=n.map(e=>BigInt(e))
+		i=BigInt(i);
+	}
+	let r=[i];
+	while(i>n[0]&&s++>=0)r.push(i=(i%n[1]?n[2]*i+n[0]:i/n[1]));
+	return{high:Math.max(...r.map(e=>Number(e))),it:s,seq:r}
+}
+function update(){
+	let canvases=Array.from(document.querySelectorAll("canvas"));
+	let os=Math.min(window.innerWidth,window.innerHeight)
+	let sz=os*.90;
+	let ctx=canvases.map(e=>e.getContext("2d"))
+	ctx[0].clearRect(0,0,sz,sz)
+	ctx[1].clearRect(0,0,sz,sz)
+	canvases.forEach(e=>{
+		e.width=os;e.height=os*.95
+	})
+	let mt=25,ml=10;
+	let r=main(inp.value),snc=sn.checked;
+	let ch=sz-mt,cw=canvases[0].width-ml*2;
+	function get(i){
+		if(ulg.checked){
+			let base=isNaN(bse.value)?10:Number(bse.value);
+			return ch-logn(base,r.seq[i])/r.high*ch+mt
+		}else
+			return ch-r.seq[i]/r.high*ch+mt
+	}
+	ctx[0].beginPath();ctx[0].lineJoin="useround";ctx[0].strokeStyle="#bcbcbc";
+	ctx[0].moveTo(ml,get(0));
+	snc&&ctx[1].fillText(r.seq[0],ml,get(0))
+	for(let i=1;i<=r.it;i++){
+		ctx[0].lineTo(cw/r.it*i+ml,get(i));
+		snc&&ctx[1].fillText(r.seq[i],cw/r.it*i+ml,get(i))
+	}
+	ctx[0].stroke();
+	dh.innerText=r.high
+	its.innerText=r.it
+	requestAnimationFrame(update)
+}
+update()
+		</script>
+	</body>
+</html>

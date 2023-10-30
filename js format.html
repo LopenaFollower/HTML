@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+			#input{
+				font-family:monospace;
+				width:100%;
+				height:80%;
+				font-size:3px;
+			}
+		</style>
+	</head>
+	<body>
+		<textarea id=input></textarea><br>remove "this."<input type=checkbox id=rthis /><br>
+		<button onclick='s()'>format</button>
+		<script>
+function rA(t,s,e){
+	let x;
+	do{
+		x=false;
+		let i=t.search(s);
+		if(i>=0){
+			let p=i+1;
+			while(t[p]!=e&&p<t.length)p++;
+			t=t.substr(0,i-1)+t.substr(p+1,t.length)
+			x=true
+		}
+	}while(x);
+	return t
+}
+function s(){
+	let st=input.value.
+	replaceAll("    ","\t").replaceAll("  "," ").
+	replaceAll(" +","+").replaceAll("+ ","+").
+	replaceAll("- ","-").replaceAll(" -","-").
+	replaceAll(" *","*").replaceAll("* ","*").
+	replaceAll("/ ","/").replaceAll(" /","/").
+	replaceAll(", ",",").replaceAll(",\t",",").replaceAll(", ",",").replaceAll(", ",",").replaceAll(", ",",").replaceAll(",\t",",").replaceAll(", ",",").replaceAll(", ",",").
+	replaceAll("; ",";").replaceAll(" ;",";").
+	replaceAll("? ","?").replaceAll(" ?","?").
+	replaceAll(" &","&").replaceAll("& ","&").
+	replaceAll("% ","%").replaceAll(" %","%").
+	replaceAll(" |","|").replaceAll("| ","|").
+	replaceAll(": ",":").replaceAll(" :",":").
+	replaceAll(") ",")").replaceAll(") ",")").replaceAll(") ",")").replaceAll(") ",")").replaceAll(") ",")").replaceAll(" (","(").
+	replaceAll("} ","}").replaceAll(" {","{").
+	replaceAll("= ","=").replaceAll(" =","=").replaceAll(" =","=").replaceAll(" =","=").replaceAll(" =","=").replaceAll(" =","=").replaceAll(" =","=").replaceAll(" =","=").replaceAll(" =","=").
+	replaceAll("! ","!").replaceAll(" !","!").
+	replaceAll(" >",">").replaceAll("> ",">").
+	replaceAll("< ","<").replaceAll(" <","<").
+	replaceAll(" ^","^").
+	replaceAll(",int ",",").
+	replaceAll(",double ",",").
+	replaceAll(",boolean ",",").
+	replaceAll(",int[] ",",").
+	replaceAll("public void","function").
+	replaceAll("public boolean","function").
+	replaceAll("protected void","function").
+	replaceAll("protected int[]","function").
+	replaceAll("protected int","function").
+	replaceAll("protected boolean","function").
+	replaceAll("private void","function").
+	replaceAll("private int","function").
+	replaceAll("private boolean","function").
+	replaceAll("private static int","function").
+	replaceAll("Writes.","").
+	replaceAll("Reads.","").
+	replaceAll(",0.5,true,false)",")").
+	replaceAll(",0.5,true,true)",",true)").
+	replaceAll(",0.5,false,true)",",true)").
+	replaceAll(",0,true,true)",",true)").
+	replaceAll(",0,false,true)",",true)").
+	replaceAll(",0.01,true,false)",")").
+	replaceAll(",0.01,true,true)",",true)").
+	replaceAll(",0.01,false,true)",",true)").
+	replaceAll(",0.05,true,false)",")").
+	replaceAll(",0.05,true,true)",",true)").
+	replaceAll(",0.05,false,true)",",true)").
+	replaceAll(",0.25,true,false)",")").
+	replaceAll(",1,true,false)",")").
+	replaceAll(",0,true,false)",")").
+	replaceAll(",0,false,true)",",true)").
+	replaceAll(",1,false,false)",")").
+	replaceAll(",1.0D,true,false)",")").
+	replaceAll(",0.0D,true,false)",")").
+	replaceAll(",1.0D,false,false)",")").
+	replaceAll(",1,false,true)",",true)").
+	replaceAll("(int[] ","(").
+	replaceAll("for(int ","for(let ").
+	replaceAll("(int ","(").
+	replaceAll("int[] ","let ").
+	replaceAll("int ","let ").
+	replaceAll("boolean ","let ").
+	replaceAll("Math.min","minVal").
+	replaceAll("Math.max","maxVal").
+	replaceAll("Math.ceil","ceil").
+	replaceAll("Math.sqrt","sqrt").
+	replaceAll("currentLength","len").
+	replaceAll("currentLen","len").
+	replaceAll("Highlights.clearAllMarks();","").
+	replaceAll("@Override","").
+	replaceAll(",1,true)==1",")>0").
+	replaceAll(",1,true)>0",")>0").
+	replaceAll(",1,true)==-1",")<0").
+	replaceAll(",1,true)<=0",")<1").
+	replaceAll(",1,true)>=0",")>=0").
+	replaceAll(",0.5,true)==1",")>0").
+	replaceAll(",0.5,true)>0",")>0").
+	replaceAll(",0.5,true)==-1",")<0").
+	replaceAll(",0.5,true)<=0",")<1").
+	replaceAll(",0.5,true)>=0",")>=0").
+	replaceAll(",0,true)==1",")>0").
+	replaceAll(",0,true)>0",")>0").
+	replaceAll(",0,true)==-1",")<0").
+	replaceAll(",0,true)<=0",")<1").
+	replaceAll(",0,true)>=0",")>=0").
+	replaceAll(",1,false)==1",")>0").
+	replaceAll(",1,false)>0",")>0").
+	replaceAll(",1,false)==-1",")<0").
+	replaceAll(",1,false)<=0",")<1").
+	replaceAll(",1,false)>=0",")>=0").
+	replaceAll(",0.5,false)==1",")>0").
+	replaceAll(",0.5,false)>0",")>0").
+	replaceAll(",0.5,false)==-1",")<0").
+	replaceAll(",0.5,false)<=0",")<1").
+	replaceAll(",0.5,false)>=0",")>=0").
+	replaceAll("runSort","main").
+	replaceAll("createExternalArray","new Array").
+	replaceAll("changeReversals(1);","")
+	if(rthis.checked)st=st.replaceAll("this.","");
+	st=rA(st,"Highlights.markArray",";");
+	st=rA(st,"Delays.sleep",";");
+	st=rA(st,"deleteExternalArray",";");
+	for(let j=0;j<5;j++)for(let i=0;i<10;i++)
+		st=st.replaceAll("Highlights.clearMark("+i+");","").
+		replaceAll("\n"+new Array(i).fill("\t").join("")+"\n","\n").
+		replaceAll(")\n"+new Array(i).fill("\t").join("")+"{","){").
+		replaceAll("}\n"+new Array(i).fill("\t").join("")+"else","}else")
+	input.value=st
+}
+		</script>
+	</body>
+</html>
