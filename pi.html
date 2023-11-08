@@ -17,7 +17,7 @@
 		<div id=tab1 onclick='changeTab(1)'>Input pi</div><div id=tab2 onclick='changeTab(0)'>View pi</div><br><br>
 		<div id=main_page>
 			type pi from memory<br><textarea id=input onchange='cpi.innerText="";ypi.innerText="";result.innerText=""'></textarea><br>
-			<button onclick='dp=("3."+pi).substr(0,input.value.length);result.innerText=((ac=0,t=dp.length)=>{cpi.innerHTML="";ypi.innerHTML="";input.value.split("").forEach((e,i)=>{dp[i]===e?(ac++,cpi.innerHTML+=e,ypi.innerHTML+=e):(ypi.innerHTML+=`<span style="color:red">${e}</span>`,cpi.innerHTML+=`<span style="color:#0f0">${dp[i]}</span>`)});ac>2?ac-=2:ac-=ac;t>2?t-=2:t-=t;return`You got ${ac} out of ${t} decimal places of pi`})()'>Check</button><button onclick='if((prompt("type \"yes\" to confirm")||"").toLowerCase().indexOf("ye")!==-1)cpi.innerText="",ypi.innerText="",result.innerText="",input.value=""'>Clear</button><br>
+			<button onclick='dp=("3."+pi).substr(0,input.value.length);result.innerText=((ac=0,t=dp.length)=>{cpi.innerHTML="";ypi.innerHTML="";input.value.split("").forEach((e,i)=>{dp[i]===e?(ac++,cpi.innerHTML+=e,ypi.innerHTML+=e):(ypi.innerHTML+=`<span style="color:red">${e}</span>`,cpi.innerHTML+=`<span style="color:#0f0">${dp[i]}</span>`)});ac>2?ac-=2:ac-=ac;t>2?t-=2:t-=t;return`You got ${ac} out of ${t} decimal places of pi`})()'>Check</button><button onclick='if((prompt("type \"yes\" to confirm","nein")).toLowerCase().indexOf("ye")>=0)cpi.innerText="",ypi.innerText="",result.innerText="",input.value=""'>Clear</button><br>
 			<p id=cpi></p>
 			<p id=ypi></p>
 			<div id=result></div>
@@ -86,7 +86,7 @@ setInterval(()=>((sub,ctx,clearance,fontsize,spacing,padding,per,x,y)=>{
 		ctx.fillText(e,x++*spacing,clearance+fontsize*y);
 	});
 	ctx.fill();
-})(pi.match(/.{10}/g),disp.getContext("2d"),10,15,100,15,5,0,0),2.5e3);
+})(pi.match(/.{10}/g),disp.getContext("2d"),10,15,100,15,5,0,0),2e3);
 function hold(e,f=a=>{},c,i){e.addEventListener("touchstart",v=>{clearInterval(i);e.style.backgroundColor="#666";f();i=setInterval(f,c)});e.addEventListener("touchend",v=>{clearInterval(i);setTimeout(()=>e.style.backgroundColor="initial",50);i=null})}
 Array.from(document.getElementsByTagName("td")).forEach(e=>hold(e,a=>{!e.id?(input.value+=e.innerText,cpi.innerText="",ypi.innerText="",result.innerText=""):input.value=input.value.substring(0,input.value.length-1)},200))
 /*

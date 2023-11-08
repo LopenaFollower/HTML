@@ -15,16 +15,23 @@
 		<script>
 const{sqrt,cbrt,E,PI,sin,cos,tan,asin,acos,atan,sinh,cosh,tanh,asinh,acosh,atanh,log,log1p,log2,log10,pow,exp,expm1,clz32}=Math;
 let prog=false,frac=[1,1],s,stopped=false;
-function approx(n){
-	if(prog)return;
+function approx(n=1){
+	if(prog||!inp.value.length)return;
 	raw.innerText="";
 	s=performance.now();
 	try{
 		n=eval(n);
+		if(n==frac[0]/frac[1]){
+			a.innerText=frac.join("/");
+			raw.innerText=frac[0]/frac[1];
+			dur.innerText=(performance.now()-s|0)/1000+"s";
+			return;
+		}
 		prog=true;
-		frac=[1,1]
+		frac=[1,1];
+		if(Number.isInteger(n))frac[0]=n
 		let i=setInterval(()=>{
-			for(let q=0;q<5e6;q++){
+			for(let q=0;q<2.5e8;q++){
 				if(frac[0]/frac[1]<n)frac[0]++
 				if(frac[0]/frac[1]>n)frac[1]++
 				if(frac[0]/frac[1]==n||stopped){
