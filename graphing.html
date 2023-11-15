@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+			#cont{width:fit-content}
+			canvas{position:fixed;border:1px solid}
+			#cvs{z-index:0}
+			#lines{
+				background-color:rgba(0,0,0,0);
+				z-index:1;
+			}
+			#zoomFactor,#iterStep{
+				width:40px;
+			}
+		</style>
+	</head>
+	<body>
+		<sub id=fps></sub><br><br>
+		<span>view<input id=zoomFactor type=number value=".05"/></span><br>
+		<span>step<input id=iterStep type=number value=".1"/></span><br>
+		<span id=fOfX>&#119891;(<i>x</i>) = <input id=fFunc value="cos(x)*10"/></span><br>
+		<div id=cont>
+			<canvas id=cvs></canvas>
+			<canvas id=lines></canvas>
+		</div>
+		<script>
+const{E,PI,abs,acos,acosh,asin,asinh,atan,atan2,atanh,cbrt,ceil,clz32,cos,cosh,exp,expm1,floor,fround,hypot,imul,log,log1p,log2,log10,max,min,pow,random,round,sign,sin,sinh,sqrt,tan,tanh,trunc}=Math;
+function updateGraph(){
+	let zoom=Number(zoomFactor.value)||1;
+	let size=min(window.innerWidth,window.innerHeight)*.9;
+	cvs.width=size;cvs.height=size;lines.width=size;lines.height=size;
+	let ctx=cvs.getContext("2d");
+	let ltx=lines.getContext("2d")
+	let sd2=size/2;
+	ctx.clearRect(0,0,size,size)
+	ltx.clearRect(0,0,size,size)
+	ctx.beginPath();
+	ctx.arc(size/2,size/2,1,0,2*PI);
+	ctx.stroke();
+	try{
+		let step=Number(iterStep.value)||1,x=-sd2;
+		ltx.beginPath();ltx.lineJoin="useround";ltx.strokeStyle="#1d2a35";
+		ltx.moveTo(0,sd2-eval(fFunc.value));
+		for(;x<size;x+=step){
+			let coords=[x/zoom+sd2,sd2-eval(fFunc.value)/zoom]
+			ctx.beginPath();
+			ctx.arc(...coords,1,0,2*PI);
+			ctx.stroke();
+			ltx.lineTo(...coords);
+		}
+		ltx.stroke()
+	}catch(e){}
+	/*
+		let step=Number(iterStep.value)||1,x=-sd2;
+		ltx.beginPath();ltx.lineJoin="useround";
+		ltx.moveTo(0,sd2-eval(fFunc.value));
+		for(let i=size/zoom;x<size;x+=i/step){
+			ctx.beginPath();
+			ctx.arc(x+sd2,sd2-eval(fFunc.value),1,0,2*PI);
+			ctx.stroke();
+			ltx.lineTo(x+sd2,sd2-eval(fFunc.value));
+		}
+		ltx.stroke()
+	*/
+}
+(function(){
+	let nd=_=>Date.now(),el=nd(),f=0,v=f;
+	const update=()=>{
+		let r=1.125;
+		if(nd()-el<=1e3/r)f+=r
+		else fps.textContent=f.toFixed(1)+" fps",el=nd(),v=f,updateGraph(),f=0;
+		requestAnimationFrame(update)
+	}
+	requestAnimationFrame(update)
+})();
+		</script>
+	</body>
+</html>
