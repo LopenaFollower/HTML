@@ -21,7 +21,7 @@
 					<td>Colored</td><td><input type=checkbox id=cob checked /></td>
 				</tr>
 				<tr>
-					<td>Zoom Factor</td><td><input type=range min=.01 step=.01 max=1 value=".1"oninput='zrnf.innerText=zoom_factor=Number(this.value)'/><span id=zrnf></span></td>
+					<td>Zoom Factor</td><td><input type=range min=.01 step=.01 max=1 value=".1"oninput='zrnf.innerText=zoom_factor=Number(this.value)'/><span id=zrnf>0.1</span></td>
 				</tr>
 				<tr>
 					<td>Real</td><td><pre id=realcoords></pre></td>
@@ -118,6 +118,7 @@ function zoominto(cset){
 	comp={x:sets[1][0],y:sets[1][1]}
 	init()
 }
+//honorable mention: https://www.desmos.com/calculator/eli8syexh3
 		</script>
 	</body>
 </html>
