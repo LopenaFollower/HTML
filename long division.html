@@ -8,15 +8,12 @@
 				font-family:monospace;
 				word-wrap:break-word;
 			}
-			input{
-				width:30px;
-			}
 		</style>
 	</head>
 	<body>
-		<input id=ndecs />
+		<input id=number />
+		<p id=seqLen></p>
 		<p id=result></p>
-		<p id=raw></p>
 		<script>
 function shortDivision(from,n){
 	if(from<n)return{rem:from,res:0}
@@ -27,10 +24,14 @@ function shortDivision(from,n){
 }
 function longDivision(f,n){
 	let{rem,res}=shortDivision(f,n);res+=".";
-	let dcs=isNaN(ndecs.value)||Number(ndecs.value)<25||!ndecs.value.length?100:Number(ndecs.value)
+	let dcs=100000,fR=rem,rep=0
 	for(let decs=0;rem&&decs<dcs;decs++){
-		let nr=shortDivision(rem*10,n)
+		let nr=shortDivision(rem*10,n);
 		res+=nr.res;
+		if(nr.rem==fR){
+			console.log(res.length-2)
+			break;
+		}
 		rem=nr.rem;
 	}
 	if(res[res.length-1]==".")res=res.substr(0,res.length-1)
@@ -45,25 +46,11 @@ function compareString(a,b){
 		else if(Number(b[i])>Number(a[i]))return-1;
 	return 0;
 }
-//result.innerText=longDivision(4,23)
-function approxStringNum(n){
-	console.log(n.length)
-	let t1=1,t2=1;
-	let i=setInterval(()=>{
-		for(let id=0;id<1e5;id++){
-			let fr=longDivision(t1,t2);
-			if(compareString(fr,n)<0)t1++
-			if(compareString(fr,n)>0)t2++
-			if(fr==n){
-				clearInterval(i);
-				console.log(t1,"/",t2)
-				break;
-			}
-		}
-		raw.innerText=t1+"/"+t2+" = "+t1/t2
-	});
+number.oninput=e=>{
+	let tniq=parseFloat(number.value);
+	if(tniq>.0000001&&tniq<1e300)result.innerText=longDivision(1,tniq)
 }
-approxStringNum("3.14159265358979323846264")
+
 		</script>
 	</body>
 </html>

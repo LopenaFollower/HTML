@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+		</style>
+	</head>
+	<body>
+		<script>
+function H(a,b,n=1){
+	let r=1;
+	if(b==0&&n>2)return r;
+	switch(n){
+		case 0:r=a+1;break;
+		case 1:r=a+b;break;
+		case 2:r=a*b;break;
+		default:r=H(a,H(a,b-1,n--),n);
+	}
+	return r;
+}
+const nAs={
+	0:"succession",
+	1:"addition",
+	2:"multiplication",
+	3:"exponentiation",
+	4:"tetration",
+	5:"pentation",
+	6:"hexation",
+	7:"heptation/septation",
+	8:"octation"
+}
+console.log(H(2,3,5))
+		</script>
+	</body>
+</html>

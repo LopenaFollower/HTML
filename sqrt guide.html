@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+		</style>
+	</head>
+	<body>
+		<table id=guide>
+			<tr><td>1</td><td>1</td></tr>
+			<tr><td>2</td><td>4</td></tr>
+			<tr><td>3</td><td>9</td></tr>
+			<tr><td>4</td><td>16</td></tr>
+			<tr><td>5</td><td>25</td></tr>
+			<tr><td>6</td><td>36</td></tr>
+			<tr><td>7</td><td>49</td></tr>
+			<tr><td>8</td><td>64</td></tr>
+			<tr><td>9</td><td>81</td></tr>
+		</table>
+		<button onclick='cur.innerText=(num=rI(99)**2);'>new</button><button onclick='cur.innerText=sqrt(num)'>ans</button><button onclick='let a=guide.style;a.opacity=a.opacity=="0"?1:0'>toggle guide</button>
+		<p id=cur></p>
+		<script>
+const{sqrt}=Math;
+function rI(n,x){
+	n=Math.min(...arguments);
+	x=Math.max(...arguments);
+	return Math.round(arguments.length==1?(Math.random()*n):(Math.random()*(x-n)+n));
+}
+var num;
+cur.innerText=(num=rI(99)**2);
+		</script>
+	</body>
+</html>

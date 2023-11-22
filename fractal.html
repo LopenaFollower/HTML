@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+		</style>
+	</head>
+	<body>
+		<canvas id=canvas></canvas><br>
+		<fieldset>
+			<legend>Options</legend>
+			<table>
+				<tr>
+					<td><button onclick='init()'>Refresh</button></td>
+				</tr>
+				<tr>
+					<td>Iteratios</td><td><input id=its value="5000"/></td>
+				</tr>
+				<tr>
+					<td>Colored</td><td><input type=checkbox id=cob checked /></td>
+				</tr>
+				<tr>
+					<td>Zoom Factor</td><td><input type=range min=.01 step=.01 max=1 value=".1"oninput='zrnf.innerText=zoom_factor=Number(this.value)'/><span id=zrnf></span></td>
+				</tr>
+				<tr>
+					<td>Real</td><td><pre id=realcoords></pre></td>
+				</tr>
+				<tr>
+					<td>Complex</td><td><pre id=compcoords></pre></td>
+				</tr>
+				<tr>
+					<td>Search</td><td><input id=destcoords placeholder='[x,y]|[x,y]'/><br><button onclick='zoominto(destcoords.value)'>Go</button></td>
+				</tr>
+			</table>
+		</fieldset>
+		<script>
+const{sqrt,abs,min}=Math,size=min(window.innerWidth,window.innerHeight)*.9;
+canvas.width=size;canvas.height=size*.75;
+let workerjs=new Blob([`let W,H,real,comp,ESreal,EScomp,MAXI;const{sqrt,abs,min}=Math
+onmessage=e=>{
+	const{iSU,its}=e.data;
+	if(!isNaN(its)&&its<1e5)MAXI=its;
+	if(iSU){const{w,h,rSet,iSet}=e.data;real={x:rSet.x,y:rSet.y},comp={x:iSet.x,y:iSet.y},ESreal=real.y-real.x,EScomp=comp.y-comp.x,W=w,H=h}else{const{col}=e.data,sets=[];for(let r=0;r<H;r++)sets[r]=calc(col,r);postMessage({col,sets})}
+}
+const calc=(a,b)=>main(rPs(a,b))
+const rPs=(x,y)=>{x=real.x+x/W*ESreal,y=comp.x+y/H*EScomp;return{x,y}}
+const main=c=>{
+	let z={x:0,y:0},i=0,d,p;
+	function fractal(m=0){
+		p={x:z.x**2,y:z.y**2};
+		d=(p.x+p.y)/2;
+		if(m==5)z={x:p.x-p.y+c.x,y:-2*z.x*z.y+c.y}//tricorn
+		else if(m==4)z={x:abs(p.x-p.y)+c.x,y:-2*z.x*z.y+c.y}//celtic
+		else if(m==3)z={x:p.x-p.y-z.x+c.x,y:2*z.x*z.y-z.y+c.y}//buffalo variant
+		else if(m==2)z={x:abs(p.x-p.y-z.x+c.x),y:abs(2*z.x*z.y-z.y+c.y)}//buffalo
+		else if(m==1)z={x:p.x-p.y+c.x,y:abs(2*z.x*z.y)+c.y}//burning ship
+		else z={x:p.x-p.y+c.x,y:2*z.x*z.y+c.y}//mandelbrot
+	}
+	for(;i<eval(MAXI);i++)if(d>2)return[i,d<=2];else fractal();
+	return[i,d<=2];
+}
+`],{type:"text/javascript"});
+const ctx=canvas.getContext('2d'),W=size,H=size*.75,TASKS=[]
+let worker,colorPalette=[],zoom_factor=.1,real={x:-2,y:1},comp={x:-1,y:1}
+//[-1.2505544066656678,-1.2495462426700197]|[0.036606875075819674,0.03727898440625168]
+const lagrange=([X1,Y1],[X2,Y2],x)=>Y1*(x-X2)/(X1-X2)+Y2*(x-X1)/(X2-X1)
+const makeRGB=(r,g,b,k)=>{
+	const calc=p=>parseInt(lagrange(p[0],p[1],k))
+	if(isNaN(r))r=calc(r);
+	if(isNaN(g))g=calc(g);
+	if(isNaN(b))b=calc(b);
+	return[r,g,b];
+}
+const palette=()=>{
+	const size=255,range=parseInt(size/6),colors=[]
+	for(let k=0;k<size;k++)colors.push(k<=range?makeRGB(255,[[0,0],[range,255]],0,k):k<=range*2?makeRGB([[range+1,255],[range*2,0]],255,0,k):k<=range*3?makeRGB(0,255,[[range*2+1,0],[range*3,255]],k):k<=range*4?makeRGB(0,[[range*3+1,255],[range*4,0]],255,k):k<=range*5?makeRGB([[range*4+1,0],[range*5,255]],0,255,k):makeRGB(255,0,[[range*5+1,255],[size-1,0]],k))
+	return colors;
+}
+const paletteBW=()=>new Array(250).fill(0).map((_,i)=>{
+	const c=lagrange([0,0],[250,255],i);
+	return[c,c,c];
+})
+const start=()=>{
+	for(let c=0;c<W;c++)TASKS[c]=c;
+	worker.postMessage({col:TASKS.shift()})
+}
+const draw=res=>{
+	if(TASKS.length>0)worker.postMessage({col:TASKS.shift()})
+	const{col,sets}=res.data;
+	for(let i= 0;i<H;i++){
+		const[m,isSet]=sets[i]
+		c=isSet?[0,0,0]:colorPalette[m%(colorPalette.length-1)]
+		ctx.fillStyle="rgb("+c.join(",")+")"
+		ctx.fillRect(col,i,1,1);
+	}
+}
+const init=()=>{
+	if(worker)worker.terminate();
+	worker=new Worker(window.URL.createObjectURL(workerjs));
+	worker.postMessage({w:W,h:H,rSet:real,iSet:comp,iSU:true,its:its.value});start();
+	colorPalette=cob.checked?palette():paletteBW();
+	worker.onmessage=draw;
+	realcoords.innerText="x: "+real.x+"\ny: "+real.y;
+	compcoords.innerText="x: "+comp.x+"\ny: "+comp.y;
+}
+canvas.addEventListener('dblclick',e=>{
+	const zfw=W*zoom_factor,zfh=H*zoom_factor,pX=e.pageX,pY=e.pageY;
+	real={x:gRP(pX-canvas.offsetLeft-zfw,W,real),y:gRP(pX-canvas.offsetLeft+zfw,W,real)}
+	comp={x:gRP(pY-canvas.offsetTop-zfh,H,comp),y:gRP(pY-canvas.offsetTop+zfh,H,comp)}
+	init()
+})
+const gRP=(p,l,s)=>s.x+p/l*(s.y-s.x);
+init();
+function zoominto(cset){
+	let sets=cset.split("|").map(e=>JSON.parse(e))
+	real={x:sets[0][0],y:sets[0][1]}
+	comp={x:sets[1][0],y:sets[1][1]}
+	init()
+}
+		</script>
+	</body>
+</html>

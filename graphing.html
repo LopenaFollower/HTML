@@ -4,74 +4,81 @@
 		<title></title>
 		<meta name="viewport"content="width=device-width,initial-scale=1">
 		<style>
-			#cont{width:fit-content}
+			#cont{width:fit-content;height:fit-content;}
 			canvas{position:fixed;border:1px solid}
 			#cvs{z-index:0}
 			#lines{
 				background-color:rgba(0,0,0,0);
 				z-index:1;
 			}
-			#zoomFactor,#iterStep{
+			#zoomFactor,#iterStep,#OcR,#OcF,#OcT,#OcS{
 				width:40px;
+			}
+			#oscillator>table{
+				border:1px dashed;
 			}
 		</style>
 	</head>
 	<body>
-		<sub id=fps></sub><br><br>
-		<span>view<input id=zoomFactor type=number value=".05"/></span><br>
-		<span>step<input id=iterStep type=number value=".1"/></span><br>
-		<span id=fOfX>&#119891;(<i>x</i>) = <input id=fFunc value="cos(x)*10"/></span><br>
+		<sub id=fps></sub><br>
+		<span>Connect Points<input type=checkbox checked id="showLines"/></span><br>
+		<span>Grid<input type=checkbox checked id="showGrid"/></span><br>
+		<span>View<input id=zoomFactor type=number value="1.5"/></span><br>
+		<span>Step<input id=iterStep type=number value="3.12"/></span><br>
+		<span id=fOfX>&#119891;(<i>x</i>) = <input id=fFunc value="cos(x)*250"/></span><br>
+		<span id=oscillator>
+			<table>
+				<tr><td>Oscillate</td><td><input id=OcW type=checkbox /></td></tr>
+				<tr><td>From</td><td><input id=OcF type=number value="6"/></td></tr>
+				<tr><td>To</td><td><input id=OcT type=number value="7"/></td></tr>
+				<tr><td>Step</td><td><input id=OcS type=number value="0.001"/></td></tr>
+			</table>
+		</span><br>
 		<div id=cont>
 			<canvas id=cvs></canvas>
 			<canvas id=lines></canvas>
 		</div>
 		<script>
 const{E,PI,abs,acos,acosh,asin,asinh,atan,atan2,atanh,cbrt,ceil,clz32,cos,cosh,exp,expm1,floor,fround,hypot,imul,log,log1p,log2,log10,max,min,pow,random,round,sign,sin,sinh,sqrt,tan,tanh,trunc}=Math;
+function fact(n){
+	if(n<2)return 1;
+	return n*fact(n-1);
+}
 function updateGraph(){
-	let zoom=Number(zoomFactor.value)||1;
-	let size=min(window.innerWidth,window.innerHeight)*.9;
+	let zoom=Number(zoomFactor.value)||1,size=min(window.innerWidth,window.innerHeight)*.9,sd2=size/2;
 	cvs.width=size;cvs.height=size;lines.width=size;lines.height=size;
-	let ctx=cvs.getContext("2d");
-	let ltx=lines.getContext("2d")
-	let sd2=size/2;
-	ctx.clearRect(0,0,size,size)
-	ltx.clearRect(0,0,size,size)
-	ctx.beginPath();
-	ctx.arc(size/2,size/2,1,0,2*PI);
-	ctx.stroke();
+	let ctx=cvs.getContext("2d"),ltx=lines.getContext("2d");
+	ltx.lineJoin="useround";ltx.strokeStyle="#1d2a35";
+	ctx.clearRect(0,0,size,size);ltx.clearRect(0,0,size,size)
+	ctx.beginPath();ctx.arc(size/2,size/2,1,0,2*PI);ctx.stroke();
+	let LC=1;
+	for(let lc1=sd2,lc2=sd2-size/LC;lc1<size&&showGrid.checked;lc1+=size/LC,lc2-=size/LC){
+		ltx.beginPath();ltx.moveTo(0,lc1);ltx.lineTo(size,lc1);ltx.stroke();
+		ltx.beginPath();ltx.moveTo(0,lc2);ltx.lineTo(size,lc2);ltx.stroke();
+		ltx.beginPath();ltx.moveTo(lc1,0);ltx.lineTo(lc1,size);ltx.stroke();
+		ltx.beginPath();ltx.moveTo(lc2,0);ltx.lineTo(lc2,size);ltx.stroke();
+	}
 	try{
-		let step=Number(iterStep.value)||1,x=-sd2;
-		ltx.beginPath();ltx.lineJoin="useround";ltx.strokeStyle="#1d2a35";
-		ltx.moveTo(0,sd2-eval(fFunc.value));
-		for(;x<size;x+=step){
-			let coords=[x/zoom+sd2,sd2-eval(fFunc.value)/zoom]
-			ctx.beginPath();
-			ctx.arc(...coords,1,0,2*PI);
-			ctx.stroke();
-			ltx.lineTo(...coords);
+		let step=Number(iterStep.value)||1,x=-sd2*zoom,finalFunc=fFunc.value.replaceAll("^","**");
+		ltx.beginPath();ltx.moveTo(0,sd2-eval(finalFunc));
+		for(;x<size*zoom;x+=abs(step)){
+			let X=x/zoom+sd2,Y=sd2-eval(finalFunc)/zoom;
+			if(X<0)continue;ctx.beginPath();ctx.arc(X,Y,1,0,2*PI);ctx.stroke();ltx.lineTo(X,Y);
 		}
-		ltx.stroke()
+		showLines.checked&&ltx.stroke()
 	}catch(e){}
-	/*
-		let step=Number(iterStep.value)||1,x=-sd2;
-		ltx.beginPath();ltx.lineJoin="useround";
-		ltx.moveTo(0,sd2-eval(fFunc.value));
-		for(let i=size/zoom;x<size;x+=i/step){
-			ctx.beginPath();
-			ctx.arc(x+sd2,sd2-eval(fFunc.value),1,0,2*PI);
-			ctx.stroke();
-			ltx.lineTo(x+sd2,sd2-eval(fFunc.value));
-		}
-		ltx.stroke()
-	*/
 }
 (function(){
-	let nd=_=>Date.now(),el=nd(),f=0,v=f;
+	let nd=_=>Date.now(),el=nd(),f=0,v=f,d=1;
 	const update=()=>{
-		let r=1.125;
-		if(nd()-el<=1e3/r)f+=r
+		if(nd()-el<=1e3/24)f+=24
 		else fps.textContent=f.toFixed(1)+" fps",el=nd(),v=f,updateGraph(),f=0;
-		requestAnimationFrame(update)
+		requestAnimationFrame(update);
+		if(OcW.checked){
+			let n=Number(iterStep.value)||1,F=Number(OcF.value)||0,T=Number(OcT.value)||1;
+			if((n>T&&d>0)||(n<F&&d<0))d=-d;
+			iterStep.value=n+(Number(OcS.value)||1)*d;
+		}
 	}
 	requestAnimationFrame(update)
 })();

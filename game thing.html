@@ -262,7 +262,7 @@ function next_p(forced){
 	if(forced&&validate_forced(forced)){
 		$("next")[IT]=forced
 	}else if(!$("next")[IT]){
-		$("next")[IT]=[32,64,128].random();
+		$("next")[IT]=[128].random();
 	}
 	if(autoplace.checked){
 		delay(()=>{
@@ -273,7 +273,7 @@ function next_p(forced){
 				}else{
 					setTimeout(retry)
 					++retries
-					if(retries>25){
+					if(retries>50){
 						delay(()=>{
 							let ready=true
 							for(let i=1;i<6;i++){
@@ -290,7 +290,7 @@ function next_p(forced){
 				}
 			}
 			retry()
-		},50);
+		});
 	}
 }
 function combine(row){

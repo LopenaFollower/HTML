@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+			#labels>td{
+				text-align:center;
+				font-weight:800;
+				width:30px;
+			}
+			#bars>td{
+				vertical-align:text-bottom;
+			}
+			#bars>td>div{
+				background:blue;
+				transition-timing-function:linear;
+				transition-duration:.5s;
+			}
+		</style>
+	</head>
+	<body>
+		<table border=1 style="border-collapse:collapse">
+			<tr id=labels><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td></tr>
+			<tr id=bars><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td></tr>
+		</table>
+		<script>
+let count=new Array(9).fill(0),n=0;
+setInterval(()=>{
+	Array.from(document.querySelectorAll("#bars>td>div")).forEach((e,i)=>{
+		e.parentNode.style.height=window.innerHeight/2.5+"px"
+		e.style.height=count[i]/Math.max(...count)*(window.innerHeight/2.5)+"px"
+	});
+	for(let i=0;i<1e5;i++){
+		let random=(Math.random()*1e5|0)>>n++
+		let ld=Number(random.toString()[0])-1;
+		if(ld<0)continue;count[ld]++
+	}
+});
+		</script>
+	</body>
+</html>
