@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+			table#main{border:1px solid #444;}
+			table#main>tbody>tr>td{text-align:center;font-size:58px;}
+			table.mini>tbody>tr>td{width:20px;height:20px;text-align:center;font-size:2px;table-layout:fixed;border:.1px solid #444;}
+		</style>
+	</head>
+	<body>
+		<table id=main>
+			<tr>
+				<td><table id=mini0 class=mini><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr></table></td>
+				<td><table id=mini1 class=mini><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr></table></td>
+				<td><table id=mini2 class=mini><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr></table></td>
+			</tr>
+			<tr>
+				<td><table id=mini3 class=mini><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr></table></td>
+				<td><table id=mini4 class=mini><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr></table></td>
+				<td><table id=mini5 class=mini><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr></table></td>
+			</tr>
+			<tr>
+				<td><table id=mini6 class=mini><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr></table></td>
+				<td><table id=mini7 class=mini><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr></table></td>
+				<td><table id=mini8 class=mini><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr></table></td>
+			</tr>
+		</table>
+		<p id=cturn>X</p>
+		<p id=cboard>Any</p>
+		<script>
+let currentBoard="any";
+const map={0:"Top Left",1:"Top",2:"Top Right",3:"Left",4:"Middle",5:"Right",6:"Bottom Left",7:"Bottom",8:"Bottom Right","any":"Any"}
+const plrs={
+	p1:"X",p2:"O",
+	tbl:["X","O"],
+	prev:"X",
+	cur:"",
+	next:function(){
+		let n=this.tbl.shift();
+		this.prev=this.tbl[0];
+		this.cur=n;
+		this.tbl.push(n);
+		return n;
+	}
+}
+function getMiniGame(id){
+	return document.getElementById("mini"+id);
+}
+function getMiniGameData(id){
+	let game=getMiniGame(id);
+	let trs=game.children[0]
+	let tds=[];
+	for(let i=0;i<3;i++)for(let j=0;j<3;j++)tds.push(trs.children[i].children[j].innerText)
+	return tds
+}
+function checkIfWon(id){
+	let s=getMiniGameData(id)
+	function comp(...b){
+		return""!==b[0]&&b.every(e=>e===b[0])
+	}
+	let horizontal,vertical,diagonal;
+	for(let i=0;i<3;i++){
+		if(comp(s[i*3],s[i*3+1],s[i*3+2]))horizontal=true;
+		if(comp(s[i],s[i+3],s[i+6]))vertical=true;
+	}
+	diagonal=comp(s[0],s[4],s[8])||comp(s[2],s[4],s[6]);
+	return horizontal||vertical||diagonal||false;
+}
+function squareStatus(id,x,y){
+	let s=getMiniGame(id).children[0].children[y].children[x].innerText;
+	return s==""?0:s==plrs.p1?1:2;
+}
+function mark(id,sym){
+	let s=getMiniGame(id),p=s.parentNode;
+	s.dataset.status="won";
+	s.style.display="none";
+	let tn=document.createElement("span");
+	tn.textContent=sym
+	p.appendChild(tn);
+	let tds=[];
+	for(let i=0;i<3;i++)for(let j=0;j<3;j++){
+		let cx=main.children[0].children[i].children[j].children
+		if(cx.length>1)tds.push(cx[1].textContent)
+		else tds.push("")
+	}
+	function comp(...b){
+		return""!==b[0]&&b.every(e=>e===b[0])
+	}
+	let horizontal,vertical,diagonal;
+	for(let i=0;i<3;i++){
+		if(comp(tds[i*3],tds[i*3+1],tds[i*3+2]))horizontal=true;
+		if(comp(tds[i],tds[i+3],tds[i+6]))vertical=true;
+	}
+	diagonal=comp(tds[0],tds[4],tds[8])||comp(tds[2],tds[4],tds[6]);
+	let mainwon=horizontal||vertical||diagonal||false;
+	if(mainwon)setTimeout(reset,1e3);
+}
+function squareStatus(id,x,y){
+	return getMiniGame(id).children[0].children[y].children[x].innerText
+}
+function checkMove(data){
+	const{id,x,y}=data;
+	if(id!=currentBoard&&currentBoard!="any")return;
+	if(squareStatus(id,x,y)!="")return;
+	if(getMiniGame(id).dataset.status!="won")getMiniGame(id).children[0].children[y].children[x].innerText=plrs.next();
+	if(checkIfWon(id))mark(id,plrs.cur);
+	if(getMiniGame(x+y*3).dataset.status!="won"){
+		currentBoard=x+y*3;
+	}else{
+		currentBoard="any";
+	}
+	cboard.innerText=map[currentBoard];
+	cturn.innerText=plrs.prev+"'s Turn";
+}
+function reset(){
+	Array.from(document.getElementsByClassName("mini")).forEach(a=>{
+		Array.from(a.children[0].children).forEach(b=>
+			Array.from(b.children).forEach(c=>{
+				c.style.backgroundColor="rgba(0,0,0,0)";
+				c.innerText="";
+			})
+		)
+		a.dataset.status="";
+		a.style.display="table";
+		if(a.parentNode.children.length>1)
+		a.parentNode.children[1].remove()
+	});
+	currentBoard="any";
+	plrs.prev="X";
+	cboard.innerText=map[currentBoard];
+	cturn.innerText=plrs.prev+"'s Turn";
+	plrs.tbl=["X","O"];
+}
+Array.from(document.getElementsByClassName("mini")).forEach((a,i)=>Array.from(a.children[0].children).forEach((b,j)=>Array.from(b.children).forEach((c,k)=>c.onclick=_=>checkMove({id:i,x:k,y:j}))));
+		</script>
+	</body>
+</html>
