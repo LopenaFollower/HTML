@@ -15,6 +15,7 @@
 		</style>
 	</head>
 	<body>
+		<button onclick='reset()'>reset</button>
 		<table id=main>
 			<tr>
 				<td><table id=mini0 class=mini><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr></table></td>
@@ -61,12 +62,16 @@ function getMiniGame(id){
 function getMiniGameData(id){
 	let game=getMiniGame(id);
 	let trs=game.children[0]
-	let tds=[];
-	for(let i=0;i<3;i++)for(let j=0;j<3;j++)tds.push(trs.children[i].children[j].innerText)
-	return tds
+	let tds=[],c=0;
+	for(let i=0;i<3;i++)for(let j=0;j<3;j++){
+		let it=trs.children[i].children[j].innerText
+		tds.push(it)
+		if(it!="")c++
+	}
+	return[tds,c]
 }
 function checkIfWon(id){
-	let s=getMiniGameData(id)
+	let s=getMiniGameData(id)[0]
 	function comp(...b){
 		return""!==b[0]&&b.every(e=>e===b[0])
 	}
@@ -121,9 +126,16 @@ function highlight(id){
 }
 function checkMove(data){
 	const{id,x,y}=data;
+	let game=getMiniGame(id)
 	if((id!=currentBoard&&currentBoard!="any")||squareStatus(id,x,y)!="")return;
-	if(getMiniGame(id).dataset.status!="won")getMiniGame(id).children[0].children[y].children[x].innerText=plrs.next();
+	if(game.dataset.status!="won")game.children[0].children[y].children[x].innerText=plrs.next();
 	if(checkIfWon(id))mark(id,plrs.cur);
+	else if(getMiniGameData(id)[1]>8){
+		setTimeout(()=>Array.from(game.children[0].children).forEach(b=>Array.from(b.children).forEach(c=>{
+			c.style.backgroundColor="rgba(0,0,0,0)";
+			c.innerText="";
+		})),150)
+	}
 	if(getMiniGame(x+y*3).dataset.status!="won")currentBoard=x+y*3;
 	else currentBoard="any";
 	cboard.innerText=map[currentBoard];
