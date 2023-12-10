@@ -4,8 +4,13 @@
 		<title></title>
 		<meta name="viewport"content="width=device-width,initial-scale=1">
 		<style>
+			*{
+				transition-timing-function:linear;
+				transition-duration:.5s;
+			}
 			table#main{border:1px solid #444;}
-			table#main>tbody>tr>td{text-align:center;font-size:58px;}
+			table.block>tbody>tr>td{width:20px;height:0px;text-align:center;font-size:2px;table-layout:fixed;border:.1px solid #444;}
+			table#main>tbody>tr>td{text-align:center;font-size:57px;overflow:hidden}
 			table.mini>tbody>tr>td{width:20px;height:20px;text-align:center;font-size:2px;table-layout:fixed;border:.1px solid #444;}
 		</style>
 	</head>
@@ -26,9 +31,14 @@
 				<td><table id=mini7 class=mini><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr></table></td>
 				<td><table id=mini8 class=mini><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr></table></td>
 			</tr>
+			<tr style="opacity:0">
+				<td><table class=block><tr><td></td><td></td><td></td></tr></table></td>
+				<td><table class=block><tr><td></td><td></td><td></td></tr></table></td>
+				<td><table class=block><tr><td></td><td></td><td></td></tr></table></td>
+			</tr>
 		</table>
-		<p id=cturn>X</p>
-		<p id=cboard>Any</p>
+		<div id=cturn>X</div>
+		<div id=cboard>Any</div>
 		<script>
 let currentBoard="any";
 const map={0:"Top Left",1:"Top",2:"Top Right",3:"Left",4:"Middle",5:"Right",6:"Bottom Left",7:"Bottom",8:"Bottom Right","any":"Any"}
@@ -75,9 +85,11 @@ function squareStatus(id,x,y){
 function mark(id,sym){
 	let s=getMiniGame(id),p=s.parentNode;
 	s.dataset.status="won";
-	s.style.display="none";
+	s.style.opacity=.25;
+	s.style.position="fixed";
 	let tn=document.createElement("span");
 	tn.textContent=sym
+	tn.style.zIndex=50;
 	p.appendChild(tn);
 	let tds=[];
 	for(let i=0;i<3;i++)for(let j=0;j<3;j++){
@@ -100,32 +112,35 @@ function mark(id,sym){
 function squareStatus(id,x,y){
 	return getMiniGame(id).children[0].children[y].children[x].innerText
 }
+function highlight(id){
+	Array.from(document.getElementsByClassName("mini")).forEach((e,i)=>{
+		if(e.dataset.status=="won")e.style.backgroundColor="#bbb";
+		else if(id=="any"||id==i)e.style.backgroundColor="initial";
+		else e.style.backgroundColor="#ddd";
+	})
+}
 function checkMove(data){
 	const{id,x,y}=data;
-	if(id!=currentBoard&&currentBoard!="any")return;
-	if(squareStatus(id,x,y)!="")return;
+	if((id!=currentBoard&&currentBoard!="any")||squareStatus(id,x,y)!="")return;
 	if(getMiniGame(id).dataset.status!="won")getMiniGame(id).children[0].children[y].children[x].innerText=plrs.next();
 	if(checkIfWon(id))mark(id,plrs.cur);
-	if(getMiniGame(x+y*3).dataset.status!="won"){
-		currentBoard=x+y*3;
-	}else{
-		currentBoard="any";
-	}
+	if(getMiniGame(x+y*3).dataset.status!="won")currentBoard=x+y*3;
+	else currentBoard="any";
 	cboard.innerText=map[currentBoard];
+	highlight(currentBoard);
 	cturn.innerText=plrs.prev+"'s Turn";
 }
 function reset(){
 	Array.from(document.getElementsByClassName("mini")).forEach(a=>{
-		Array.from(a.children[0].children).forEach(b=>
-			Array.from(b.children).forEach(c=>{
-				c.style.backgroundColor="rgba(0,0,0,0)";
-				c.innerText="";
-			})
-		)
+		Array.from(a.children[0].children).forEach(b=>Array.from(b.children).forEach(c=>{
+			c.style.backgroundColor="rgba(0,0,0,0)";
+			c.innerText="";
+		}))
 		a.dataset.status="";
-		a.style.display="table";
-		if(a.parentNode.children.length>1)
-		a.parentNode.children[1].remove()
+		a.style.opacity="1";
+		a.style.position="initial";
+		a.style.backgroundColor="initial"
+		if(a.parentNode.children.length>1)a.parentNode.children[1].remove()
 	});
 	currentBoard="any";
 	plrs.prev="X";
