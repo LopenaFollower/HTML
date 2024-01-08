@@ -20,6 +20,7 @@
 				font-size:1px;
 				font-weight:900;
 				line-height:1;
+				letter-spacing:-.1px;
 			}
 			video,canvas{
 				opacity:1;
@@ -32,7 +33,8 @@
 		<canvas id="canvas"style="opacity:0;position:fixed;"></canvas>
 		<input type=file id=in /><br>
 		<input value=150 oninput="!isNaN(this.value)&&this.value>0&&setMax(parseInt(this.value).toFixed())"placeholder="display size"/><br>
-		<video width=200 height=200 id="video"src=""type="video/mp4"controls autoplay></video>
+		<video width=200 height=200 id="video"src=""type="video/mp4"controls autoplay></video><br>
+		<button onclick="navigator.clipboard.writeText(out.textContent)">copy frame</button>
 		<center>
 			<pre id=out></pre>
 		</center>
@@ -42,7 +44,7 @@ var canvas=document.getElementById("canvas"),
 	video=document.querySelector("video"),
 	output=document.getElementById("out"),
 	input=document.getElementById("in"),
-	chars="$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/|()1{}[]?-_+~<>i!lI;:,\"^`'. ",
+	chars="█▒░⠀";"$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/|()1{}[]?-_+~<>i!lI;:,\"^`'. ",
 	max=165;
 let rfs=false;
 let frames=[];
@@ -68,10 +70,8 @@ function capture(){
 			}
 			return a+c;
 		},"");
-		if(rfs){
-			frames[frames.length]=output.textContent
-		}
 	}catch(e){}
+	requestAnimationFrame(capture)
 }
 function resize(w,h){
 	let nw=Math.floor(fr*w);
@@ -96,7 +96,7 @@ input.onchange=e=>{
 	video.load()
 	video.src=URL.createObjectURL(e.target.files[0])
 }
-setInterval(capture,1000/16)
+capture()
 		</script>
 	</body>
 </html>

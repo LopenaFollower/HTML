@@ -55,7 +55,7 @@
 				padding:2px;
 				text-align:center;
 			}
-			div.space{display:none;}
+			div.space{display:none}
 		</style>
 	</head>
 	<body bgcolor=#0e151a>
@@ -2296,7 +2296,7 @@ function iterativeDiamondSort(){
 	}
 	m/=2;m|=0
 	for(let k=0;k<=m/2|0;k++)for(let i=k;i+1<minVal(len,m-k);i+=2)if(compareIndices(array,i,i+1)>0)swap(array,i,i+1);
-	return[5,0]
+	return[5,1]
 }
 function recursiveDiamondSort(){
 	let array=[...arr];
@@ -12731,9 +12731,31 @@ function bubbleMergeSort(){
 	}
 	return[5,1]
 }
-function Sort(){
+function swapMergeSort(){
 	let array=[...arr];
-	
+	function mD(a,s,d){
+		for(let i=d;i<s;i++)swap(a,i,s);
+	}
+	function mr(a,l,r,e){
+		while(l<r){
+			if(l>=e||r>=e)break;
+			else if(compareIndices(a,l,r)<1)l++;
+			else mD(a,r++,l++);
+		}
+	}
+	function mR(a,s,m,e){
+		if(s==m)return;
+		mR(a,s,(m+s)/2|0,m);
+		mR(a,m,(m+e)/2|0,e);
+		if(e-s<32)return;
+		else if(e-s==32)binInsertSort(a,s,minVal(len,e+1));
+		else mr(a,s,m,e);
+	}
+	function main(a,l){
+		if(l<32)return binInsertSort(a,0,l);
+		mR(a,0,l/2|0,l);
+	}
+	main(array,len)
 	return[5,1]
 }
 function Sort(){
@@ -12934,16 +12956,14 @@ function set(v){sn.push(v)}
 function get(n,cs=0){
 	if(n.trim().length==0)return 0;
 	if(!isNaN(n))return parseInt(n)-1;
-	for(let i=0;i<sn.length;i++)if(sn[i][0].toLowerCase().startsWith(n.toLowerCase()))return i;
-	for(let i=0;i<sn.length;i++)if(sn[i][0].toLowerCase().search(n.toLowerCase())>=0)return i;
+	for(let i=0;i<sn.length;i++)if(sn[i][0].toLowerCase().startsWith(n.toLowerCase())||sn[i][0].toLowerCase().search(n.toLowerCase())>=0)return i;
 	n=cs?n:n.toLowerCase();
 	let offset=[];
 	for(let i=0;i<sn.length;i++){
 		let v=cs?sn[i][0]:sn[i][0].toLowerCase();offset[i]=[0,i];
 		if(n.match(v))return i
 		for(let j=0;j<n.length;j++)if(n[j]==v[j])offset[i][0]++
-		offset[i][0]/=n.length
-		offset[i][0]*=100;
+		offset[i][0]/=n.lengthoffset[i][0]*=100;
 	}
 	return offset.sort((a,b)=>b[0]-a[0])[0][1]
 }
@@ -13194,6 +13214,7 @@ set(["Adaptive Median-Of-Medians Quick Sort",adaptiveMedianOfMediansQuickSort])
 set(["Adaptive Shuffle Quick Sort",adaptiveShuffleQuickSort])
 set(["Tumbleweed Sort",tumbleweedSort])
 set(["Bubble Merge Sort",bubbleMergeSort])
+set(["SwapMerge Sort",swapMergeSort])
 //set(["test Sort",testSort])
 sn.sort((a,b)=>a[0].localeCompare(b[0]))
 const inputs={0:"Random",1:"Reversed",2:"Slightly",3:"Sorted",4:"Naive Random",5:"Shuffled Tail",6:"Shuffled Head",7:"Shifted Element",8:"Noisy",9:"Shuffled Odds",10:"Final Merge Pass",11:"Shuffled Final Merge",12:"Shuffled Half",13:"Partitioned",14:"Sawtooth",15:"Pipe Organ",16:"Final Bitonic Pass",17:"Interlaced",18:"Double Layered",19:"Final Radix Pass",20:"Real Final Radix",21:"Recursive Final Radix",22:"Half Rotation",23:"Half Reversed",24:"Logarithmic Slopes",25:"Heapified",26:"Triangular Heapified",27:"Circle Pass",28:"Final Pairwise Pass",29:"Recursive Reversal",30:"Gray Code Fractal",31:"Sierpinski Triangle",32:"Triangular",33:"Quicksort Adversary",34:"Grailsort Adversary",35:"Modulo",36:"Quadratic",37:"Cubic",38:"Bit Reversal",39:"Random Block",40:"Block Reverse",41:"Sine Wave",42:"Partial Merge",43:"Many Similar",44:"Perlin Noise",45:"Bell Curve",46:"Ruler",47:"Blancmange Curve",48:"Cantor Function",49:"Sum of Divisors",50:"FSD",51:"Decreasing Random",52:"Euler's Totient Function"}
@@ -13205,7 +13226,7 @@ function appendTo(parent,text,func){
 	let a=document.createElement("div");
 	a.className="selectbtn";a.textContent=text;hold(a)
 	if(typeof func=="function")a.onclick=func
-	else{a.onclick=function(){queue=get(text);nextsort.innerText="Next: "+text;cancel=1;setTimeout(()=>cancel=0)}}
+	else a.onclick=_=>{queue=get(text);nextsort.innerText="Next: "+text;cancel=1;setTimeout(()=>cancel=0)}
 	parent.appendChild(a)
 }
 sn.forEach(e=>{
@@ -13219,14 +13240,14 @@ sn.forEach(e=>{
 	if(name.match("binary"))appendTo(binarysortsholder,e[0]);
 })
 Object.values(inputs).forEach((e,i)=>{
-	appendTo(shufflesholder,e,function(){
-		inputdisplay2.innerText=(i+1)+" "+String.fromCharCode(47)+" "+Object.keys(inputs).length;
+	appendTo(shufflesholder,e,()=>{
+		inputdisplay2.innerText=i+1+" "+String.fromCharCode(47)+" "+Object.keys(inputs).length;
 		queue2=i;cancel=1;setTimeout(()=>cancel=0);
 	})
 })
-Array.from(document.querySelectorAll("div.topicname")).map((e,i)=>{
+Array.from(document.querySelectorAll("div.topicname")).forEach((e,i)=>{
 	let ch=document.querySelectorAll("div.btnholder")[i]
-	e.onclick=function(){
+	e.onclick=_=>{
 		if(cancel||!canq2&&e.textContent.substr(0,8)=="Shuffles")return;
 		let h=parseFloat(window.getComputedStyle(ch).getPropertyValue("opacity"))==1
 		ch.style.height=(h?0:300)+"px";ch.style.opacity=h?0:1;ch.style.padding=(h?0:3)+"px 0px";
@@ -13234,12 +13255,11 @@ Array.from(document.querySelectorAll("div.topicname")).map((e,i)=>{
 	}
 })
 let teind=Object.values(sn).findIndex(e=>e[0].toLowerCase().match("test"))
-let req=get("evu");if(teind>=0)req=teind
+let req=get("swapm");if(teind>=0)req=teind
 runSort(req)
 /*
 to do: clean up the code
 later plans: fix grit sort
-folder: hybrid
 */
 function testallsorts(){
 	arr=create(count);
