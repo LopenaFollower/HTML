@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+			body{margin:0 0}
+			#cvs{
+				-moz-opacity:.5;
+				-ms-opacity:.5;
+				-o-opacity:.5;
+				-webkit-opacity:.5;
+				opacity:.5;
+			}
+			#cvs,#out{
+				position:fixed;
+				top:0;
+				left:0;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id=out></canvas>
+		<canvas id=cvs></canvas>
+		<script>
+const ctx1=cvs.getContext("2d"),ctx2=out.getContext("2d"),{sin,cos,PI,random,sqrt}=Math;
+window.onresize=function(){
+	cvs.width=out.width=window.innerWidth;
+	cvs.height=out.height=window.innerHeight;
+}
+window.onresize();
+const slowness=5;
+class Circle{
+	constructor(x,y,r,a,s,p,d){
+		this.x=x-r/2;
+		this.y=y-r/2;
+		this.r=r;
+		this.a=a;
+		this.s=s;
+		this.p=p;
+		this.d=d;
+		this.getCoords(p);
+	}
+	getCoords(p){
+		if(p instanceof Circle){
+			p.getCoords(p.p);
+			this.x=p.x+cos(p.getDegree())*p.r;
+			this.y=p.y+sin(p.getDegree())*p.r;
+		}
+	}
+	step(){
+		this.a+=this.s/slowness;
+		this.draw();
+	}
+	getDegree(){
+		return this.a/4*PI;
+	}
+	draw(){
+		this.getCoords(this.p);
+		let a=this.getDegree();
+		ctx1.beginPath();
+		ctx1.moveTo(this.x,this.y);
+		ctx1.lineTo(this.x+cos(a)*this.r,this.y+sin(a)*this.r);
+		ctx1.stroke();
+		ctx1.beginPath();
+		ctx1.arc(this.x,this.y,this.r,0,2*PI);
+		ctx1.stroke();
+		if(this.d){
+			ctx2.arc(this.x+cos(a)*this.r,this.y+sin(a)*this.r,0,0,2*PI);
+			ctx2.stroke();
+		}
+	}
+}
+let series=[];
+function createSeries(arr,x,y){
+	series=[];
+	let f=arr.shift();
+	series.push(new Circle(x+f.r/2,y+f.r/2,f.r,f.a,f.s,undefined,arr.length?undefined:true));
+	if(arr.length){
+		let l=arr.pop(),i=0;
+		for(;i<arr.length;i++){
+			let c=arr[i];
+			series.push(new Circle(x-c.r/2,y-c.r/2,c.r,c.a,c.s,series[i],false));
+		}
+		series.push(new Circle(x-l.r/2,y-l.r/2,l.r,l.a,l.s,series[i],true));
+	}
+}
+createSeries([{
+	r:50,
+	a:45,
+	s:-1
+},{
+	r:100,
+	a:180,
+	s:2/3
+}],cvs.width/2,cvs.height/2);
+requestAnimationFrame(function draw(){
+	ctx1.clearRect(0,0,cvs.width,cvs.height);
+	const sl=series.length;
+	for(let i=0;i<sl;i++){
+		series[i].step();
+	}
+	requestAnimationFrame(draw);
+})
+		</script>
+	</body>
+</html>
