@@ -12,24 +12,27 @@
 				-webkit-opacity:.5;
 				opacity:.5;
 			}
-			#cvs,#out{
+			#out{
 				position:fixed;
 				top:0;
 				left:0;
+				border:1px solid #000;
 			}
+			#smoothness{width:60px}
 		</style>
 	</head>
 	<body>
 		<canvas id=out></canvas>
 		<canvas id=cvs></canvas>
+		<div id=epc_count></div>
+		<input id=smoothness value=25 type=number />
 		<script>
-const ctx1=cvs.getContext("2d"),ctx2=out.getContext("2d"),{sin,cos,PI,random,sqrt}=Math;
+const ctx1=cvs.getContext("2d"),ctx2=out.getContext("2d"),{sqrt,sin,cos,atan,atan2,PI}=Math;
 window.onresize=function(){
 	cvs.width=out.width=window.innerWidth;
-	cvs.height=out.height=window.innerHeight;
+	cvs.height=out.height=window.innerHeight*.95;
 }
 window.onresize();
-const slowness=5;
 class Circle{
 	constructor(x,y,r,a,s,p,d){
 		this.x=x-r/2;
@@ -49,11 +52,13 @@ class Circle{
 		}
 	}
 	step(){
-		this.a+=this.s/slowness;
+		let r=Number(smoothness.value)|0;
+		let d=isNaN(r)||r<1?25:r
+		this.a+=this.s/d;
 		this.draw();
 	}
 	getDegree(){
-		return this.a/4*PI;
+		return this.a;
 	}
 	draw(){
 		this.getCoords(this.p);
@@ -75,33 +80,82 @@ let series=[];
 function createSeries(arr,x,y){
 	series=[];
 	let f=arr.shift();
-	series.push(new Circle(x+f.r/2,y+f.r/2,f.r,f.a,f.s,undefined,arr.length?undefined:true));
-	if(arr.length){
-		let l=arr.pop(),i=0;
-		for(;i<arr.length;i++){
+	let l=arr.length;
+	series.push(new Circle(x+f.r/2,y+f.r/2,f.r,f.a,f.s,undefined,l?undefined:true));
+	if(l){
+		for(let i=0;i<l;i++){
 			let c=arr[i];
-			series.push(new Circle(x-c.r/2,y-c.r/2,c.r,c.a,c.s,series[i],false));
+			series.push(new Circle(x-c.r/2,y-c.r/2,c.r,c.a,c.s,series[i],i==l-1));
 		}
-		series.push(new Circle(x-l.r/2,y-l.r/2,l.r,l.a,l.s,series[i],true));
 	}
 }
-createSeries([{
-	r:50,
-	a:45,
-	s:-1
-},{
-	r:100,
-	a:180,
-	s:2/3
-}],cvs.width/2,cvs.height/2);
 requestAnimationFrame(function draw(){
 	ctx1.clearRect(0,0,cvs.width,cvs.height);
 	const sl=series.length;
+	const pl=path.length;
 	for(let i=0;i<sl;i++){
 		series[i].step();
 	}
+	if(state==1)ctx2.beginPath();
+	for(let i=0;i<pl;i++){
+		let{x,y}=path[i];
+		ctx2.arc(x+cvs.width/2,y+cvs.height/2,0,0,2*PI);
+		ctx2.stroke();
+	}
+	epc_count.innerText="Epicycles: "+sl;
 	requestAnimationFrame(draw);
-})
+});
+let state=null,path=[],userMouse={x:0,y:0};
+["touchend","touchcancel","mouseout","mouseup","contextmenu","focusout","blur"].forEach(v=>cvs.addEventListener(v,e=>{
+	state=0;
+	if(path.length){
+		ctx2.beginPath();
+		ctx2.clearRect(0,0,out.width,out.height);
+		coordsToSeries(path.splice(0,1/0));
+	}
+}));
+["touchmove","mousemove"].forEach((v,j)=>cvs.addEventListener(v,e=>{
+	let t=e.targetTouches&&e.targetTouches.item(0),x=(j?e:t).pageX-cvs.width/2,y=(j?e:t).pageY-cvs.height/2;
+	if(x!=userMouse.x||y!=userMouse.y){
+		ctx2.beginPath();
+		ctx2.clearRect(0,0,out.width,out.height);
+		series=[];
+		userMouse.x=x;userMouse.y=y;
+		path.push({x,y})
+	}
+}));
+class C{
+	constructor(a,b){this.r=a;this.i=b}
+	a(c){this.r+=c.r;this.i+=c.i}
+	m(c){return new C(this.r*c.r-this.i*c.i,this.r*c.i+this.i*c.r)}
+}
+function dft(x){
+	const X=[],l=x.length;
+	for(let k=0;k<l;k++){
+		let s=new C(0,0);
+		for(let n=0;n<l;n++){
+			const p=(2*PI*k*n)/l;
+			s.a(x[n].m(new C(cos(p),-sin(p))));
+		}
+		s.r/=l;s.i/=l;
+		X[k]={s:k,r:sqrt(s.r**2+s.i**2),a:atan2(s.i,s.r)};
+	}
+	return X;
+}
+function epicycles(o,sr){
+	let epc=[],dt=2*PI/sr.length;
+	for(let i=0;i<sr.length;i++){
+		const{r,a,s}=sr[i],rad=(x,y)=>2*atan(y/(x+sqrt(x**2+y**2)));
+		epc[i]={r,a,s:(rad(cos(s*dt+a+o),sin(s*dt+a+o))-rad(cos(a+o),sin(a+o)))/dt};
+	}
+	return epc;
+}
+function coordsToSeries(p){
+	let x=[];
+	const skip=1;
+	for (let i=0;i<p.length;i+=skip)x.push(new C(p[i].x,p[i].y));
+	createSeries(epicycles(0,dft(x).sort((a,b)=>b.r-a.r)),cvs.width/2,cvs.height/2);
+}
 		</script>
 	</body>
 </html>
