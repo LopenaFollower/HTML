@@ -11,6 +11,7 @@
 			#main_page,#pi_page{padding:10px}
 			#tab1,#tab2{background-color:#222a33;border-radius:5px;font-family:monospace;line-height:30px;text-align:center;position:fixed;border:2.5px solid #868e97;height:30px;color:#ddd;width:50%}
 			#disp{background-color:rgba(0,0,0,0);border-radius:10px;border:3px dashed #777f88;width:90%}
+			#keyboard{display:none}
 		</style>
 	</head>
 	<body bgcolor=#222>
@@ -24,7 +25,7 @@
 			<table border=1 id=keyboard><tr><td>7</td><td>8</td><td>9</td></tr><tr><td>4</td><td>5</td><td>6</td></tr><tr><td>1</td><td>2</td><td>3</td></tr><tr><td>.</td><td>0</td><td id=back><</td></tr></table>
 		</div>
 		<div id=pi_page style="display:none">
-			<span style="font:900 200% monospace">3.</span>
+			<span onclick='keyboard.style.display=keyboard.style.display=="none"?"table":"none"'style="font:900 200% monospace">3.</span>
 			<canvas id=disp></canvas>
 		</div>
 		<script>
@@ -58,7 +59,7 @@ function changeTab(tab){
 		}
 	});
 }
-document.body.onclick=()=>{
+document.onclick=()=>{
 	tab1.style.backgroundColor="#222a33";
 	tab2.style.backgroundColor="#222a33";
 }
