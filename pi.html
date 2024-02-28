@@ -10,7 +10,7 @@
 			table,td{border-collapse:collapse;table-layout:fixed;border-color:#eee;text-align:center;font-size:67.5px;height:90px;width:90px}
 			#main_page,#pi_page{padding:10px}
 			#tab1,#tab2{background-color:#222a33;border-radius:5px;font-family:monospace;line-height:30px;text-align:center;position:fixed;border:2.5px solid #868e97;height:30px;color:#ddd;width:50%}
-			#disp{background-color:rgba(0,0,0,0);border-radius:10px;border:3px dashed #777f88;width:90%}
+			#disp{background-color:#0000;border-radius:10px;border:3px dashed #777f88;width:90%}
 			#keyboard{display:none}
 		</style>
 	</head>
@@ -25,7 +25,7 @@
 			<table border=1 id=keyboard><tr><td>7</td><td>8</td><td>9</td></tr><tr><td>4</td><td>5</td><td>6</td></tr><tr><td>1</td><td>2</td><td>3</td></tr><tr><td>.</td><td>0</td><td id=back><</td></tr></table>
 		</div>
 		<div id=pi_page style="display:none">
-			<span onclick='keyboard.style.display=keyboard.style.display=="none"?"table":"none"'style="font:900 200% monospace">3.</span>
+			<div onclick='keyboard.style.display=keyboard.style.display=="none"?"table":"none"'style="font:900 200% monospace">3.</div>
 			<canvas id=disp></canvas>
 		</div>
 		<script>
@@ -43,33 +43,21 @@ function*calc_pi(q=60n,r=13440n,t=10080n,i=2n){
 	for(;;)u=3n*++i,u=6n+3n*u**2n+u*9n,d=(27n*q*i+5n*r-12n*q)/(t*5n),yield d,r=10n*u*(r+(5n*i-2n)*q-d*t),t*=u,q*=i*10n*(2n*i-1n);
 }
 let pi="",dp="",seq=calc_pi();
-function changeTab(tab){
+function changeTab(t){
 	setTimeout(()=>{
-		if(tab){
-			main_page.style.display="block";
-			pi_page.style.display="none";
-			tab1.style.backgroundColor="#555";
-			tab2.style.backgroundColor="#222a33";
-		}else{
-			main_page.style.display="none";
-			pi_page.style.display="block";
-			input.value="";
-			tab1.style.backgroundColor="#222a33";
-			tab2.style.backgroundColor="#555";
-		}
+		main_page.style.display=t?"block":"none";
+		pi_page.style.display=t?"none":"block";
+		tab1.style.backgroundColor=t?"#555":"#222a33";
+		tab2.style.backgroundColor=t?"#222a33":"#555";
 	});
 }
-document.onclick=()=>{
-	tab1.style.backgroundColor="#222a33";
-	tab2.style.backgroundColor="#222a33";
-}
+document.onclick=()=>tab1.style.backgroundColor=tab2.style.backgroundColor="#222a33";
 setInterval((z=input)=>{
 	for(let i=0;i<5;i++)pi+=Number(seq.next().value);
-	z.value=z.value.replaceAll(/[^\d.]/g,"")
-	tab1.style.left=0;
+	z.value=z.value.replaceAll(/[^\d.]/g,"");
 	tab2.style.left=2.5+window.innerWidth/2+"px";
-	z.style.height=0
-	z.style.height=z.scrollHeight
+	z.style.height=0;
+	z.style.height=z.scrollHeight;
 	keyboard.style.left=window.innerWidth/2-parseFloat(window.getComputedStyle(keyboard).getPropertyValue("width"))/2+"px";
 	z.value.split(".").length>2&&(z.value=z.value.substring(0,z.value.length-1));
 })
@@ -80,11 +68,11 @@ setInterval(()=>((sub,ctx,clearance,fontsize,spacing,padding,per,x,y)=>{
 	ctx.clearRect(0,0,disp.height,disp.width);
 	ctx.font=fontsize+"px monospace";
 	ctx.fillStyle="#fff";
-	sub.forEach(e=>{
+	const l=sub.length;
+	for(let i=0;i<l;i++){
 		x>=per&&(++y,x=0);
-		ctx.fillText(e,x++*spacing,clearance+fontsize*y);
-	});
-	ctx.fill();
+		ctx.fillText(sub[i],x++*spacing,clearance+fontsize*y);
+	}
 })(pi.match(/.{10}/g),disp.getContext("2d"),10,15,100,15,5,0,0),2e3);
 function hold(e,f=a=>{},c,i){e.addEventListener("touchstart",v=>{clearInterval(i);e.style.backgroundColor="#666";f();i=setInterval(f,c)});e.addEventListener("touchend",v=>{clearInterval(i);setTimeout(()=>e.style.backgroundColor="initial",50);i=null})}
 Array.from(document.getElementsByTagName("td")).forEach(e=>hold(e,a=>{!e.id?(input.value+=e.innerText,cpi.innerText="",ypi.innerText="",result.innerText=""):input.value=input.value.substring(0,input.value.length-1)},100))

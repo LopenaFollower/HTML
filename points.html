@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+			.inp{
+				width:70px;
+			}
+		</style>
+	</head>
+	<body>
+		<select id=mode oninput='update(parseInt(this.value))'>
+			<option value=0>2 Points</option>
+			<option value=1>3 Points</option>
+		</select>
+		<div id=m0 class=m>
+			<table>
+				<tr><td>A</td><td><input class=inp id=m0A /></td></tr>
+				<tr><td>B</td><td><input class=inp id=m0B /></td></tr>
+				<tr><td colspan=2><button onclick='getDistance()'>Distance</button>&nbsp;<button onclick='getSlope()'>Slope</button>&nbsp;<button onclick='getMidpoint()'>Midpoint</button></td></tr>
+			</table>
+		</div>
+		<div id=m1 class=m>
+			<table>
+				<tr><td>A</td><td><input class=inp id=m1A /></td></tr>
+				<tr><td>B</td><td><input class=inp id=m1B /></td></tr>
+				<tr><td>C</td><td><input class=inp id=m1C /></td></tr>
+				<tr><td colspan=2><button onclick='getDistances()'>Distances</button>&nbsp;<button onclick='getPerimeter()'>Perimeter</button>&nbsp;<button onclick='getArea()'>Area</button>&nbsp;<button onclick='triangleType()'>Triangle Type</button>&nbsp;<button onclick='areCollinear(0)'>Are Collinear(distance method)</button>&nbsp;<button onclick='areCollinear(1)'>Are Collinear(slope method)</button>&nbsp;<button onclick='areCollinear(2)'>Are Collinear(area method)</button></td></tr>
+			</table>
+		</div>
+		<div id=ans></div>
+		<script>
+const{sqrt}=Math;
+function num(a){
+	switch(typeof a){
+		case"object":
+			if(Array.isArray(a)){
+				return a.map(e=>parseFloat(e));
+			}
+			break;
+		default:
+			return parseFloat(a);
+			break;
+	}
+}
+function update(m){
+	const ms=document.querySelectorAll("div.m");
+	for(let i=0;i<ms.length;i++){
+		ms[i].style.display="block";
+		if(i!=m)ms[i].style.display="none";
+	}
+}
+update(0);
+function distance([x1,y1],[x2,y2]){
+	return sqrt((x2-x1)**2+(y2-y1)**2);
+}
+function slope([x1,y1],[x2,y2]){
+	return(y2-y1)/(x2-x1);
+}
+//For m0
+function getDistance(){
+	const P1=num(m0A.value.split(","));
+	const P2=num(m0B.value.split(","));
+	ans.innerText="d = "+distance(P1,P2);
+}
+function getSlope(){
+	const P1=num(m0A.value.split(","));
+	const P2=num(m0B.value.split(","));
+	ans.innerText="m = "+slope(P1,P2);
+}
+function getMidpoint(){
+	const P1=num(m0A.value.split(","));
+	const P2=num(m0B.value.split(","));
+	ans.innerText=`The point between A and B is (${(P2[0]-P1[0])/2}, ${(P2[1]-P1[1])/2})`;
+}
+//For m1
+function getDistances(){
+	const P1=num(m1A.value.split(","));
+	const P2=num(m1B.value.split(","));
+	const P3=num(m1C.value.split(","));
+	let AB,BC,AC;
+	AB=distance(P1,P2);
+	BC=distance(P2,P3);
+	AC=distance(P1,P3);
+	ans.innerText=`AB = ${AB}\nBC = ${BC}\nAC = ${AC}`;
+	return[AB,BC,AC];
+}
+function getPerimeter(){
+	ans.innerText="p = "+getDistances().reduce((a,b)=>a+b);
+}
+function getArea(){
+	const P1=num(m1A.value.split(","));
+	const P2=num(m1B.value.split(","));
+	const P3=num(m1C.value.split(","));
+	let A=(P1[0]*(P2[1]-P3[1])+P2[0]*(P3[1]-P1[1])+P3[0]*(P1[1]-P2[1]))/2;
+	ans.innerText=A+" u²";
+	return A;
+}
+function triangleType(){
+	const sides=getDistances();
+	let similar=1;
+	if(sides[0]==sides[1])similar++;
+	if(sides[0]==sides[2])similar++;
+	if(sides[1]==sides[2])similar++;
+	ans.innerText=`The 3 points form ${["a Scalene","an Isosceles","an Equilateral"][similar]} triangle.`;
+	if(areCollinear(2))ans.innerText="The points do not form a triangle, since they are collinear.";
+}
+function areCollinear(m){
+	const P1=num(m1A.value.split(","));
+	const P2=num(m1B.value.split(","));
+	const P3=num(m1C.value.split(","));
+	let collinear=false;
+	if(m<1){
+		collinear=distance(P1,P2)+distance(P2,P3)==distance(P1,P3);
+	}else if(m<2){
+		let m1,m2,m3;
+		m1=slope(P1,P2);
+		m2=slope(P2,P3);
+		m3=slope(P1,P3);
+		collinear=m1==m2&&m2==m3;
+	}else{
+		collinear=getArea()==0;
+	}
+	ans.innerText=collinear?"True":"False";
+	return collinear;
+}
+		</script>
+	</body>
+</html>
