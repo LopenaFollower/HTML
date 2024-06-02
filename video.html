@@ -44,44 +44,33 @@ var canvas=document.getElementById("canvas"),
 	video=document.querySelector("video"),
 	output=document.getElementById("out"),
 	input=document.getElementById("in"),
-	chars="█▒░⠀";"$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/|()1{}[]?-_+~<>i!lI;:,\"^`'. ",
+	chars="$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/|()1{}[]?-_+~<>i!lI;:,\"^`'. ",
 	max=165;
 let rfs=false;
 let frames=[];
 function setMax(v){return max=v}
 function capture(){
-	let[width,height]=resize(video.videoWidth,video.videoHeight)
+	let[width,height]=resize(video.videoWidth,video.videoHeight);
+	if(!width||!height)return requestAnimationFrame(capture);;
 	canvas.width=width;
 	canvas.height=height;
 	ctx.drawImage(video,0,0,width,height);
-	try{
-		let data=ctx.getImageData(0,0,width,height),
-			gss=[];
-		for(let i=0;i<data.data.length;i+=4){
-			let gs=(data.data[i]+data.data[i+1]+data.data[i+2])/3;
-			data.data[i]=data.data[i+1]=data.data[i+2]=gs;
-			gss.push(gs);
-		}
-		ctx.putImageData(data,0,0);
-		output.textContent=gss.reduce((a,g,i)=>{
-			let c=chars[Math.ceil((chars.length-1)*g/256)];
-			if((i+1)%width===0){
-				c+="\n";
-			}
-			return a+c;
-		},"");
-	}catch(e){}
-	requestAnimationFrame(capture)
+	let data=ctx.getImageData(0,0,width,height),gss=[];
+	for(let i=0;i<data.data.length;i+=4){
+		let gs=(data.data[i]+data.data[i+1]+data.data[i+2])/3;
+		data.data[i]=data.data[i+1]=data.data[i+2]=gs;
+		gss.push(gs);
+	}
+	output.textContent=gss.reduce((a,g,i)=>{
+		let c=chars[Math.ceil((chars.length-1)*g/256)];
+		if((i+1)%width===0)c+="\n";
+		return a+c;
+	},"");
+	requestAnimationFrame(capture);
 }
 function resize(w,h){
 	let nw=Math.floor(fr*w);
-	if(h>max){
-		return[Math.floor(nw*max/h),max];
-	}
-	if(w>max){
-		return[max,Math.floor(h*max/nw)];
-	}
-	return[nw,h];
+	return h>max?[Math.floor(nw*max/h),max]:w>max?[max,Math.floor(h*max/nw)]:[nw,h];
 };
 let fr=(()=>{
 	let pr=document.createElement("pre");

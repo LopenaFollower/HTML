@@ -7,7 +7,7 @@
 		</style>
 	</head>
 	<body>
-		<input id=inp oninput="zalgo(this.value,50)"/>
+		<input id=inp oninput="zalgo(this.value,1)"/>
 		<!--button onclick="console.log(i,lib[i],pr())"></!-->
 		<div id=w>50 per text</div>
 		<span id=d></span>
@@ -24,7 +24,7 @@ function zalgo(str,ln){
 		let res=e
 		for(let i=0;i<ln;i++)res+=String.fromCharCode(lib[Math.random()*lib.length|0])
 		return res
-	}).join("")
+	}).join("");
 }
 function pr(){
 	d.innerText=String.fromCharCode(lib[i++])

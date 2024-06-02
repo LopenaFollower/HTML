@@ -25,16 +25,16 @@ function c(l=5){
 	return new Array(l).fill("").map(e=>String.fromCharCode(Math.random()*2**16)).join("");
 }
 const abs=Math.abs;
-function rnd(n,d=1){
+function rnd(n,d=10){
 	return parseFloat(n.toFixed(d))
 }
 function fall(e){
 	let RAF,pos=vector(0,0),floorP=window.innerHeight/3,wallR=window.innerWidth,vel=vector(0,0),force=vector(25,0),gravity=vector(0,.1);
 	function anim(){
-		let bp=1.001;
+		let bp=1e-2;
 		add(vel,gravity);
 		add(pos,vel);
-		let{width,height}=e.getBoundingClientRect()
+		let{width,height}=e.getBoundingClientRect();
 		let ma=getMass(5,width*height/2)
 		velo.innerText=Object.values(vel).map(e=>rnd(e)).join(", ")
 		forc.innerText=Object.values(force).map(e=>rnd(e)).join(", ")
@@ -51,7 +51,7 @@ function fall(e){
 			if(vel.y>=-gravity.y){
 				vel.y=0;
 				pos.y=g-gravity.y;
-				//floorP=1/0;
+				floorP=1/0;
 			}
 		}
 		if(pos.y<0){
@@ -61,7 +61,7 @@ function fall(e){
 			vel.y=((abs(vel.y)*d)*dec|0)/dec;
 			if(vel.y>=-gravity.y){
 				vel.y=0;
-				//floorP=1/0;
+				floorP=1/0;
 			}
 		}
 		if(pos.x>=w){

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Template</title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+			body{margin:0}
+			@media(orientation:landscape){#cvs{width:auto}}
+			@media(orientation:portrait){#cvs{width:100%}}
+		</style>
+	</head>
+	<body>
+		<div id=flexbox>
+			<canvas id=cvs></canvas>
+			<fieldset>
+				
+			</fieldset>
+		</div>
+		<script>
+const ctx=cvs.getContext("2d");
+requestAnimationFrame(function update(){
+	flexbox.style.display=window.innerWidth<window.innerHeight?"inline-block":"flex";
+	requestAnimationFrame(update);
+})
+window.onresize=function(){
+	cvs.width=cvs.height=Math.min(window.innerWidth,window.innerHeight);
+}
+window.onresize();
+		</script>
+	</body>
+</html>

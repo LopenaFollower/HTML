@@ -8,9 +8,19 @@
 				position:fixed;
 				left:0;
 			}
+			#mono{
+				font-family:monospace;
+			}
 		</style>
 	</head>
 	<body>
+		<pre id=mono>
+			mono space
+			█▒⣿░|⠀█▒⣿░|⠀█▒⣿░|⠀█▒⣿░|⠀█
+			▒⣿░|⠀█▒⣿░|⠀█▒⣿░|⠀█▒⣿░|⠀█▒⣿░|⠀█▒
+			⣿░|⠀█▒⣿░|⠀
+			testing 1w
+		</pre>
 		pause<input type=checkbox id=pause />
 		<p id=s></p>
 		<canvas id="canvas"width="300"height="300"style="border:1px solid black"></canvas>
@@ -83,32 +93,33 @@ function get_sector(p){
 	}
 }
 function draw(...a){
-	ctx["clearRect"](0,0,side,side);
-	ctx["font"]=(2+1)*(1["toString"]()+0["toString"]())+"px monospace";
-	ctx["fillText"]("A",side*.25,side*.25);
-	ctx["fillText"]("B",side*.75,side*.25);
-	ctx["fillText"]("C",side*.25,side*.75);
-	ctx["fillText"]("D",side*.75,side*.75);
-	ctx["rect"](v["x"]-size["x"]/2,v["y"]-size["y"]/2,size["x"],size["y"]);
-	ctx["fillStyle"]="rgb("+0+","+0+","+0+")"
-	ctx["fill"]()
-	ctx["beginPath"]();
-	ctx["moveTo"](0,midpoint["x"]);
-	ctx["lineTo"](side,midpoint["x"]);
-	ctx["stroke"]();
-	ctx["beginPath"]();
-	ctx["moveTo"](midpoint["y"],0);
-	ctx["lineTo"](midpoint["y"],side);
-	ctx["stroke"]();
-	if(v["y"]>side-size["y"]||v["y"]<0){
-		velocity["y"]*=-1;
+	ctx.clearRect(0,0,side,side);
+	ctx.font="30px monospace";
+	ctx.fillStyle="blue"
+	ctx.fillText("A",side*.25,side*.25);
+	ctx.fillText("B",side*.75,side*.25);
+	ctx.fillText("C",side*.25,side*.75);
+	ctx.fillText("D",side*.75,side*.75);
+	ctx.rect(v.x-size.x/2,v.y-size.y/2,size.x,size.y);
+	ctx.fillStyle="rgb("+0+","+0+","+0+")"
+	ctx.fill()
+	ctx.beginPath();
+	ctx.moveTo(0,midpoint.x);
+	ctx.lineTo(side,midpoint.x);
+	ctx.stroke();
+	ctx.beginPath();
+	ctx.moveTo(midpoint.y,0);
+	ctx.lineTo(midpoint.y,side);
+	ctx.stroke();
+	if(v.y>side-size.y||v.y<0){
+		velocity.y*=-1;
 	}
-	if(v["x"]>side||v["x"]<0){
-		velocity["x"]*=-1;
+	if(v.x>side||v.x<0){
+		velocity.x*=-1;
 	}
-	if(!pause["checked"]){
+	if(!pause.checked){
 		add(velocity,gravity);
-		add(velocity,ca(force,getMass(1,size["x"]*size["y"])));
+		add(velocity,ca(force,getMass(1,size.x*size.y)));
 		add(v,velocity);
 	}
 }

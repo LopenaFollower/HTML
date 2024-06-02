@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Chaos</title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+			body{margin:0 0}
+			@media(orientation:landscape){#cvs{width:auto}}
+			@media(orientation:portrait){#cvs{width:100%}}
+		</style>
+	</head>
+	<body>
+		<div id=flexbox>
+			<canvas id=cvs></canvas>
+		</div>
+		<script>
+const ctx=cvs.getContext("2d"),{sin,cos,PI,sqrt,random,atan2}=Math;
+let n=3;
+requestAnimationFrame(function update(){
+	flexbox.style.display=window.innerWidth<window.innerHeight?"inline-block":"flex";
+	end=Array(n).fill().map((e,i)=>[c+dcos(45+360/n*i)*c*.95,c+dsin(45+360/n*i)*c*.95]);
+	for(let i=0;i<10000;i++)plot();
+	requestAnimationFrame(update);
+});
+window.onresize=function(){
+	cvs.width=cvs.height=Math.min(window.innerWidth,window.innerHeight);
+}
+window.onresize();
+const c=cvs.width/2;
+function dcos(a){
+	return cos(a*PI/180);
+}
+function dsin(a){
+	return sin(a*PI/180);
+}
+function section([x1,y1],[x2,y2],m,n){
+	return[(m*x2+n*x1)/(m+n),(m*y2+n*y1)/(m+n)];
+}
+let end,px=c,py=c;
+let colors=["red","green","blue","yellow","orange","lime","lightblue","purple"]
+function plot(){
+	let v=random()*n|0;
+	ctx.fillStyle=colors[v];
+	[px,py]=section(end[v],[px,py],1,1);
+	ctx.beginPath();
+	ctx.arc(px,py,.25,0,2*PI);
+	ctx.fill();
+}
+		</script>
+	</body>
+</html>

@@ -12,6 +12,8 @@
 				letter-spacing:.001em;
 				text-align:center;
 				line-height:19px;
+				width:fit-content;
+				overflow-x:scroll;
 			}
 			#sigma{
 				font-size:30px;
@@ -38,20 +40,30 @@
 		<span contenteditable id=happen>x</span> = <span id=result></span><br><br>
 		<button onclick='it()'>Iterate</button>
 		<script>
-var n,l;
-const{tan,tanh,atan,atan2,atanh,cos,cosh,acos,acosh,sin,sinh,asin,asinh,sqrt,pow,cbrt,abs}=Math
+var n,l,d;
+const delay=ms=>new Promise(r=>setTimeout(r,ms));
+const{log,log10,log2,log1p,clz32,tan,tanh,atan,atan2,atanh,cos,cosh,acos,acosh,sin,sinh,asin,asinh,sqrt,pow,cbrt,abs,PI,E,hypot,exp,expm1}=Math
+function logn(n,x){return log10(x)/log10(n)}//change-of-base theorem
 function fact(n){
 	if(n==0||n==1)return 1;
 	if(n<0)return undefined;
 	return n*fact(--n)
 }
-function it(){
-	l=eval(num.innerText);
-	n=eval(den.innerText);
-	let sum=0;
-	for(let x=n;x<=l;x++)
-		sum+=parseFloat(eval(happen.innerText));
-	result.innerText=sum
+async function it(){
+	if(d)return;
+	d=true
+	try{
+		l=eval(num.innerText)|0;
+		n=eval(den.innerText)|0;
+		let sum=0;
+		for(let x=n;x<=l;x++){
+			sum+=parseFloat(eval(happen.innerText));
+			await delay();
+			result.innerText=sum;
+			if(abs(sum)==1/0)return;
+		}
+	}catch(e){}
+	d=false
 }
 		</script>
 	</body>

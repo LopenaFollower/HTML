@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>text encryption</title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+		</style>
+	</head>
+	<body>
+		<input type=number id=seed_input oninput='updateE();updateD()'/><br>
+		<table>
+			<tr><td>Encrypt</td><td>Decrypt</td></tr>
+			<tr>
+				<td>
+					<textarea id=encrypt_input oninput='updateE()'></textarea>
+				</td>
+				<td>
+					<textarea id=decrypt_input oninput='updateD()'></textarea>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<textarea id=encrypt_output readonly></textarea>
+				</td>
+				<td>
+					<textarea id=decrypt_output readonly></textarea>
+				</td>
+			</tr>
+		</table>
+		<script>
+const{PI,E,abs,sqrt,cbrt,sin,cos,tan,log,log10,log2}=Math;
+function RNG(s){
+	const m=2**31;
+	let n=abs(Number(s));
+	this.nextInt=function(){
+		n=(1103515245*n+12345)%m;
+		return n;
+	}
+	this.next=function(){
+		return this.nextInt()/(m-1);
+	}
+}
+class Encryption{
+	#seed;
+	rng(s){
+		let i=s.length;
+		let r=new RNG(this.#seed*i**2);
+		let a;
+		while(i--)a=r.next();
+		return a;
+	}
+	step1a(str){
+		let l=str.length;
+		let a=[...str];
+		for(let i=0;i<l;i++){
+			let r=this.rng(str)*(l-i)+i|0;
+			[a[i],a[r]]=[a[r],a[i]]
+		}
+		return a.join("");
+	}
+	step2a(str){
+		return btoa(str);
+	}
+	step3a(str){
+		let l=str.length;
+		let off=2**this.rng(str)*8|0;
+		let ns="";
+		for(let i=0;i<l;i++){
+			ns+=String.fromCharCode(str.charCodeAt(i)+off);
+		}
+		return ns;
+	}
+	step1b(str){
+		let l=str.length;
+		let a=[...str];
+		let tmp=[...a];
+		let pairs=[];
+		for(let i=0;i<l;i++){
+			let r=this.rng(str)*(l-i)+i|0;
+			pairs.unshift([i,r]);
+		}
+		pairs.forEach(([x,y])=>{
+			[a[x],a[y]]=[a[y],a[x]];
+		});
+		return a.join("");
+	}
+	step2b(str){
+		return atob(str);
+	}
+	step3b(str){
+		let l=str.length;
+		let off=2**this.rng(str)*8|0;
+		let ns="";
+		for(let i=0;i<l;i++){
+			ns+=String.fromCharCode(str.charCodeAt(i)-off);
+		}
+		return ns;
+	}
+	encrypt(str,k){
+		this.#seed=sin(k);
+		return this.step3a(this.step2a(this.step1a(str)));
+	}
+	decrypt(str,k){
+		this.#seed=sin(k);
+		return this.step1b(this.step2b(this.step3b(str)));
+	}
+}
+//shuffle → atob → ceasar → shuffle;
+//unshuf  →-ceasar → btoa → unshuf;
+const encr=new Encryption();
+function updateE(){
+	encrypt_output.value="";
+	decrypt_input.value=encrypt_output.value=encr.encrypt(encrypt_input.value,Number(seed_input.value));
+	updateD();
+}
+function updateD(){
+	decrypt_output.value="";
+	decrypt_output.value=encr.decrypt(decrypt_input.value,Number(seed_input.value));
+}
+seed_input.value=Math.random()*1e5|0;
+encrypt_input.value="Text Encrypt";
+updateE();updateD();
+		</script>
+	</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>img to ascii</title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+			body{
+				margin:0;
+			}
+			pre,#out{
+				font-family:monospace;
+				font-size:1px;
+				font-weight:900;
+				line-height:1;
+				letter-spacing:-.2px;
+			}
+		</style>
+	</head>
+	<body>
+		<input type=file id=img_in />
+		<input type=range id=scale min=0.01 max=2 step=0.01 value=1 />
+		<pre id=out></pre>
+		<script>
+let image=new Image(),chars="$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/|()1{}[]?-_+~i!lI;:,\"^`'. ";
+let debounce=false;
+function capture(sc=.5){
+	let width=image.width*sc|0,height=image.height*sc|0;
+	if(!width||!height)return;
+	let canvas=document.createElement("canvas");
+	let ctx=canvas.getContext("2d");
+	canvas.width=width;
+	canvas.height=height;
+	ctx.drawImage(image,0,0,width,height);
+	let data=ctx.getImageData(0,0,width,height),gss=[];
+	for(let i=0;i<data.data.length;i+=4){
+		let gs=(data.data[i]+data.data[i+1]+data.data[i+2])/3;
+		data.data[i]=data.data[i+1]=data.data[i+2]=gs;
+		gss.push(gs);
+	}
+	out.innerHTML=gss.reduce((a,g,i)=>{
+		let sc=_=>Math.ceil((_-1)*g/256);
+		let c=chars[sc(chars.length)];
+		if((i+1)%width===0)c+="<br>";
+		let cl=sc(256);
+		cl=cl+","+cl+","+cl
+		return a+`<span style='color:rgb(${cl})'>${c}</span>`;
+	},"");
+}
+img_in.onchange=e=>{
+	image.src=URL.createObjectURL(e.target.files[0]);
+}
+image.onload=_=>{
+	capture();
+}
+scale.oninput=function(e){
+	if(debounce)return;
+	debounce=true;
+	capture(Number(this.value));
+	setTimeout(()=>{
+		debounce=false;
+	},100);
+}
+		</script>
+	</body>
+</html>

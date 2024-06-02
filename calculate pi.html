@@ -12,44 +12,44 @@
 	</head>
 	<body onbeforeunload="save()">
 		<pre id=digit></pre>
-		<button onclick="save()">download</button><div id=len></div><br>
+		<button onclick="save()">download</button>
 		<script>
-if(!localStorage.getItem("pi_formula")){
+if(!localStorage.getItem("pi_formula"))
 	localStorage.setItem("pi_formula","60,13440,10080,3")
-}
-if(!localStorage.getItem("pi")){
+if(!localStorage.getItem("pi"))
 	localStorage.setItem("pi","3.")
-}
 var[q,r,t,i]=localStorage.getItem("pi_formula").split(",").map(e=>BigInt(e));
+let pi=localStorage.getItem("pi");
+requestAnimationFrame(function update(){
+	digit.innerText=pi.length;
+	requestAnimationFrame(update);
+});
 function calc_pi(){
-	u=3n*i;
-	u=6n+3n*u**2n+u*9n;
+	let x=3n*i;
+	u=6n+3n*x**2n+x*9n;
 	d=(27n*q*i+5n*r-12n*q)/(t*5n);
 	r=10n*u*(r+(5n*i-2n)*q-d*t);
 	t*=u;
 	q*=i*10n*(2n*i++-1n);
-	localStorage.setItem("pi_formula",q.toString()+","+r.toString()+","+t.toString()+","+i.toString())
-	return Number(d)
+	return Number(d);
 }
 setInterval(()=>{
-	for(let index=0;index<5;index++){
-		let d=calc_pi();
-		digit.innerText+=d
-		if(digit.innerText.length>=50)
-			digit.innerText=""
-		localStorage.setItem("pi",localStorage.getItem("pi")+d);
-	}
-})
-setInterval(()=>{
-	len.innerText=localStorage.getItem("pi").length
-},5e3)
+	for(let i=0;i<25;i++)
+		pi+=calc_pi();
+});
 function save(){
+	localStorage.setItem("pi_formula",q.toString()+","+r.toString()+","+t.toString()+","+i.toString());
+	localStorage.setItem("pi",pi);
 	let link=document.createElement("a");
-	let pi=localStorage.getItem("pi")
 	link.href=URL.createObjectURL(new Blob([pi],{type:"text/plain"}));
-	link.download=(pi.length-1).toLocaleString()+" chars of pi.txt";
+	link.download=(pi.length-2).toLocaleString()+" chars of pi.txt";
 	link.click();
 	URL.revokeObjectURL(link.href);
+}
+function reset(){
+	localStorage.setItem("pi_formula","60,13440,10080,3");
+	localStorage.setItem("pi","3.");
+	pi="3.";q=60n;r=13440n;t=10080n;i=3n;
 }
 		</script>
 	</body>

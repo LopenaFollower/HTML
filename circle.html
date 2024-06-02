@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Template</title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+			body{
+				margin:0;
+			}
+			#cvs{
+				border:1px #000 solid;
+			}
+			#func{
+				width:99%;
+			}
+			.sbox{
+				width:40px;
+			}
+			@media(orientation:landscape){#cvs{width:auto}}
+			@media(orientation:portrait){#cvs{width:100%}}
+			table{
+				margin:5px;
+			}
+			.hidden{
+				display:none;
+			}
+		</style>
+	</head>
+	<body>
+		<div id=flexbox>
+			<canvas id=cvs></canvas>
+			<input class=sbox type=number id=rotation value=360 placeholder='rotation'/>
+			<input class=sbox type=number id=step value=1 placeholder='step'/>
+			<input class=sbox type=number id=scale value=30 placeholder='scale'/>
+			<textarea id=func onblur='this.value=this.value.replaceAll("theta","θ")'>sin(θ)</textarea>
+			<table>
+				<tr>
+					<td>a</td>
+					<td><input class=sbox id=mina value=-10 oninput='rangea.min=this.value'/></td>
+					<td><input class=sbox id=maxa value=10 oninput='rangea.max=this.value'/></td>
+					<td><input type=checkbox id=cyclea /></td>
+					<td><input type=number id=cycleas value=0.25 class="hidden sbox"/></td>
+				</tr>
+				<tr>
+					<td colspan=10><input type=range id=rangea step=.01 min=-10 max=10 value=0 oninput='this.max=maxa.value;this.min=mina.value;vala.innerText=this.value'/></td><td id=vala>0</td>
+				</tr>
+			</table>
+		</div>
+		<script>
+const ctx=cvs.getContext("2d"),c={};
+const{sin,cos,PI,E,random,round:rnd,sqrt,atan2,acos,abs,tan,log}=Math;
+requestAnimationFrame(function update(){
+	flexbox.style.display=window.innerWidth<window.innerHeight?"inline-block":"flex";
+	c.x=cvs.width/2;
+	c.y=cvs.height/2;
+	cycleas.style.display=cyclea.checked?"table-cell":"none";
+	requestAnimationFrame(update);
+})
+window.onresize=function(){cvs.width=cvs.height=Math.min(window.innerWidth,window.innerHeight)};window.onresize();
+function degToRad(a){
+	return a*PI/180;
+}
+function logn(a,n){
+	return log(a)/log(n);
+}
+function dcos(a){
+	return cos(degToRad(a));
+}
+function dsin(a){
+	return sin(degToRad(a));
+}
+function cos2(n){
+	return cos(n)**2;
+}
+function sin2(n){
+	return sin(n)**2;
+}
+function gcd(a,b){
+	return b?gcd(b,a%b):a;
+}
+function mod(a,b){
+	return a%b;
+}
+function cycle(n,step,min,max){
+	n=Number(n);
+	step=Number(step);
+	min=Number(min);
+	max=Number(max);
+	let v=n+step;
+	if(v>max)v=min;
+	if(v<min)v=max;
+	return v;
+}
+function constraint(n,m,x){
+	return Math.max(m,Math.min(x,Number(n)));
+}
+function graph(){
+	ctx.clearRect(0,0,c.x*2,c.y*2);
+	let run=true;
+	try{
+		let θ=0,a=Number(rangea.value);
+		let theta=θ;
+		eval(func.value)
+	}catch(e){
+		run=false;
+	}
+	let s=constraint(step.value,0.05,10);
+	let rot=constraint(rotation.value,1,3600);
+	let sc=constraint(scale.value,.01,100);
+	for(let i=0;i<rot&&run;i+=s){
+		ctx.beginPath();
+		let θ=degToRad(i);
+		let theta=θ;
+		let a=Number(rangea.value);
+		let r=eval(func.value);
+		r*=sc;
+		ctx.arc(c.x+cos(θ)*r,c.y+sin(θ)*r,1,0,2*PI);
+		ctx.fill();
+		if(cyclea.checked&&i<1){
+			vala.innerText=(rangea.value=cycle(a,cycleas.value,mina.value,maxa.value)).toFixed(3);
+		}
+	}
+}
+setInterval(graph,17);
+/*
+(1+.9*cos(8*θ))*(1+.1*cos(4*θ))*((.9+.1*cos(200*θ))*(1+sin(θ)))*-1;
+sin2(1.2*θ)+cos(6*θ)**3
+*/
+		</script>
+	</body>
+</html>

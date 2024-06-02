@@ -4,142 +4,249 @@
 		<title></title>
 		<meta name="viewport"content="width=device-width,initial-scale=1">
 		<style>
-			#input{
+			body{
+				background:#000;
+				color:#fff;
+			}
+			#input,#output{
+				background-color:#1e252a;
 				font-family:monospace;
+				font-weight:600;
+				font-size:0.1px;
+				color:#eee;
 				width:100%;
-				height:80%;
-				font-size:3px;
+				height:40%;
+			}
+			input.tx{
+				width:60px;
 			}
 		</style>
 	</head>
 	<body>
-		<textarea id=input></textarea><br>remove "this."<input type=checkbox id=rthis /><br>
+		<input type=file id=txt /><br><br>
+		<table>
+			<tr><td>increase indent</td><td><button onclick='input.value=input.value.replaceAll("\n","\n\t")'>btn</button></td></tr>
+			<tr><td>reduce indent</td><td><button onclick='input.value=input.value.replaceAll("\n\t","\n")'>btn</button></td></tr>
+		</table>
+		<textarea id=input></textarea><br>
+		<textarea id=output></textarea><br>
 		<button onclick='s()'>format</button>
+		<span id=info></span>
+		<table><tbody id=tpar></tbody></table>
 		<script>
-function rA(t,s,e){
-	let x;
-	do{
-		x=false;
-		let i=t.search(s);
-		if(i>=0){
-			let p=i+1;
-			while(t[p]!=e&&p<t.length)p++;
-			t=t.substr(0,i-1)+t.substr(p+1,t.length)
-			x=true
+let dtc="SORTNAMEHERE";
+function addOption(n,id,c){
+	let tr=document.createElement("tr");
+	let tdn=document.createElement("td");
+	tdn.innerText=n;
+	let tdc=document.createElement("td");
+	let cb=document.createElement("input");
+	cb.type="checkbox";
+	cb.id=id;
+	cb.checked=c;
+	tpar.appendChild(tr);
+	tr.appendChild(tdn);
+	tr.appendChild(tdc);
+	tdc.appendChild(cb);
+}
+function isUpper(n){
+	return n.toUpperCase()==n;
+}
+function getSortName(t){
+	let i=t.search(dtc),l=['"',"'"," "],j;
+	if(i+1){
+		while(l.indexOf(t[i])<0)i++;
+		j=i+1;
+		while(l.indexOf(t[j])<0)j++;
+	}
+	let str=t.substring(i+1,j);
+	let cammelCase=ucc.checked&&!isUpper(str[1])?str[0].toLowerCase()+str.slice(1):str;
+	return cammelCase;
+}
+function getImports(s){
+	let blacklist=["ArrayVisualizer","Sort","ReentrantLock","Random","LinkedList","Arrays","ArrayList","IndexedRotations"];
+	let sp=s.split("\n");
+	let imports=[];
+	for(let i=0;i<sp.length;i++){
+		let txt=sp[i];
+		if(txt.indexOf("import")+1){
+			let raw=txt.split(".").slice(-2).map((e,i)=>e.substr(0,e.length-i));
+			let filter=raw[1];
+			if(blacklist.indexOf(filter)<0){
+				imports.push("//"+raw.join("."));
+			}
 		}
-	}while(x);
-	return t
+	}
+	if(imports.length<1)return"";
+	return"\n"+imports.join("\n");
+}
+function rA(t,s,e,o=1){
+	for(let a=0;a<1e4;a++){
+		let i=t.search(s),p=i+1;
+		if(i<0)break;
+		while(t[p]!=e&&p<t.length)p++;
+		t=t.substr(0,i)+t.substr(p+o,t.length)
+	}
+	return t;
+}
+function rA2(t,s,e){
+	let sp=t.split("\n");
+	let na=[];
+	let m=true;
+	for(let i=0;i<sp.length;i++){
+		let v=sp[i];
+		if(m){
+			if(v.indexOf(s)>=0){
+				m=v.indexOf(e)>=0;
+			}else
+				na.push(v);
+		}else
+			if(v.indexOf(e)>=0)
+				m=true;
+	}
+	return na.join("\n");
+}
+function getIdx(t,s,e){
+	let last;
+	for(let a=0;a<1e4;a++){
+		let i=t.search(s);
+		if(i<0)break;
+		p=i+1;
+		while(t[p]!=e&&p<t.length)p++;
+		last=t.substr(p+2,t.length)
+		t=t.substr(0,i-1)+last
+	}
+	return last.substr(0,last.length-1);
 }
 function s(){
-	let st=input.value.
-	replaceAll("    ","\t").replaceAll("  "," ").
-	replaceAll(" +","+").replaceAll("+ ","+").
-	replaceAll("- ","-").replaceAll(" -","-").
-	replaceAll(" *","*").replaceAll("* ","*").
-	replaceAll("/ ","/").replaceAll(" /","/").
-	replaceAll(", ",",").replaceAll(",\t",",").replaceAll(", ",",").replaceAll(", ",",").replaceAll(", ",",").replaceAll(",\t",",").replaceAll(", ",",").replaceAll(", ",",").
-	replaceAll("; ",";").replaceAll(" ;",";").
-	replaceAll("? ","?").replaceAll(" ?","?").
-	replaceAll(" &","&").replaceAll("& ","&").
-	replaceAll("% ","%").replaceAll(" %","%").
-	replaceAll(" |","|").replaceAll("| ","|").
-	replaceAll(": ",":").replaceAll(" :",":").
-	replaceAll(") ",")").replaceAll(") ",")").replaceAll(") ",")").replaceAll(") ",")").replaceAll(") ",")").replaceAll(" (","(").
-	replaceAll("} ","}").replaceAll(" {","{").
-	replaceAll("= ","=").replaceAll(" =","=").replaceAll(" =","=").replaceAll(" =","=").replaceAll(" =","=").replaceAll(" =","=").replaceAll(" =","=").replaceAll(" =","=").replaceAll(" =","=").
-	replaceAll("! ","!").replaceAll(" !","!").
-	replaceAll(" >",">").replaceAll("> ",">").
-	replaceAll("< ","<").replaceAll(" <","<").
-	replaceAll(" ^","^").
-	replaceAll(",int ",",").
+	let chars=["+","-","*","/",",",",\t",";","?","&","%","|",":",")","(","{","}","=","!",">","<","^"];
+	let st=input.value;
+	for(let i=0;i<10;i++)
+		for(let v of chars)
+			st=st.replaceAll("    ","\t").replaceAll("  ","\t").replaceAll("\t ","\t");
+	if(rsp.checked)
+		for(let i=0;i<10;i++)
+			for(let v of chars)
+				st=st.replaceAll(" "+v,v).replaceAll(v+" ",v);
+	st=st.replaceAll(",int ",",").
 	replaceAll(",double ",",").
 	replaceAll(",boolean ",",").
 	replaceAll(",int[] ",",").
-	replaceAll("public void","function").
-	replaceAll("public boolean","function").
+	replaceAll("public void ","function ").
+	replaceAll("public boolean ","function ").
+	replaceAll("public int ","function ").
+	replaceAll("public long ","function ").
 	replaceAll("protected void","function").
 	replaceAll("protected int[]","function").
-	replaceAll("protected int","function").
+	replaceAll("protected int ","function ").
 	replaceAll("protected boolean","function").
 	replaceAll("private void","function").
-	replaceAll("private int","function").
+	replaceAll("private int[]","function").
+	replaceAll("private int ","function ").
+	replaceAll("private double","function").
 	replaceAll("private boolean","function").
-	replaceAll("private static int","function").
-	replaceAll("Writes.","").
-	replaceAll("Reads.","").
-	replaceAll(",0.5,true,false)",")").
-	replaceAll(",0.5,true,true)",",true)").
-	replaceAll(",0.5,false,true)",",true)").
-	replaceAll(",0,true,true)",",true)").
-	replaceAll(",0,false,true)",",true)").
-	replaceAll(",0.01,true,false)",")").
-	replaceAll(",0.01,true,true)",",true)").
-	replaceAll(",0.01,false,true)",",true)").
-	replaceAll(",0.05,true,false)",")").
-	replaceAll(",0.05,true,true)",",true)").
-	replaceAll(",0.05,false,true)",",true)").
-	replaceAll(",0.25,true,false)",")").
-	replaceAll(",1,true,false)",")").
-	replaceAll(",0,true,false)",")").
-	replaceAll(",0,false,true)",",true)").
-	replaceAll(",1,false,false)",")").
-	replaceAll(",1.0D,true,false)",")").
-	replaceAll(",0.0D,true,false)",")").
-	replaceAll(",1.0D,false,false)",")").
-	replaceAll(",1,false,true)",",true)").
-	replaceAll("(int[] ","(").
-	replaceAll("for(int ","for(let ").
-	replaceAll("(int ","(").
+	replaceAll("private static boolean ","function ").
+	replaceAll("private static double ","function ").
+	replaceAll("private static int ","function ").
+	replaceAll("public static int ","function ").
+	replaceAll("void ","function ").
+	replaceAll("Writes.swap","await swap").
+	replaceAll("Writes.write","await write").
+	replaceAll("Writes.multiSwap","await multiSwap").
+	replaceAll("Writes.reversal","await reversal").
+	replaceAll("Writes.insert","await Wr.insert").
+	replaceAll("Writes.","").replaceAll("Reads.","").
+	replaceAll("(int[] ","(").replaceAll("for(int ","for(let ").replaceAll("(int ","(").replaceAll("(double ","(").
 	replaceAll("int[] ","let ").
 	replaceAll("int ","let ").
 	replaceAll("boolean ","let ").
-	replaceAll("Math.min","minVal").
-	replaceAll("Math.max","maxVal").
-	replaceAll("Math.ceil","ceil").
-	replaceAll("Math.sqrt","sqrt").
-	replaceAll("currentLength","len").
-	replaceAll("currentLen","len").
-	replaceAll("Highlights.clearAllMarks();","").
+	replaceAll("double ","let ").
+	replaceAll("Math.min","minVal").replaceAll("Math.max","maxVal").replaceAll("Math.ceil","ceil").replaceAll("Math.sqrt","sqrt").replaceAll("Math.abs","abs").replaceAll("Math.log","log").replaceAll("Math.pow","pow").replaceAll("Math.floor","floor").
+	replaceAll("currentLength","len").replaceAll("sortLength","len").replaceAll("currentLen","len").
 	replaceAll("@Override","").
-	replaceAll(",1,true)==1",")>0").
-	replaceAll(",1,true)>0",")>0").
-	replaceAll(",1,true)==-1",")<0").
-	replaceAll(",1,true)<=0",")<1").
-	replaceAll(",1,true)>=0",")>=0").
-	replaceAll(",0.5,true)==1",")>0").
-	replaceAll(",0.5,true)>0",")>0").
-	replaceAll(",0.5,true)==-1",")<0").
-	replaceAll(",0.5,true)<=0",")<1").
-	replaceAll(",0.5,true)>=0",")>=0").
-	replaceAll(",0,true)==1",")>0").
-	replaceAll(",0,true)>0",")>0").
-	replaceAll(",0,true)==-1",")<0").
-	replaceAll(",0,true)<=0",")<1").
-	replaceAll(",0,true)>=0",")>=0").
-	replaceAll(",1,false)==1",")>0").
-	replaceAll(",1,false)>0",")>0").
-	replaceAll(",1,false)==-1",")<0").
-	replaceAll(",1,false)<=0",")<1").
-	replaceAll(",1,false)>=0",")>=0").
-	replaceAll(",0.5,false)==1",")>0").
-	replaceAll(",0.5,false)>0",")>0").
-	replaceAll(",0.5,false)==-1",")<0").
-	replaceAll(",0.5,false)<=0",")<1").
-	replaceAll(",0.5,false)>=0",")>=0").
+	replaceAll(",1,true)==1",")>0").replaceAll(",1,true)>0",")>0").replaceAll(",1,true)==-1",")<0").replaceAll(",1,true)<=0",")<1").replaceAll(",1,true)>=0",")>=0").replaceAll(",0.5,true)==1",")>0").replaceAll(",0.5,true)>0",")>0").replaceAll(",0.5,true)==-1",")<0").replaceAll(",0.5,true)<=0",")<1").replaceAll(",0.5,true)>=0",")>=0").replaceAll(",0,true)==1",")>0").replaceAll(",0,true)>0",")>0").replaceAll(",0,true)==-1",")<0").replaceAll(",0,true)<=0",")<1").replaceAll(",0,true)>=0",")>=0").replaceAll(",1,false)==1",")>0").replaceAll(",1,false)>0",")>0").replaceAll(",1,false)==-1",")<0").replaceAll(",1,false)<=0",")<1").replaceAll(",1,false)>=0",")>=0").replaceAll(",0.5,false)==1",")>0").replaceAll(",0.5,false)>0",")>0").replaceAll(",0.5,false)==-1",")<0").replaceAll(",0.5,false)<=0",")<1").replaceAll(",0.5,false)>=0",")>=0").
 	replaceAll("runSort","main").
-	replaceAll("createExternalArray","new Array").
-	replaceAll("changeReversals(1);","")
+	replaceAll("createExternalArray","new Array").replaceAll("createArrayList","new Array").
+	replaceAll("changeReversals(1);","").
+	replaceAll("changeAuxWrites(1);","").
+	replaceAll("addComparison();","").replaceAll("stopLap();","").replaceAll("startLap();","").
+	replaceAll("compareOriginalValues","compareValues").
+	replaceAll("compareOriginalIndices","compareIndices").
+	replaceAll("throws Exception","");
 	if(rthis.checked)st=st.replaceAll("this.","");
-	st=rA(st,"Highlights.markArray",";");
+	if(rmr.checked)st=rA(st,"Highlights.",";");
 	st=rA(st,"Delays.sleep",";");
 	st=rA(st,"deleteExternalArray",";");
+	st=rA(st,"changeAllocAmount",";");
+	st=rA(st,"deleteArrayList",";");
+	st=rA(st,"//","\n",0);
 	for(let j=0;j<5;j++)for(let i=0;i<10;i++)
-		st=st.replaceAll("Highlights.clearMark("+i+");","").
-		replaceAll("\n"+new Array(i).fill("\t").join("")+"\n","\n").
-		replaceAll(")\n"+new Array(i).fill("\t").join("")+"{","){").
-		replaceAll("}\n"+new Array(i).fill("\t").join("")+"else","}else")
-	input.value=st
+		st=st.replaceAll("\n"+new Array(i).fill("\t").join("")+"\n","\n").
+	replaceAll(")\n"+new Array(i).fill("\t").join("")+"{","){").
+	replaceAll("}\n"+new Array(i).fill("\t").join("")+"else","}else");
+	st=st.replaceAll("public final class",dtc);
+	st=st.replaceAll("final public class",dtc);
+	st=st.replaceAll("public abstract class",dtc);
+	st=st.replaceAll("public class",dtc);
+	st=rA2(st,"/*","*/");
+	let threshold=1e5;
+	let s2=st;
+	if(s2.indexOf("setBogoSort")>=0){
+		let lower=getIdx(s2,"setBogoSort","}");
+		let spl=lower.split("\n");
+		let test=spl[0].indexOf("main")>=0;
+		let r=test?"\n":"\n\t";
+		if(test){
+			let newLower=[];
+			for(let i=0;i<spl.length-1;i++){
+				if(spl[i].indexOf("function main(")<0){
+					newLower.push(spl[i]);
+				}
+			}
+			lower=newLower.join("\n");
+		}
+		s2=`async ${getSortName(st)}(len){\n${lower}}`.replaceAll("\n",r);
+		let temp=s2.split("\n");
+		temp[temp.length-1]=temp[temp.length-1].replaceAll("}}","}");
+		s2=temp.join("\n");
+		output.value=s2;
+		if(s2.length<threshold)navigator.clipboard.writeText(s2+getImports(input.value));
+	}else if(s2.indexOf("super")>=0){
+		let lower=getIdx(s2,"super","}");
+		let spl=lower.split("\n");
+		let test=spl[0].indexOf("main")>=0;
+		let r=test?"\n":"\n\t";
+		if(test){
+			let newLower=[];
+			for(let i=0;i<spl.length-1;i++){
+				if(spl[i].indexOf("function main(")<0){
+					newLower.push(spl[i]);
+				}
+			}
+			lower=newLower.join("\n");
+		}
+		s2=`async ${getSortName(st).replaceAll("Sorting","Sort")}(len){\n${lower}}`.replaceAll("\n",r);
+		let temp=s2.split("\n");
+		temp[temp.length-1]=temp[temp.length-1].replaceAll("}}","}");
+		s2=temp.join("\n");
+		output.value=s2;
+		if(s2.length<threshold)navigator.clipboard.writeText(s2+getImports(input.value));
+	}
+	info.innerText=s2.split("\n").length+` lines, ${s2.length} chars`;
 }
+txt.onchange=e=>{
+	let fr=new FileReader(),f=e.target.files[0];
+	info.innerText="";
+	fr.onload=function(){input.value=fr.result}
+	fr.readAsText(f);
+}
+addOption("this.","rthis",true);
+addOption("spaces","rsp",true);
+addOption("use camelCase","ucc",true);
+addOption("remove mark","rmr",true);
+//the way she moves
+//one way ticket  to the moon
+//i dont want to see you anymore 
 		</script>
 	</body>
 </html>
