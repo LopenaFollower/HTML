@@ -21,7 +21,7 @@ const ctx=cvs.getContext("2d");
 requestAnimationFrame(function update(){
 	flexbox.style.display=window.innerWidth<window.innerHeight?"inline-block":"flex";
 	requestAnimationFrame(update);
-})
+});
 window.onresize=function(){
 	cvs.width=cvs.height=Math.min(window.innerWidth,window.innerHeight);
 }
