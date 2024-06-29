@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+		</style>
+	</head>
+	<body>
+		<input oninput='primeFactors(this.value)'/><br>
+		<span id=ns></span><br>
+		<span id=ds></span>
+		<script>
+const e=Math.E,E=e;
+function primeFactors(n){
+	try{
+		n=eval(n.replaceAll(/[^\d.eE*+-\/]/g,""))|0;
+		if(n>1e8||n<1)return;
+		let fs=[n],d;
+		if(n>1){
+			for(d=Math.round(n/2);d>0;d--)if(n%d==0)fs.push(d);
+		}
+		ds.innerText="factors of "+n+" = "+fs.sort((a,b)=>a-b).join(", ");
+		ns.innerText=fs.length
+	}catch(e){ds.innerText=e.message}
+}
+		</script>
+	</body>
+</html>
