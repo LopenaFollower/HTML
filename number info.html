@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+		</style>
+	</head>
+	<body>
+		<input id=num></input><button onclick='display()'>Info</button>
+		<table><tbody id=tb></tbody></table>
+		<script>
+const{ceil,sqrt,log2}=Math;
+const{isInteger}=Number;
+function factors(n){
+	if(n==1)return[1];
+	let fs=[n];
+	for(let i=ceil(n/2);i>0;i--)
+		if(n%i<1)
+			fs.unshift(i);
+	return fs;
+}
+function divisors(n){
+	return factors(n).length;
+}
+function isAntiPrime(n){
+	let f=divisors(n);
+	for(let i=0;i<n;i++)
+		if(divisors(i)>=f)
+			return false;
+	return true;
+}
+function isPrime(n){
+	if(n==1)return false;
+	return divisors(n)<3;
+}
+function nextPrime(n){
+	for(let i=n+1;;i++)
+		if(isPrime(i))
+			return i;
+}
+function primeFactors(n){
+	let q=n;
+	let p=2;
+	let pfs=[];
+	while(1){
+		if(p>q)break;
+		if(isInteger(q/p)){
+			pfs.push(p);
+			q=q/p;
+		}else p=nextPrime(p);
+	}
+	return pfs;
+}
+function isMersennePrime(n){
+	if(!isPrime(n))return false;
+	if(isInteger(log2(n+1)))return true;
+}
+function isHappy(n){
+	let seen=new Set();
+	function squareSum(n){
+		return(""+n).split("").map(e=>e*e).reduce((a,b)=>a+b);
+	}
+	let s=squareSum(n);
+	while(1){
+		if(s<2)return true;
+		if(seen.has(s))return false;
+		seen.add(s);
+		s=squareSum(s);
+	}
+}
+function isPerfect(n){
+	return factors(n).reduce((a,b)=>a+b)==2*n;
+}
+function isTetrahedral(n){
+	for(let i=0;;i++){
+		let a=(i*(i+1)*(i+2))/6;
+		if(a==n)return true;
+		if(a>n)return false;
+	}
+}
+function isPractical(n){
+	let fs=factors(n).reverse();
+	let p=true;
+	for(let i=1;i<n;i++){
+		let s=0;
+		for(let f=0;f<fs.length;f++)
+			if(s+fs[f]<=i)
+				s+=fs[f];
+		if(s-i)p=false;
+	}
+	return p;
+}
+function isPerfectSquare(n){
+	return isInteger(sqrt(n));
+}
+function digitalRoot(n){
+	return(""+n).split("").map(e=>parseInt(e)).reduce((a,b)=>a+b);
+}
+function bool(b){
+	return b?"Yes":"No";
+}
+function display(){
+	let val=parseInt(num.value.replaceAll(/[^\d.]/g,""));
+	let tr=[],i=0;
+	let prime=isPrime(val);
+	tr[i++]=["isPerfectSquare",bool(isPerfectSquare(val))];
+	tr[i++]=["isPrime",bool(prime)];
+	if(prime){
+		tr[i++]=["isMersennePrime",bool(isMersennePrime(val))];
+	}else{
+		tr[i++]=["isAntiPrime",bool(isAntiPrime(val))];
+	}
+	tr[i++]=["factors",factors(val).join(", ")];
+	tr[i++]=["#factors",divisors(val)];
+	tr[i++]=["primeFactorization",primeFactors(val).join(" * ")];
+	tr[i++]=["isPerfect",bool(isPerfect(val))];
+	tr[i++]=["isPractical",bool(isPractical(val))];
+	tr[i++]=["isTetrahedral",bool(isTetrahedral(val))];
+	tr[i++]=["isHappy",bool(isHappy(val))];
+	tr[i++]=["digitalRoot",digitalRoot(val)];
+	tb.innerHTML="";
+	tr.forEach(e=>{
+		let t=document.createElement("tr");
+		tb.appendChild(t);
+		let a=document.createElement("td");
+		a.innerText=e[0];
+		t.appendChild(a);
+		let b=document.createElement("td");
+		b.innerText=e[1];
+		t.appendChild(b);
+	});
+}
+		</script>
+	</body>
+</html>
