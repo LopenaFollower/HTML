@@ -10,20 +10,20 @@
 		<input id=num></input><button onclick='display()'>Info</button>
 		<table border=1 style="border-collapse:collapse"><tbody id=tb></tbody></table>
 		<script>
-const{ceil,sqrt,log2}=Math;
+const{ceil,sqrt,log2,min:minVal,max:maxVal}=Math;
 const{isInteger}=Number;
+var fcs=[];
 async function factors(n){
 	if(n==1)return[1];
 	let fs=[n];
-	for(let i=ceil(n/2);i>0;i--){
+	for(let i=ceil(n/2),j=0;i>0;i--)
 		if(n%i<1)
 			fs.unshift(i);
-		await new Promise(r=>setTimeout(r));
-	}
+	await new Promise(r=>setTimeout(r,j=0));
 	return fs;
 }
 async function divisors(n){
-	return await factors(n).length;
+	return(await factors(n)).length;
 }
 async function isAntiPrime(n){
 	let f=await divisors(n);
@@ -33,29 +33,34 @@ async function isAntiPrime(n){
 	return true;
 }
 async function isPrime(n){
-	if(n<2)return false;
-	return await divisors(n)<3;
+	let u=ceil(sqrt(n));
+	for(let i=2;i<u;i++)
+		if(n%i===0)
+			return false;
+	return true;
 }
-async function nextPrime(n){
-	for(let i=n+1;;i++)
-		if(await isPrime(i))
-			return i;
-}
-async function primeFactors(n){
-	let q=n;
-	let p=2;
+async function primeFactors(q){
+	if(await isPrime(q))return[q];
+	let p=3,j=0;
 	let pfs=[];
-	while(1){
-		if(p>q)break;
-		if(isInteger(q/p)){
+	if(q%2<1){
+		pfs.push(2);
+		q/=2;
+	}
+	while(q>=2){
+		if(q%p==0){
 			pfs.push(p);
-			q=q/p;
-		}else p=await nextPrime(p);
+			q/=p;
+		}else p+=2;
+		if(++j>1e7){
+			console.log("pfs",q,p);
+			await new Promise(r=>setTimeout(r,j=0));
+		}
 	}
 	return pfs;
 }
 async function isSemiprime(n){
-	return await primeFactors(n).length==2;
+	return(await primeFactors(n)).length==2;
 }
 async function isMersennePrime(n){
 	if(!await isPrime(n))return false;
@@ -75,8 +80,8 @@ async function isHappy(n){
 		await new Promise(r=>setTimeout(r));
 	}
 }
-async function isPerfect(n){
-	return await factors(n).reduce((a,b)=>a+b)==2*n;
+function isPerfect(n){
+	return fcs.reduce((a,b)=>a+b)==2*n;
 }
 function isTetrahedral(n){
 	for(let i=1;;i++){
@@ -85,8 +90,8 @@ function isTetrahedral(n){
 		if(a>n)return false;
 	}
 }
-async function isPractical(n){
-	let fs=await factors(n).reverse();
+function isPractical(n){
+	let fs=[...fcs].reverse();
 	let p=true;
 	for(let i=1;i<n;i++){
 		let s=0;
@@ -104,7 +109,7 @@ function digitalRoot(n){
 	return(""+n).split("").map(e=>parseInt(e)).reduce((a,b)=>a+b);
 }
 async function isChenPrime(n){
-	if(! await isPrime(n))return false;
+	if(!await isPrime(n))return false;
 	return await isPrime(n+2)||await isSemiprime(n+2);
 }
 async function isCircularPrime(n){
@@ -135,68 +140,70 @@ async function isPythagoreanPrime(n){
 	}
 }
 async function isSophieGermainPrime(n){
-	return await isPrime(n)&& await isPrime(2*n+1);
+	return await isPrime(n)&&await isPrime(2*n+1);
 }
 async function isIsolatedPrime(n){
 	return await isPrime(n)&&!(await isPrime(n-2)||await isPrime(n+2));
 }
 async function isSafePrime(n){
-	return await isPrime(n)&& await isPrime((n-1)/2);
+	return await isPrime(n)&&await isPrime((n-1)/2);
 }
 async function isSphenic(n){
 	let pfs=await primeFactors(n);
 	return pfs.length==3&&new Set(pfs).size==3;
 }
-async function isAbundant(n){
-	return await factors(n).reduce((a,b)=>a+b)-n>n;
+function isAbundant(n){
+	return fcs.reduce((a,b)=>a+b)-n>n;
 }
 function bool(b){
 	return b?"Yes":"No";
 }
-async function display(){
-	let val=parseInt(num.value.replaceAll(/[^\d.]/g,""));
-	if(isNaN(val))return;
-	let tr=[],i=0;
-	let prime=isPrime(val);
-	tr[i++]=["factors",await factors(val).join(", ")];
-	tr[i++]=["#factors",divisors(val)];
-	tr[i++]=["primeFactorization",primeFactors(val).join(" * ")];
-	tr[i++]=["digitalRoot",digitalRoot(val)];
-	tr[i++]=["isPerfect",bool(isPerfect(val))];
-	tr[i++]=["isPractical",bool(isPractical(val))];
-	tr[i++]=["isTetrahedral",bool(isTetrahedral(val))];
-	tr[i++]=["isHappy",bool(await isHappy(val))];
-	tr[i++]=["isPrime",bool(prime)];
-	if(prime){
-		tr[i++]=["isMersennePrime",bool(isMersennePrime(val))];
-		tr[i++]=["isChenPrime",bool(isChenPrime(val))];
-		tr[i++]=["isCircularPrime",bool(isCircularPrime(val))];
-		tr[i++]=["isEisensteinPrime",bool(isEisensteinPrime(val))];
-		tr[i++]=["isGaussianPrime",bool(isGaussianPrime(val))];
-		tr[i++]=["isPythagoreanPrime",bool(isPythagoreanPrime(val))];
-		tr[i++]=["isSophieGermainPrime",bool(isSophieGermainPrime(val))];
-		tr[i++]=["isIsolatedPrime",bool(isIsolatedPrime(val))];
-		tr[i++]=["isSafePrime",bool(isSafePrime(val))];
-	}else{
-		tr[i++]=["isSemiprime",bool(isSemiprime(val))];
-		tr[i++]=["isAntiPrime",bool(isAntiPrime(val))];
-		tr[i++]=["isPerfectSquare",bool(isPerfectSquare(val))];
-		tr[i++]=["isSphenic",bool(isSphenic(val))];
-		tr[i++]=["isAbundant",bool(isAbundant(val))];
-	}
-	tb.innerHTML="";
-	tr.forEach(e=>{
-		let t=document.createElement("tr");
-		tb.appendChild(t);
-		let a=document.createElement("td");
-		a.innerText=e[0];
-		t.appendChild(a);
-		let b=document.createElement("td");
-		b.innerText=e[1];
-		t.appendChild(b);
-	});
+function append(e){
+	let t=document.createElement("tr");
+	tb.appendChild(t);
+	let a=document.createElement("td");
+	a.innerText=e[0];
+	t.appendChild(a);
+	let b=document.createElement("td");
+	b.innerText=e[1];
+	t.appendChild(b);
 }
-let ar=new Array(100).fill().map((e,i)=>++i).filter(isAbundant);
+async function display(){
+	let val=minVal(2147483647,parseInt(num.value.replaceAll(/[^\d.]/g,"")));
+	if(isNaN(val))return;
+	num.value=val;
+	console.clear();
+	fcs=await factors(val);
+	let prime=await isPrime(val);
+	tb.innerHTML="";
+	append(["factors",fcs.join(", ")]);
+	append(["#factors",fcs.length]);
+	append(["primeFactorization",(await primeFactors(val)).join(" * ")]);
+	append(["digitalRoot",digitalRoot(val)]);
+	append(["isPrime",bool(prime)]);
+	append(["isPerfect",bool(isPerfect(val))]);
+	append(["isPractical",bool(isPractical(val))]);
+	append(["isTetrahedral",bool(isTetrahedral(val))]);
+	append(["isHappy",bool(await isHappy(val))]);
+	if(prime){
+		append(["isMersennePrime",bool(await isMersennePrime(val))]);
+		append(["isEisensteinPrime",bool(await isEisensteinPrime(val))]);
+		append(["isGaussianPrime",bool(await isGaussianPrime(val))]);
+		ppend(["isPythagoreanPrime",bool(await isPythagoreanPrime(val))]);
+		append(["isSophieGermainPrime",bool(await isSophieGermainPrime(val))]);
+		append(["isIsolatedPrime",bool(await isIsolatedPrime(val))]);
+		append(["isSafePrime",bool(await isSafePrime(val))]);
+		append(["isChenPrime",bool(await isChenPrime(val))]);
+		append(["isCircularPrime",bool(await isCircularPrime(val))]);
+	}else{
+		append(["isSemiprime",bool(await isSemiprime(val))]);
+		append(["isAntiPrime",bool(await isAntiPrime(val))]);
+		append(["isPerfectSquare",bool(isPerfectSquare(val))]);
+		append(["isSphenic",bool(await isSphenic(val))]);
+		append(["isAbundant",bool(isAbundant(val))]);
+	}
+	console.log("done");
+}
 		</script>
 	</body>
 </html>
