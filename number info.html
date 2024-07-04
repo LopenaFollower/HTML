@@ -8,38 +8,40 @@
 	</head>
 	<body>
 		<input id=num></input><button onclick='display()'>Info</button>
-		<table><tbody id=tb></tbody></table>
+		<table border=1 style="border-collapse:collapse"><tbody id=tb></tbody></table>
 		<script>
 const{ceil,sqrt,log2}=Math;
 const{isInteger}=Number;
-function factors(n){
+async function factors(n){
 	if(n==1)return[1];
 	let fs=[n];
-	for(let i=ceil(n/2);i>0;i--)
+	for(let i=ceil(n/2);i>0;i--){
 		if(n%i<1)
 			fs.unshift(i);
+		await new Promise(r=>setTimeout(r));
+	}
 	return fs;
 }
-function divisors(n){
-	return factors(n).length;
+async function divisors(n){
+	return await factors(n).length;
 }
-function isAntiPrime(n){
-	let f=divisors(n);
+async function isAntiPrime(n){
+	let f=await divisors(n);
 	for(let i=0;i<n;i++)
-		if(divisors(i)>=f)
+		if(await divisors(i)>=f)
 			return false;
 	return true;
 }
-function isPrime(n){
-	if(n==1)return false;
-	return divisors(n)<3;
+async function isPrime(n){
+	if(n<2)return false;
+	return await divisors(n)<3;
 }
-function nextPrime(n){
+async function nextPrime(n){
 	for(let i=n+1;;i++)
-		if(isPrime(i))
+		if(await isPrime(i))
 			return i;
 }
-function primeFactors(n){
+async function primeFactors(n){
 	let q=n;
 	let p=2;
 	let pfs=[];
@@ -48,15 +50,18 @@ function primeFactors(n){
 		if(isInteger(q/p)){
 			pfs.push(p);
 			q=q/p;
-		}else p=nextPrime(p);
+		}else p=await nextPrime(p);
 	}
 	return pfs;
 }
-function isMersennePrime(n){
-	if(!isPrime(n))return false;
+async function isSemiprime(n){
+	return await primeFactors(n).length==2;
+}
+async function isMersennePrime(n){
+	if(!await isPrime(n))return false;
 	if(isInteger(log2(n+1)))return true;
 }
-function isHappy(n){
+async function isHappy(n){
 	let seen=new Set();
 	function squareSum(n){
 		return(""+n).split("").map(e=>e*e).reduce((a,b)=>a+b);
@@ -67,20 +72,21 @@ function isHappy(n){
 		if(seen.has(s))return false;
 		seen.add(s);
 		s=squareSum(s);
+		await new Promise(r=>setTimeout(r));
 	}
 }
-function isPerfect(n){
-	return factors(n).reduce((a,b)=>a+b)==2*n;
+async function isPerfect(n){
+	return await factors(n).reduce((a,b)=>a+b)==2*n;
 }
 function isTetrahedral(n){
-	for(let i=0;;i++){
+	for(let i=1;;i++){
 		let a=(i*(i+1)*(i+2))/6;
 		if(a==n)return true;
 		if(a>n)return false;
 	}
 }
-function isPractical(n){
-	let fs=factors(n).reverse();
+async function isPractical(n){
+	let fs=await factors(n).reverse();
 	let p=true;
 	for(let i=1;i<n;i++){
 		let s=0;
@@ -97,28 +103,87 @@ function isPerfectSquare(n){
 function digitalRoot(n){
 	return(""+n).split("").map(e=>parseInt(e)).reduce((a,b)=>a+b);
 }
+async function isChenPrime(n){
+	if(! await isPrime(n))return false;
+	return await isPrime(n+2)||await isSemiprime(n+2);
+}
+async function isCircularPrime(n){
+	return await isPrime(n)&&await isPrime(parseInt((n+"").split("").reverse().join("")));
+}
+async function isEisensteinPrime(n){
+	if(!await isPrime(n))return false;
+	for(let i=1;;i++){
+		let a=3*i-1;
+		if(a==n)return true;
+		if(a>n)return false;
+	}
+}
+async function isGaussianPrime(n){
+	if(!await isPrime(n))return false;
+	for(let i=0;;i++){
+		let a=4*i+3;
+		if(a==n)return true;
+		if(a>n)return false;
+	}
+}
+async function isPythagoreanPrime(n){
+	if(!await isPrime(n))return false;
+	for(let i=0;;i++){
+		let a=4*i+1;
+		if(a==n)return true;
+		if(a>n)return false;
+	}
+}
+async function isSophieGermainPrime(n){
+	return await isPrime(n)&& await isPrime(2*n+1);
+}
+async function isIsolatedPrime(n){
+	return await isPrime(n)&&!(await isPrime(n-2)||await isPrime(n+2));
+}
+async function isSafePrime(n){
+	return await isPrime(n)&& await isPrime((n-1)/2);
+}
+async function isSphenic(n){
+	let pfs=await primeFactors(n);
+	return pfs.length==3&&new Set(pfs).size==3;
+}
+async function isAbundant(n){
+	return await factors(n).reduce((a,b)=>a+b)-n>n;
+}
 function bool(b){
 	return b?"Yes":"No";
 }
-function display(){
+async function display(){
 	let val=parseInt(num.value.replaceAll(/[^\d.]/g,""));
+	if(isNaN(val))return;
 	let tr=[],i=0;
 	let prime=isPrime(val);
-	tr[i++]=["isPerfectSquare",bool(isPerfectSquare(val))];
-	tr[i++]=["isPrime",bool(prime)];
-	if(prime){
-		tr[i++]=["isMersennePrime",bool(isMersennePrime(val))];
-	}else{
-		tr[i++]=["isAntiPrime",bool(isAntiPrime(val))];
-	}
-	tr[i++]=["factors",factors(val).join(", ")];
+	tr[i++]=["factors",await factors(val).join(", ")];
 	tr[i++]=["#factors",divisors(val)];
 	tr[i++]=["primeFactorization",primeFactors(val).join(" * ")];
+	tr[i++]=["digitalRoot",digitalRoot(val)];
 	tr[i++]=["isPerfect",bool(isPerfect(val))];
 	tr[i++]=["isPractical",bool(isPractical(val))];
 	tr[i++]=["isTetrahedral",bool(isTetrahedral(val))];
-	tr[i++]=["isHappy",bool(isHappy(val))];
-	tr[i++]=["digitalRoot",digitalRoot(val)];
+	tr[i++]=["isHappy",bool(await isHappy(val))];
+	tr[i++]=["isPrime",bool(prime)];
+	if(prime){
+		tr[i++]=["isMersennePrime",bool(isMersennePrime(val))];
+		tr[i++]=["isChenPrime",bool(isChenPrime(val))];
+		tr[i++]=["isCircularPrime",bool(isCircularPrime(val))];
+		tr[i++]=["isEisensteinPrime",bool(isEisensteinPrime(val))];
+		tr[i++]=["isGaussianPrime",bool(isGaussianPrime(val))];
+		tr[i++]=["isPythagoreanPrime",bool(isPythagoreanPrime(val))];
+		tr[i++]=["isSophieGermainPrime",bool(isSophieGermainPrime(val))];
+		tr[i++]=["isIsolatedPrime",bool(isIsolatedPrime(val))];
+		tr[i++]=["isSafePrime",bool(isSafePrime(val))];
+	}else{
+		tr[i++]=["isSemiprime",bool(isSemiprime(val))];
+		tr[i++]=["isAntiPrime",bool(isAntiPrime(val))];
+		tr[i++]=["isPerfectSquare",bool(isPerfectSquare(val))];
+		tr[i++]=["isSphenic",bool(isSphenic(val))];
+		tr[i++]=["isAbundant",bool(isAbundant(val))];
+	}
 	tb.innerHTML="";
 	tr.forEach(e=>{
 		let t=document.createElement("tr");
@@ -131,6 +196,7 @@ function display(){
 		t.appendChild(b);
 	});
 }
+let ar=new Array(100).fill().map((e,i)=>++i).filter(isAbundant);
 		</script>
 	</body>
 </html>
