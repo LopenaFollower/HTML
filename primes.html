@@ -11,17 +11,18 @@
 		<button onclick="save()">download</button><br>
 		prime count: <span id=nc></span><br>
 		prime/s: <span id=ps></span><br>
+		cur prime <span id=cur></span><br>
 		nth prime<input id=nth type=number oninput='try{dis.innerText=primes[this.value-1].toLocaleString()}catch(e){}'/>
 		<p id=dis></p>
 		<script>
 function g(n){
-	for(let i=0;i<Math.sqrt(p)|0;i++)if(n%primes[i]==0)return false;
+	for(let i=1;i<Math.sqrt(p)|0;i++)
+		if(n%primes[i]==0)return false;
 	primes[p++]=n;
 }
 let primes=[2,3],p=primes.length,n=primes[p-1]
 setInterval(()=>{
-	for(let i=0;i<1e4;i++)
-		g(n+=2)
+	for(let i=0;i<2e4;i++)g(n+=2);
 });
 (function(){
 	let e1=Date.now(),f=0,per=p;
@@ -29,15 +30,13 @@ setInterval(()=>{
 		let rate=1;
 		if(Date.now()-e1<=1e3/rate)f+=rate
 		else{
-			
-			ps.innerText=p-per;
-			per=p
+			ps.innerText=p-per;per=p
 			e1=Date.now()
-			fps.innerText=f
-			f=0
+			fps.innerText=f;f=0
 		}
 		nc.innerText=p.toLocaleString()
-		requestAnimationFrame(update)
+		cur.innerText=primes[p-1];
+		requestAnimationFrame(update);
 	}
 	requestAnimationFrame(update)
 })();
