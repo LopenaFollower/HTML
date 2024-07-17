@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+			#results{
+				display:flex;
+				max-width:100%;
+				flex-wrap:wrap;
+			}
+			img{
+				width:220px;
+			}
+			.item{
+				display:flex;
+				flex-direction:column;
+				justify-content:space-between;
+				width:220px;
+				margin:1px;
+				border:1px solid #000;
+				text-align:center;
+				align-items:stretch;
+			}
+		</style>
+	</head>
+	<body>
+		<input oninput="searchTags(this.value.trim().toLowerCase())"></input>
+		<div id=results></div>
+		<script>
+const prefix="https://media.discordapp.net/attachments/1222430477101826130/"
+const data=[
+	{
+		name:"Piccadily Circus, London UK",
+		img:prefix+"1262074198361378940/image.png?ex=669545b1&is=6693f431&hm=a0236211f8a32f835b17992c119ff02d35b93c1b52feed9db47edc4a63f7369b&=&format=webp&quality=lossless&width=398&height=205",
+		loc:prefix+"1262082663737462835/image.png?ex=66954d93&is=6693fc13&hm=1d582344472cd27917a6e45572eb9f37e1cf025e85b45206b53aab4bf8a2e8e7&=&format=webp&quality=lossless&width=652&height=621",
+		tags:["square","eu","circus"]
+	},{
+		name:"Forbidden City, China",
+		img:prefix+"1262074431212097646/image.png?ex=669545e8&is=6693f468&hm=7fe9e658e2f07d46b362277f2b536e6ffd720049dd2e14c7776e64287d20adda&=&format=webp&quality=lossless&width=494&height=257",
+		loc:prefix+"1262084057592758292/image.png?ex=66954edf&is=6693fd5f&hm=bdc2934fc64ac2267bc8cca81592cfbda9b0bcdb14be50a1153962777e152154&=&format=webp&quality=lossless&width=369&height=314",
+		tags:["asia","asian","redroof","pointed","forbidden","temple","china"]
+	},{
+		name:"Bath, Somerset UK",
+		img:prefix+"1262074308474175558/image.png?ex=669545cb&is=6693f44b&hm=ed8168ed8efe196e85a6d52b41b74f525d0c77c61952e73f1097fbe20194f09b&=&format=webp&quality=lossless&width=448&height=223",
+		loc:prefix+"1262084624310468669/image.png?ex=66954f66&is=6693fde6&hm=5708bfc5357268475b8f1f594127103ab0f8d015c2bc3e1699e8381beace0832&=&format=webp&quality=lossless&width=322&height=314",
+		tags:["castle","eu","cathedral","white","bath","somerset"]
+	},{
+		name:"Alhambra, Spain",
+		img:prefix+"1262074534354223124/image.png?ex=6695eec1&is=66949d41&hm=d0c07ee966f2c58159661ee349e997691a862c21f4e610fd488ee1ae07190a88&=&format=webp&quality=lossless&width=494&height=257",
+		loc:prefix+"1262259389172023408/image.png?ex=6695f22a&is=6694a0aa&hm=fc62d3366051bfc6940a4f4cc0a02a98af3a320403a9c3686863047e470d3cca&=&format=webp&quality=lossless&width=692&height=621",
+		tags:["castle","elevated","eu","mt","mountain","alhambra"]
+	},{
+		name:"Cinque Terre, Italy",
+		img:prefix+"1262074667632689343/image.png?ex=6695eee0&is=66949d60&hm=22272153aba55eb28be44bbd1d60f9f4e372a751017ea3eb652153299be0b52f&=&format=webp&quality=lossless&width=340&height=168",
+		loc:prefix+"1262263450219053167/image.png?ex=6695f5f2&is=6694a472&hm=ebb7e33d894e8ba3e796072f9aec9a68abfb5aaf45a5b4982feee24a3b2d48c3&=&format=webp&quality=lossless&width=529&height=440",
+		tags:["red","boat","beach","eu","water","cinque","terre"]
+	},{
+		name:"Yellowstone National Park, US",
+		img:prefix+"1262074760318287944/image.png?ex=6695eef7&is=66949d77&hm=ae389d9a8d5c33b5c77a650b325a362bc075fb003444743bf43df280aa035f14&=&format=webp&quality=lossless&width=332&height=170",
+		loc:prefix+"1262264438480830494/image.png?ex=6695f6dd&is=6694a55d&hm=046916f917d3e6e91ee0d43f2efe399713a00fefd8ea8ab2376036890eac3dfc&=&format=webp&quality=lossless&width=539&height=378",
+		tags:["spring","mt","steam","orange","yellow","water"]
+	},{
+		name:"Uluru, Australia",
+		img:prefix+"1262074869185777685/image.png?ex=6695ef11&is=66949d91&hm=2298d67696f1c767e2c3d1253b022e8a9fcceaebbaf1ac29f55855a45e2e2136&=&format=webp&quality=lossless&width=325&height=170",
+		loc:prefix+"1262265343586340945/image.png?ex=6695f7b5&is=6694a635&hm=03cd8065add6a7ad16038760b1472808ad06863d6705d3f689c734c93e487cfb&=&format=webp&quality=lossless&width=370&height=314",
+		tags:["mt","mountain","red","desert","flat"]
+	},{
+		name:"Times Square, NY",
+		img:prefix+"1262075054921879643/image.png?ex=6695ef3d&is=66949dbd&hm=5b74366eed3bb9d269500c538b11e379975f54266fa897c22e66d36a0ccfb8d2&=&format=webp&quality=lossless&width=432&height=226",
+		loc:prefix+"1262266203901132810/image.png?ex=6695f882&is=6694a702&hm=6f38695893c21e34f5468326f5e11f9b1a2fe501e1293c4054a8ffa93fb47461&=&format=webp&quality=lossless&width=305&height=314",
+		tags:["times","billboard","buildings","square"]
+	},{
+		name:"Space Needle",
+		img:prefix+"1262075160727392266/image.png?ex=6695ef56&is=66949dd6&hm=d9944564cb985115d151d8a128010d81f34783e8498996ef38a513bdd9a370dd&=&format=webp&quality=lossless&width=463&height=244",
+		loc:prefix+"1262267083077713961/image.png?ex=6695f954&is=6694a7d4&hm=dadb0939564263abba380e6cbe2fd58d578a37ccf0a27c820a054d6da8e06950&=&format=webp&quality=lossless&width=404&height=472",
+		tags:["round","circle","tower","needle","space"]
+	},{
+		name:"Nazca Lines",
+		img:prefix+"1262075276947361973/image.png?ex=6695ef72&is=66949df2&hm=aa5bc1660fcdc0245eaac9c486aa133d523420efad12b841452d099e82756ed4&=&format=webp&quality=lossless&width=472&height=244",
+		loc:prefix+"1262267918599716896/image.png?ex=6695fa1b&is=6694a89b&hm=581bff001b7931b42c1561b48e457c876b8c59814c1f6d6829c22f9ca55843e0&=&format=webp&quality=lossless&width=499&height=456",
+		tags:["hill","brown","mountain","mt","lines","nazca"]
+	},{
+		name:"Maldives",
+		img:prefix+"1262075400540917852/image.png?ex=6695ef8f&is=66949e0f&hm=8e40dd1921a9ddc528df652112ba62e50dd5c99e07fb399c7c54f352542c2509&=&format=webp&quality=lossless&width=460&height=244",
+		loc:prefix+"1262269686616424488/image.png?ex=6695fbc1&is=6694aa41&hm=7ac89c4e4a3bf50550a13338db5d092aeaa7dc7063d2eb2e5174d75fd960d492&=&format=webp&quality=lossless&width=653&height=377",
+		tags:["palm","sea","huts","water","maldives"]
+	},{
+		name:"Rock of Gibraltar",
+		img:prefix+"1262075569395466250/image.png?ex=6695efb7&is=66949e37&hm=a5c62707ad96360d2c9f40d0f433c8157520e385eab50fd938744a5652cb1366&=&format=webp&quality=lossless&width=321&height=183",
+		loc:prefix+"1262270597719785542/image.png?ex=6695fc9a&is=6694ab1a&hm=411097233f689e07f17147de1001475138b287059a65d0eab7e8ff2e4f593d92&=&format=webp&quality=lossless&width=668&height=525",
+		tags:["mt","mountain","tower","white","eu","rock","gibraltar","elevated"]
+	},{
+		name:"Christ The Redeemer",
+		img:prefix+"1262075754951344189/image.png?ex=6695efe4&is=66949e64&hm=65e7d630bcd3855e40a845675730e1b622e4dff3abae6ce88f5f2eec615a74a8&=&format=webp&quality=lossless&width=332&height=172",
+		loc:prefix+"1262276941374029854/image.png?ex=66960282&is=6694b102&hm=0181633a7a678bce0a0730fe928594ed658fd9b7d87060ac4cb1e6a88681feb3&=&format=webp&quality=lossless&width=474&height=566",
+		tags:["statue","redeemer","elevated"]
+	},{
+		name:"Windsor Castle, UK",
+		img:prefix+"1262075923193270394/image.png?ex=6695f00c&is=66949e8c&hm=ef581e0ec5896122b1defa954610288c34697c15e85088ba9deca168f476a045&=&format=webp&quality=lossless&width=392&height=206",
+		loc:prefix+"1262278700569722890/image.png?ex=66960426&is=6694b2a6&hm=d816bdfb2b70005ab45e1937bb7c061c24d117af38d3e9fb247e017dc0a8186c&=&format=webp&quality=lossless&width=380&height=314",
+		tags:["castle","eu"]
+	},{
+		name:"Istanbul",
+		img:prefix+"1262076059814330449/image.png?ex=6695f02c&is=66949eac&hm=75d7fc7ca3e09dc016fbac9e4c507a2cc97cd76de1fda0bcc3b97d98c3bd61ab&=&format=webp&quality=lossless&width=431&height=228",
+		loc:prefix+"1262279551581683772/image.png?ex=669604f1&is=6694b371&hm=6876d898646db7e66ab4aa265475982a8495724fc79bdd19e10ae0bfd2d6a79c&=&format=webp&quality=lossless&width=494&height=300",
+		tags:["colors","round","castle","eu"]
+	},{
+		name:"Millau Bridge",
+		img:prefix+"1262076394398290000/image.png?ex=6695f07c&is=66949efc&hm=582e4f1220487f791c4be33fffb3112640491f971e0df23ca74afe664e24a083&=&format=webp&quality=lossless&width=324&height=171",
+		loc:prefix+"1262280350403399812/image.png?ex=669605af&is=6694b42f&hm=b1ea288e03ef08f622d6b86a7b6a3545c03e39931b36dd491537e24983a28ac3&=&format=webp&quality=lossless&width=701&height=442",
+		tags:["bridge","eu","white","fog"]
+	},{
+		name:"Drottningholm Palace",
+		img:prefix+"1262076514690928650/image.png?ex=6695f099&is=66949f19&hm=4396020c71949cfcf125735a879f346e0855b42faf9f063ef97732057ff12335&=&format=webp&quality=lossless&width=282&height=143",
+		loc:prefix+"1262280924234649630/image.png?ex=66960638&is=6694b4b8&hm=8b9c31225379066b802fec9c6953bfa1e2380fa36dc003836baaee5818d88494&=&format=webp&quality=lossless&width=455&height=422",
+		tags:["green","eu","palace","pool","pond","bush"]
+	},{
+		name:"Osaka Castle",
+		img:prefix+"1262076675227648120/image.png?ex=6695f0bf&is=66949f3f&hm=d82926c60c5fe0d6d5b65854302ca5822b6569f73fa1934c3cfe6f06d87dae1e&=&format=webp&quality=lossless&width=428&height=226",
+		loc:prefix+"1262281642148364338/image.png?ex=669606e3&is=6694b563&hm=cf5bc7fc35f6dd0d57df3f02767dc0348eb857daa0962143e91781eeb9308dd6&=&format=webp&quality=lossless&width=473&height=367",
+		tags:["sign","temple","asia","asian","white","pointed"]
+	},{
+		name:"Notre-Dame Cathedral",
+		img:prefix+"1262076926663852094/image.png?ex=6695f0fb&is=66949f7b&hm=1ddaaa6e2da11475875e9563ff717c901132cb7628722dc0b5a83b1fecbb49ba&=&format=webp&quality=lossless&width=428&height=225",
+		loc:prefix+"1262282595538960394/image.png?ex=669607c6&is=6694b646&hm=c4fced938705a212646e37d4cf303b574c1fab81116e05329e396301a4c6194e&=&format=webp&quality=lossless&width=426&height=314",
+		tags:["tower","twin","eu","canal","2"]
+	},{
+		name:"Bran Castle",
+		img:prefix+"1262077070364774412/image.png?ex=6695f11d&is=66949f9d&hm=fdccaf99b68b4156a751d15cc1f660dd252ffed324f385c3d29a8c9efb85e2c0&=&format=webp&quality=lossless&width=314&height=160",
+		loc:prefix+"1262283478649667604/image.png?ex=66960899&is=6694b719&hm=f8d0e7c30e93e109e8c96ebaf47d60f57617c2e79caa8816f886255fda956b38&=&format=webp&quality=lossless&width=271&height=197",
+		tags:["elevated","castle","eu"]
+	},{
+		name:"Berlin Cathedral",
+		img:prefix+"1262077141701496974/image.png?ex=6695f12e&is=66949fae&hm=a6508aeb331448e6b001fc533b68c704e8832c1da09289ed8e71d7d4fee285d1&=&format=webp&quality=lossless&width=332&height=170",
+		loc:prefix+"1262283867843461120/image.png?ex=669608f6&is=6694b776&hm=3feadb37341a642f29542bb735bac72a89f19d849cc28da3bc061a446a1bf001&=&format=webp&quality=lossless&width=357&height=314",
+		tags:["cathedral","palace","castle","round","eu","yellow","white"]
+	},{
+		name:"Galapagos Islands",
+		img:prefix+"1262077295854751896/image.png?ex=6695f153&is=66949fd3&hm=022c41477318b1d0a176c9633664e306d103d352149cb39390aa5cada5929eba&=&format=webp&quality=lossless&width=338&height=168",
+		loc:prefix+"1262284521697710110/image.png?ex=66960992&is=6694b812&hm=c2bfe5b4e0f1c6a5457234d615a02a40e94daeb21dbfb1986496535f291dcf99&=&format=webp&quality=lossless&width=323&height=314",
+		tags:["lake","island","fog","water"]
+	},{
+		name:"Tower of Pisa",
+		img:prefix+"1262077375508779132/image.png?ex=6695f166&is=66949fe6&hm=12ce007ab13994f97348f812e0f1e003f4f9dc7f804bfe2f3a624294d28db641&=&format=webp&quality=lossless&width=332&height=175",
+		loc:prefix+"1262285808958705736/image.png?ex=66960ac4&is=6694b944&hm=71c832948ecefa0eb6579f29c88bd5c6bc3406e56a65b980094bf908ad929554&=&format=webp&quality=lossless&width=467&height=365",
+		tags:["pisa","tower","eu"]
+	},{
+		name:"Mont Saint-Michel",
+		img:prefix+"1262077551065432216/image.png?ex=6695f190&is=6694a010&hm=995a1af9908c99be4d8b32164b869caad68d5f66e893f9edc834248418bda315&=&format=webp&quality=lossless&width=444&height=230",
+		loc:prefix+"1262286380730679346/image.png?ex=66960b4d&is=6694b9cd&hm=24ad5565cc8cfd07e0e8ac7f4396d7f28cb020c460d6849ede2811e3bb358842&=&format=webp&quality=lossless&width=449&height=314",
+		tags:["castle","water","eu","elevated","mt","mountain"]
+	},{
+		name:"Milan Cathedral",
+		img:prefix+"1262077742954844221/image.png?ex=6695f1be&is=6694a03e&hm=0f45f5905b0b8f39157909c4071eedc2e81e19a957a7edca2f7f16e2741fe358&=&format=webp&quality=lossless&width=452&height=233",
+		loc:prefix+"1262286880775340042/image.png?ex=66960bc4&is=6694ba44&hm=c1627930ccde34184416ba39bf009eb86d0fb77971435c8f09143dffc250c04f&=&format=webp&quality=lossless&width=384&height=314",
+		tags:["eu","cathedral"]
+	},{
+		name:"St. Basil's Cathedral",
+		img:prefix+"1262077798680363079/image.png?ex=6695f1cb&is=6694a04b&hm=299cb147573b681d76747fee11a29a76204f59cc3cc093455155c4b11f1d26a3&=&format=webp&quality=lossless&width=440&height=232",
+		loc:prefix+"1262287345546301540/image.png?ex=66960c33&is=6694bab3&hm=7ae065d6fe994637aa5dab7fd48c5bbe2c85f50c2cb66d1868d3fb743c190b67&=&format=webp&quality=lossless&width=368&height=314",
+		tags:["colors","russia","eu"]
+	},{
+		name:"Piezza del Campo",
+		img:prefix+"1262079559461896385/image.png?ex=6695f36f&is=6694a1ef&hm=f31f44cf2795eba2e75a3e7bc4db751df58477698356a5e72bd4d0590d2b5db3&=&format=webp&quality=lossless&width=341&height=179",
+		loc:prefix+"1262288045244420116/image.png?ex=66960cda&is=6694bb5a&hm=112d442a4356d8de34b5b5ca52cf696c4f66c4b59856db0206198fa36642c7ae&=&format=webp&quality=lossless&width=439&height=314",
+		tags:["tall","tower","eu","red"]
+	},{
+		name:"Atacama Desert",
+		img:prefix+"1262079671139569724/image.png?ex=6695f389&is=6694a209&hm=356b6ad12ed57c7ba544fe6366f0394236f5a2237b7e3c5094e45f630bf0d13a&=&format=webp&quality=lossless&width=314&height=161",
+		loc:prefix+"1262288408449908786/image.png?ex=66960d30&is=6694bbb0&hm=5c3ec6f8b5174fe78e312aa3a1bfe1059b58de6d20988dd509447d4adfbcd41a&=&format=webp&quality=lossless&width=231&height=314",
+		tags:["desert","red","mt","mountain"]
+	},{
+		name:"Redwood National and State Parks",
+		img:prefix+"1262079723820028014/image.png?ex=6695f396&is=6694a216&hm=0dd5fe445c8d6c1886e28987e10b86c939520553a1ed84c74cab30fe2915f442&=&format=webp&quality=lossless&width=314&height=165",
+		loc:prefix+"1262288655280640040/image.png?ex=66960d6b&is=6694bbeb&hm=2b75cf52e4e6d69c5be3ea864aa29247381eb81654e7b5029e3fe74fbe7937fa&=&format=webp&quality=lossless&width=345&height=314",
+		tags:["forest","bigtrees"]
+	},{
+		name:"Borobudur Temple",
+		img:prefix+"1262079836621377676/image.png?ex=6695f3b1&is=6694a231&hm=5f5255cce737abb3fdebf9ce3a5e6f66094460abbf620db98e0b14e876837345&=&format=webp&quality=lossless&width=314&height=160",
+		loc:prefix+"1262288931546861569/image.png?ex=66960dad&is=6694bc2d&hm=b0ad840c8acb6d17734b91a0f298468cb29585e98c3ec5fa577dbc839e15c2af&=&format=webp&quality=lossless&width=404&height=314",
+		tags:["temple","asia","round","pointed","spike"]
+	},{
+		name:"St. Mark's Square",
+		img:prefix+"1262080184509530232/image.png?ex=6695f404&is=6694a284&hm=cb347cef1c3366e5afd84b4d72e3333303ea0b68635982f4e0a586301cc4673c&=&format=webp&quality=lossless&width=400&height=203",
+		loc:prefix+"1262289553251762217/image.png?ex=66960e41&is=6694bcc1&hm=0c261abf3621f3137516e663c3ea1733224bd925fa9b50dfbdc1ace963b24b6e&=&format=webp&quality=lossless&width=272&height=314",
+		tags:["tower","red","statue"]
+	},{
+		name:"Dolomites",
+		img:prefix+"1262080304697315328/image.png?ex=6695f420&is=6694a2a0&hm=d1348976f2a95cd1a1274d68a0896cfc352c83a78d3ba2a229361f82c14c9aed&=&format=webp&quality=lossless&width=453&height=229",
+		loc:prefix+"1262289911458041887/image.png?ex=66960e97&is=6694bd17&hm=be3d7fd4e6ceeab78e050ac780304e68937003ee9c2e8f767269e36d5759f54c&=&format=webp&quality=lossless&width=380&height=396",
+		tags:["mt","mountain","field","eu"]
+	},{
+		name:"CN Tower",
+		img:prefix+"1262080400738619402/image.png?ex=6695f437&is=6694a2b7&hm=008a1aa88c92e53fa1906ce6a0787b1b33a9e560de5a4b7f7c2c759e2cbc4a30&=&format=webp&quality=lossless&width=495&height=250",
+		loc:prefix+"1262290397296721960/image.png?ex=66960f0a&is=6694bd8a&hm=745ca04cba6b3821459c592fc8f3608999b00e4f347d634f8d270e83da2d9789&=&format=webp&quality=lossless&width=422&height=608",
+		tags:["cn","tower","city","water"]
+	},{
+		name:"Chapel Bridge",
+		img:prefix+"1262080521031389264/image.png?ex=6695f454&is=6694a2d4&hm=b3cc4da5d503db667e017b1ca081b8b588a4ed8e7adcda47852a073af0a8fd30&=&format=webp&quality=lossless&width=490&height=252",
+		loc:prefix+"1262290763195219978/image.png?ex=66960f62&is=6694bde2&hm=acb3d132b512e51538d1ccfc429780a77d73ff23618f3ed4479177b696d278c9&=&format=webp&quality=lossless&width=269&height=314",
+		tags:["bridge","tower","water"]
+	},{
+		name:"Mt Everest",
+		img:prefix+"1262080627998724116/image.png?ex=6695f46e&is=6694a2ee&hm=8a74e1e638d25b9a0752ebd548cb2bf5b987fdf714bf9df7905a55bc425defc5&=&format=webp&quality=lossless&width=494&height=253",
+		loc:prefix+"1262291150908166206/image.png?ex=66960fbe&is=6694be3e&hm=b3ca2c4444dd1f915c0710059c2af71f83226fb0fd6439b908be2ac6ff51ce1b&=&format=webp&quality=lossless&width=475&height=413",
+		tags:["everest","mt","mountain","gravel","snow"]
+	},{
+		name:"Bryggen",
+		img:prefix+"1262080819464376380/image.png?ex=6695f49b&is=6694a31b&hm=bb515ae66cc547754adffa230e2f919d1d3e7e840be0c6400eebf0708ce6b15f&=&format=webp&quality=lossless&width=406&height=209",
+		loc:prefix+"1262292295613546598/image.png?ex=669610cf&is=6694bf4f&hm=10b7749c0bdf3a8ae9d32e82bc659023ce472e6e9306b78b29e5d6e6d9ff4ba8&=&format=webp&quality=lossless&width=235&height=314",
+		tags:["red","eu","ferris","houses"]
+	},{
+		name:"Big Ben",
+		img:prefix+"1262080962452520960/image.png?ex=6695f4bd&is=6694a33d&hm=e83b07fd01b5fa598e12dd958d3af22e1dcbc74c304f5a37fa9baafdd69f463b&=&format=webp&quality=lossless&width=456&height=236",
+		loc:prefix+"1262292588816502834/image.png?ex=66961115&is=6694bf95&hm=93b6fedc05c6defd9d7ff962f40052d0c1f285fcf0064d4eae08a7f7810ef1b7&=&format=webp&quality=lossless&width=390&height=314",
+		tags:["clock","tower","london","ben","big"]
+	},{
+		name:"Alcatraz",
+		img:prefix+"1262081086851383316/image.png?ex=6695f4db&is=6694a35b&hm=accabc70f0ef5b7aa45d537b0c78da61c5591712366bbe1c1bf5622a5a1b4935&=&format=webp&quality=lossless&width=485&height=251",
+		loc:prefix+"1262293095882559599/image.png?ex=6696118e&is=6694c00e&hm=bcb3f22583e81c38d98d5385a7ca4d3f272affa87eb703d9870757bdd7947682&=&format=webp&quality=lossless&width=259&height=314",
+		tags:["alcatraz","island","water","elevated"]
+	},{
+		name:"Zhangjiajie",
+		img:prefix+"1262081207101820999/image.png?ex=6695f4f8&is=6694a378&hm=5562902d733440a0dbc251c3ac490ec0697b0601de1a7e1606103917c81d2209&=&format=webp&quality=lossless&width=370&height=190",
+		loc:prefix+"1262293541393010728/image.png?ex=669611f8&is=6694c078&hm=8cc5d98a5559a1ffd7ef8b4b24648a0e12ee06779ff80f7c28e6ecae2a9016c4&=&format=webp&quality=lossless&width=339&height=314",
+		tags:["forest","mt","mountain","nature","fog","zhang"]
+	},{
+		name:"Old Town of Dubrovnik",
+		img:prefix+"1262081423255408691/image.png?ex=6695f52b&is=6694a3ab&hm=83d135904c2a4075f6dca2925d68cf8de4b8d3d012e294248d9ea1f3159dc6f0&=&format=webp&quality=lossless&width=494&height=253",
+		loc:prefix+"1262294165501509632/image.png?ex=6696128d&is=6694c10d&hm=e5c48a8ea2ae9d866c48758e2f95684edbc12a39327d4978a6df6960872f4184&=&format=webp&quality=lossless&width=693&height=467",
+		tags:["cliff","water","orange","white","town","city"]
+	},{
+		name:"Angkor Wat",
+		img:prefix+"1262081702226821120/image.png?ex=6695f56e&is=6694a3ee&hm=1187687c0eadf91f617613aeade99401ae3a23483dc0aae2843735fd4087cc74&=&format=webp&quality=lossless&width=494&height=253",
+		loc:prefix+"1262294890763653121/image.png?ex=6696133a&is=6694c1ba&hm=bc0bf1a2d2575c5fe76b54895d455dc9404fa8def0777b0c52c261fd056535d6&=&format=webp&quality=lossless&width=571&height=422",
+		tags:["temple","asia","asian","palm","swamp"]
+	},{
+		name:"Helsinki Cathedral",
+		img:prefix+"1262081810729402408/image.png?ex=6695f588&is=6694a408&hm=9fbf8388d2218ee5cbcb675c8f118931000f4eb7e8d9ba7ba7dafa9ae329c7fd&=&format=webp&quality=lossless&width=494&height=251",
+		loc:prefix+"1262295318368878645/image.png?ex=669613a0&is=6694c220&hm=7bb01b6bde54868da252d4bd67459a0fa117fd7d3882fb4c5e73ec11d9f9f32d&=&format=webp&quality=lossless&width=260&height=314",
+		tags:["lamp","round","white","elevated"]
+	},{
+		name:"Panama Canal",
+		img:prefix+"1262081920305598478/image.png?ex=6695f5a2&is=6694a422&hm=68b90cfaee84d9126fee611fdbd1e9102d5930ed8c6a49256044bdd89e948b5e&=&format=webp&quality=lossless&width=494&height=251",
+		loc:prefix+"1262295681859719238/image.png?ex=669613f6&is=6694c276&hm=9671e5514db16261eb7941c21f159bc4c7181619edf8bc779a2b95702a6f2e78&=&format=webp&quality=lossless&width=431&height=314",
+		tags:["canal","panama","cargo","ship","boat","water"]
+	},{
+		name:"Niagara Falls",
+		img:prefix+"1262082063499001986/image.png?ex=6695f5c4&is=6694a444&hm=197864e7aa057fbb9c43305604b4b0ec89472b335e5955e74dbbe038e103a363&=&format=webp&quality=lossless&width=438&height=225",
+		loc:prefix+"1262296016187555882/image.png?ex=66961446&is=6694c2c6&hm=f1d432769c806144d5ff644fe7b18c54a63afd5de34f85da942c1c0cd242e0cd&=&format=webp&quality=lossless&width=625&height=346",
+		tags:["fall","waterfall","water"]
+	},{
+		name:"Table Mountain",
+		img:prefix+"1262082142465294486/image.png?ex=6695f5d7&is=6694a457&hm=ac1cec7cbdc1922754abe292401a0b3ccc0301747a2c0cbc1b8591578d81e7a1&=&format=webp&quality=lossless&width=296&height=157",
+		loc:prefix+"1262296689604038759/image.png?ex=669614e7&is=6694c367&hm=26372d603316268d17f4556ae572d4f8352c8fd46898b553dc570f921dccfe39&=&format=webp&quality=lossless&width=332&height=314",
+		tags:["table","mt","mountain"]
+	},{
+		name:"Tower Bridge",
+		img:prefix+"1262082234932789322/image.png?ex=6695f5ed&is=6694a46d&hm=f0ddc314233d7d1c7ece60e0828696ff5f82adb563cc434a14e73599003f6700&=&format=webp&quality=lossless&width=348&height=181",
+		loc:prefix+"1262296945859493928/image.png?ex=66961524&is=6694c3a4&hm=3f0c9029a6164fcc951ab404a33264423e04d77d311cddb73c326538cc3587bf&=&format=webp&quality=lossless&width=381&height=314",
+		tags:["london","tower","bridge","water"]
+	},{
+		name:"Valley of the Kings",
+		img:prefix+"1262301346346827796/image.png?ex=6698bc3d&is=66976abd&hm=bb43b8efcb255920d95c50ba327a3aa877d4be663985491c22bd755ee420ef22&=&format=webp&quality=lossless&width=428&height=224",
+		loc:prefix+"1262311736606724146/image.png?ex=6698c5ea&is=6697746a&hm=c7479b80b42d850781416bd77ea1417c825a3b31288c07643778eb5363340cbc&=&format=webp&quality=lossless&width=311&height=220",
+		tags:["desert","valley","kings"]
+	},{
+		name:"Kinderdijk",
+		img:prefix+"1262301569282740224/image.png?ex=66961972&is=6694c7f2&hm=de0fd21a1a3c6d24aaa36d9fb78fd52a3d657e31ad04f8182bd01fd72290e966&=&format=webp&quality=lossless&width=411&height=213",
+		loc:prefix+"1262312596372197386/image.png?ex=669623b7&is=6694d237&hm=cdbcd6e02a07a93659038e03c57040c9f9a728997e5ba0c1a26d679e682d8077&=&format=webp&quality=lossless&width=443&height=462",
+		tags:["wind","mill","windmill","water"]
+	},{
+		name:"St. Peter's Basilica",
+		img:prefix+"1262301678548287498/image.png?ex=6696198c&is=6694c80c&hm=0ed4986509f4cc079c654798334637d68b11b96bcb25161cbce2ae5f1d5d5db7&=&format=webp&quality=lossless&width=440&height=233",
+		loc:prefix+"1262313472314839080/image.png?ex=66962488&is=6694d308&hm=0b5cdc8a75bed5d72e95c164ee461bfb8494854d8dac8a62ec1766101fdd3afb&=&format=webp&quality=lossless&width=333&height=314",
+		tags:["cathedral","bridge"]
+	},{
+		name:"Shanghai World Financial Center",
+		img:prefix+"1262301805463736381/image.png?ex=669619aa&is=6694c82a&hm=1b5aa40f90b359b431bdd03b581f78766e39c650084eb125c36fca6134e46885&=&format=webp&quality=lossless&width=428&height=229",
+		loc:prefix+"1262314394285506612/image.png?ex=66962564&is=6694d3e4&hm=d2b882269cc763d49149e50e9685a71a6cbdd21fa7d91f18eb0d361a279465a5&=&format=webp&quality=lossless&width=406&height=314",
+		tags:["asia","asian","building","china","chinese"]
+	},{
+		name:"Potala Palace",
+		img:prefix+"1262301904449306724/image.png?ex=669619c2&is=6694c842&hm=6729db346974fa231b9e6774dfee869c8f36bf5c6ddc0962f6df7d0d73fdd58a&=&format=webp&quality=lossless&width=506&height=260",
+		loc:prefix+"1262315050241232936/image.png?ex=66962600&is=6694d480&hm=dd657a560ea874ff92433ff4d33f2d5f3708b475d6b8999f15c8f374750cdfa4&=&format=webp&quality=lossless&width=747&height=549",
+		tags:["elevated","mt","mountain"]
+	},{
+		name:"Willis/Sears Tower",
+		img:prefix+"1262302266296107038/image.png?ex=66961a18&is=6694c898&hm=744316a505f527c9b5db3f0ccd525b662a440e43553c12413c0871e370ee0019&=&format=webp&quality=lossless&width=379&height=196",
+		loc:prefix+"1262315203526393906/image.png?ex=66962625&is=6694d4a5&hm=468d7573e16c3f08219908d7ab1c977392700c0ebd5d868caa5754c38fa3fa2b&=&format=webp&quality=lossless&width=431&height=314",
+		tags:["sears","tower","willis","blue"]
+	},{
+		name:"Oslo Opera House",
+		img:prefix+"1262315550718169089/Screenshot_2024-07-15_145903.png?ex=66962677&is=6694d4f7&hm=9dbbe8ed8532f8245117bd5be0a570cae77739463134730d087f4be0a6aff29b&=&format=webp&quality=lossless&width=398&height=208",
+		loc:prefix+"1262315749402476584/image.png?ex=669626a7&is=6694d527&hm=0092252606f3d02de1676622e7676ccfa10bc82762273c987f87eeee8ce1db94&=&format=webp&quality=lossless&width=287&height=314",
+		tags:["glass","building"]
+	},{
+		name:"Øresund Bridge",
+		img:prefix+"1262316311661252618/Screenshot_2024-07-15_145938.png?ex=6696272d&is=6694d5ad&hm=7fbecbb4b1b1bbe7f1bdc850bc4807b3968519c35aaf28b502f798a90225e0b7&=&format=webp&quality=lossless&width=495&height=257",
+		loc:prefix+"1262316497263394886/image.png?ex=66962759&is=6694d5d9&hm=44dce04dc1b0f094c76bb951a01bbce6541b580f09f288861641ebf19572721b&=&format=webp&quality=lossless&width=251&height=314",
+		tags:["bridge","fog","water"]
+	},{
+		name:"Taj Mahal",
+		img:prefix+"1262316857222762498/Screenshot_2024-07-15_150034.png?ex=669627af&is=6694d62f&hm=c00d3316ec0f2006a2a7d1edbfb6f8f45dcd877a4c47d2875976274e1442f4a6&=&format=webp&quality=lossless&width=396&height=208",
+		loc:prefix+"1262316863589716098/image.png?ex=669627b0&is=6694d630&hm=e87f5e93ca909808f84708ab0abef7e6d66162420e9639459323b5418f1e95d9&=&format=webp&quality=lossless&width=269&height=314",
+		tags:["taj","mahal","pond","hedge","water"]
+	},{
+		name:"Giant's Causeway",
+		img:prefix+"1262317860940812298/Screenshot_2024-07-15_150139.png?ex=6696289e&is=6694d71e&hm=bdca2680f7a1dd2a9cfb05db4f0049adfe1707dae2ff28153de6c791d05a6198&=&format=webp&quality=lossless&width=494&height=251",
+		loc:prefix+"1262318018093121626/image.png?ex=669628c4&is=6694d744&hm=f6e348346597e4d6b9bd29f01624e6100bd881ab1d93c7a29dd946030dd69242&=&format=webp&quality=lossless&width=379&height=323",
+		tags:["rock","pattern","giant","water"]
+	},{
+		name:"Hagia Sophia Grand Mosque",
+		img:prefix+"1262318469198774334/Screenshot_2024-07-15_150232.png?ex=6696292f&is=6694d7af&hm=d394a93e34caf730b75b4e3b499b5314da0fc70221c5c7acf2f47cfd7aa0813b&=&format=webp&quality=lossless&width=459&height=227",
+		loc:prefix+"1262318739777654814/image.png?ex=66962970&is=6694d7f0&hm=00ded49af1be39e4328741437fd8ecd2c254232d7c7528ab1cf6b016e0d182ea&=&format=webp&quality=lossless&width=508&height=382",
+		tags:["mosque","fountain","water","blue","round"]
+	},{
+		name:"Florence Cathedral",
+		img:prefix+"1262320469122482176/Screenshot_2024-07-15_150301.png?ex=66962b0c&is=6694d98c&hm=00ab0b87bd19c5781a25a623b2cd54a811759f0ce586e979a16645498ca7c9c8&=&format=webp&quality=lossless&width=494&height=251",
+		loc:prefix+"1262320473988010046/image.png?ex=66962b0d&is=6694d98d&hm=ab5da007b241840f0ae74681e0fea49c014652b81e6295708b989c41e901edfa&=&format=webp&quality=lossless&width=402&height=314",
+		tags:["cathedral","orange","round","red","pointed"]
+	},{
+		name:"Big Sur",
+		img:prefix+"1262321017507024896/Screenshot_2024-07-15_150425.png?ex=66962b8f&is=6694da0f&hm=b5b1f02acda10696b07f40e81295ddad1c343a84ca29c500c88aab0a2398c785&=&format=webp&quality=lossless&width=422&height=214",
+		loc:prefix+"1262321137598201866/image.png?ex=66962bab&is=6694da2b&hm=1350e5124a59e5e825838d4a7567bf11fde5b51c7c268c3e8350dd94767cac26&=&format=webp&quality=lossless&width=328&height=314",
+		tags:["bridge","water","beach"]
+	},{
+		name:"Brandenburg Gate",
+		img:prefix+"1262321459502780476/Screenshot_2024-07-15_150505.png?ex=66962bf8&is=6694da78&hm=5a386e96731bfe0edeb7c2a2d5038fb06b88ebe1024f58a2ede84cf4b28474d0&=&format=webp&quality=lossless&width=403&height=212",
+		loc:prefix+"1262321706135978035/image.png?ex=66962c33&is=6694dab3&hm=745b0d631cde35fc11749a530b5ec20dc206347b98fa277fceb765ba26ed2f90&=&format=webp&quality=lossless&width=267&height=314",
+		tags:["horse","statue","arch"]
+	},{
+		name:"Nyhavn",
+		img:prefix+"1262322107065569442/Screenshot_2024-07-15_150602.png?ex=66962c93&is=6694db13&hm=24522e5bfe12c0bc45cc6b3fb396fd9a80a7f57fe45bfcb5e513d62e075e1ac5&=&format=webp&quality=lossless&width=503&height=257",
+		loc:prefix+"1262322111830298624/image.png?ex=66962c94&is=6694db14&hm=d967a94976f8efd03ea01b574854481f5f093e06471a9d6d28d5abce75f1e795&=&format=webp&quality=lossless&width=277&height=314",
+		tags:["river","canal","water","houses","nyhavn"]
+	},{
+		name:"Arc de Triomphe",
+		img:prefix+"1262324479095214110/Screenshot_2024-07-15_150628.png?ex=66962ec8&is=6694dd48&hm=587d707629be24cc169f5501783104c7b117822202b45a455e3ae43dd2a5dac8&=&format=webp&quality=lossless&width=494&height=247",
+		loc:prefix+"1262324637828776070/image.png?ex=66962eee&is=6694dd6e&hm=cf6fb744b34a656f1892bac2d12bdc30dd8c8d7e8c06045c27ff1c072f66bf1a&=&format=webp&quality=lossless&width=347&height=287",
+		tags:["tall","arc","cube","square","white"]
+	},{
+		name:"Portofino",
+		img:prefix+"1262325127262109706/Screenshot_2024-07-15_150753.png?ex=66962f63&is=6694dde3&hm=f73c8570d7ed985360ac4e53bb9c84d8092af6a6fc747af4a2ae89d4f2c25104&=&format=webp&quality=lossless&width=494&height=252",
+		loc:prefix+"1262325134274855003/image.png?ex=66962f64&is=6694dde4&hm=409fc06fe9c6faa75b9b062461440adf822b9e7f5f95a4de27f9f15e8377e932&=&format=webp&quality=lossless&width=335&height=314",
+		tags:["hill","water","orange","boats"]
+	},{
+		name:"Château de Chambord",
+		img:prefix+"1262325424466165780/Screenshot_2024-07-15_150820.png?ex=66962faa&is=6694de2a&hm=05ce721dd9a1a40f9e6e009b9981efd0c5f345b21bea955c7b789fb548ea0361&=&format=webp&quality=lossless&width=479&height=252",
+		loc:prefix+"1262325787902873631/image.png?ex=66963000&is=6694de80&hm=92fa4bf1590549e1b648c2b3781e49a771e35f7091b55c5c1af422911542edb8&=&format=webp&quality=lossless&width=408&height=314",
+		tags:["masion","4","white"]
+	},{
+		name:"Neuschwanstein Castle",
+		img:prefix+"1262326325792739339/Screenshot_2024-07-15_150909.png?ex=66963080&is=6694df00&hm=85494dac87f5ea39b9a6d0df7f187794d6b029bf9a44d9461d0a565f0074ef9b&=&format=webp&quality=lossless&width=494&height=252",
+		loc:prefix+"1262326388560629833/image.png?ex=6696308f&is=6694df0f&hm=71722d34b40c9aa2b39e40c52b6cab5fb4a6633e4c75f68eca340546a2a812c1&=&format=webp&quality=lossless&width=278&height=314",
+		tags:["elevated","mt","castle","pointed","mountain","white"]
+	},{
+		name:"Blue Mosque",
+		img:prefix+"1262364640894255144/Screenshot_2024-07-15_172816.png?ex=6696542f&is=669502af&hm=ba528a561e3392f4df473b8b3e5b7fae895f8b898dff0feb0054fe90656f441a&=&format=webp&quality=lossless&width=477&height=234",
+		loc:prefix+"1262327159939137597/image.png?ex=66963147&is=6694dfc7&hm=2be7ad8ba388e2ad0fc4cb560595e2a942b941d09735098d95b969977c38c808&=&format=webp&quality=lossless&width=487&height=314",
+		tags:["blue","white","mosque","2","tower","round"]
+	},{
+		name:"Trafalgar Square",
+		img:prefix+"1262327911076069427/Screenshot_2024-07-15_151031.png?ex=669631fa&is=6694e07a&hm=3de3893635e14dce21b598f4086ef1507d634aaf3ef3d22370c5ced293f51965&=&format=webp&quality=lossless&width=429&height=220",
+		loc:prefix+"1262327914641489931/image.png?ex=669631fb&is=6694e07b&hm=a7071af21691a7db8fbd5253aaf50eb48b1f3dd1b171e1641b2bc72e68923b75&=&format=webp&quality=lossless&width=294&height=260",
+		tags:["round","red"]
+	},{
+		name:"Iguaza Falls",
+		img:prefix+"1262328172742185021/Screenshot_2024-07-15_151323.png?ex=66963239&is=6694e0b9&hm=b71baee27b24f6367461c0cc8928f79d0ba5b3de12228c60f45ac01101002c45&=&format=webp&quality=lossless&width=425&height=224",
+		loc:prefix+"1262328329202302976/image.png?ex=6696325e&is=6694e0de&hm=9a6b5b7506f8b284cbc9a7cbac8e729881b01a0f509d3dff96f6553a204ed5c8&=&format=webp&quality=lossless&width=492&height=621",
+		tags:["water","fall","waterfall"]
+	},{
+		name:"Sydney Opera House",
+		img:prefix+"1262328575030202388/Screenshot_2024-07-15_151420.png?ex=66963299&is=6694e119&hm=7c7d5ec2aa3ff2bcac55b6d34cc20519059ba99da3a3945530fa5352b77e40da&=&format=webp&quality=lossless&width=381&height=197",
+		loc:prefix+"1262328772640768010/image.png?ex=669632c8&is=6694e148&hm=eac25d84bc5110d75ed300b42709b2059adfc44e8eb7b873d5e01983514eba4d&=&format=webp&quality=lossless&width=417&height=314",
+		tags:["sydney","water"]
+	},{
+		name:"Teotihuacan",
+		img:prefix+"1262328958305959978/Screenshot_2024-07-15_151721.png?ex=669632f4&is=6694e174&hm=5ff9988a79c8f055eb71965bc83210fa1167f533b8860aa85599ed0592de7095&=&format=webp&quality=lossless&width=489&height=247",
+		loc:prefix+"1262329337777229834/image.png?ex=6696334f&is=6694e1cf&hm=fe9abb0a129d9afbbc77ca42d8267a99a31451d86bdbaac0a360a17368bd3e22&=&format=webp&quality=lossless&width=433&height=314",
+		tags:["pyramid","temple","mexico"]
+	},{
+		name:"Sri Harmandir Sahib",
+		img:prefix+"1262329610897461289/Screenshot_2024-07-15_151744.png?ex=66963390&is=6694e210&hm=e72eea944d0711d2a41f38fd4646f995e84fcee978d421c9c2a4564b33260f02&=&format=webp&quality=lossless&width=437&height=219",
+		loc:prefix+"1262329764035690546/image.png?ex=669633b4&is=6694e234&hm=dbc4f4ccfbda50497882aaee15243b92016b16b16c682be6c00fc27a52f47f11&=&format=webp&quality=lossless&width=472&height=314",
+		tags:["gold","water"]
+	},{
+		name:"Rijksmuseum",
+		img:prefix+"1262330406024511538/Screenshot_2024-07-15_151811.png?ex=6696344d&is=6694e2cd&hm=bd3c381647d3f5a107c5abb9d1e95c589c81c3c6280f3d0ffd140e1e82217186&=&format=webp&quality=lossless&width=451&height=227",
+		loc:prefix+"1262330427046363168/image.png?ex=66963452&is=6694e2d2&hm=d3cbe9a15bb17a9516123ce401f9664af6dc344547c66371c3fd0c2f6c2ba638&=&format=webp&quality=lossless&width=286&height=314",
+		tags:["pond","symmetry","far"]
+	},{
+		name:"Santorini",
+		img:prefix+"1262330647435935805/Screenshot_2024-07-15_151837.png?ex=66963487&is=6694e307&hm=7854f513660e1f90403e9f1bc387087825f1fcaaa20ea0042c7c416de0ceb803&=&format=webp&quality=lossless&width=343&height=175",
+		loc:prefix+"1262330993680060447/image.png?ex=669634d9&is=6694e359&hm=cd29ca8d8006e569ea20a1cff4e5d4b655cebb948b8908cb5b87f045af0c568f&=&format=webp&quality=lossless&width=315&height=259",
+		tags:["blue","water","white","elevated"]
+	},{
+		name:"Amalfi Coast",
+		img:prefix+"1262331206243192893/Screenshot_2024-07-15_151951.png?ex=6696350c&is=6694e38c&hm=8f3871a1b5f7b2d02b89f88feac1bcc17dcbdd50986a7b32094b64f6cd19e676&=&format=webp&quality=lossless&width=476&height=250",
+		loc:prefix+"1262331409037656175/image.png?ex=6696353c&is=6694e3bc&hm=2a52f3da7443a380591435504e160b1969ef66f68d4b4e50940e3f3c43be8551&=&format=webp&quality=lossless&width=349&height=314",
+		tags:["houses","mt","mountain","water","boat","yellow","amalfi","coast"]
+	},{
+		name:"Tallinn Town Hall",
+		img:prefix+"1262331707558727744/Screenshot_2024-07-15_152020.png?ex=66963584&is=6694e404&hm=b70096dd67ae11ea437b465349824a0b88679741e079f444e8b9a8a89dbff301&=&format=webp&quality=lossless&width=351&height=192",
+		loc:prefix+"1262331910869356596/image.png?ex=669635b4&is=6694e434&hm=13ee4ce9edd9a3a0fa35672e4522cf5262dd182a1acf886503e837e1c0444f00&=&format=webp&quality=lossless&width=311&height=314",
+		tags:["tower","white","orange","tallinn","hall"]
+	},{
+		name:"Cliffs of Moher",
+		img:prefix+"1262332100330258442/Screenshot_2024-07-15_152144.png?ex=669635e1&is=6694e461&hm=e458f4b48771f33ca38566f313dcfa60a4f1c5d538b6c3c6b6ab490dc3e42fbc&=&format=webp&quality=lossless&width=458&height=222",
+		loc:prefix+"1262332227308748800/image.png?ex=669635ff&is=6694e47f&hm=fb854c1bf4b9ffdc485dad2ed65cfbaf7eca445898386179a5194af5eae426a6&=&format=webp&quality=lossless&width=368&height=314",
+		tags:["nature","cliff","water","mt","mountain"]
+	},{
+		name:"Matsumoto-jō Castle",
+		img:prefix+"1262332417750995004/Screenshot_2024-07-15_152214.png?ex=6696362d&is=6694e4ad&hm=ee08ebd9b7e84be8ef627e4c2944f008487378b322838175f80bb370d02f5c0b&=&format=webp&quality=lossless&width=375&height=190",
+		loc:prefix+"1262332704993574983/image.png?ex=66963671&is=6694e4f1&hm=dd5e720862628acbfe15633d3d8d0ca18457ab536919b7659cc1680fe5b5353f&=&format=webp&quality=lossless&width=350&height=314",
+		tags:["asian","asia","water","elevated"]
+	},{
+		name:"The Great Sphinx",
+		img:prefix+"1262333216648462406/Screenshot_2024-07-15_152321.png?ex=669636eb&is=6694e56b&hm=9ee633b9e27db07d708aff062e6c8ca2bd360e62ab26fbadb38caffd6cdebc97&=&format=webp&quality=lossless&width=362&height=197",
+		loc:prefix+"1262333230531608657/image.png?ex=669636ef&is=6694e56f&hm=ba7731f9c674dbbaae0197a54db28d69d1e8115f90c933007e29bd4c7863de2b&=&format=webp&quality=lossless&width=370&height=314",
+		tags:["sphinx","egypt","statue"]
+	},{
+		name:"Twelve Apostles",
+		img:prefix+"1262333992099909723/Screenshot_2024-07-15_152448.png?ex=669637a4&is=6694e624&hm=6304f203d780a4aced528d56bb199150325d8bf459d872de9cd10a7933deed32&=&format=webp&quality=lossless&width=266&height=132",
+		loc:prefix+"1262333992548700171/image.png?ex=669637a4&is=6694e624&hm=5b8f9a2bd534078afa3d17cf50b5c85ecd5d84c572be8e029e953a0f19f7f2e9&=&format=webp&quality=lossless&width=445&height=314",
+		tags:["cliff","water","rock"]
+	},{
+		name:"Acropolis of Athens",
+		img:prefix+"1262334622050549820/Screenshot_2024-07-15_152507.png?ex=6696383a&is=6694e6ba&hm=84bedb1855c73782e88a3efe85ee4080c5e3e09edfe18ec5a19958974ee59ea9&=&format=webp&quality=lossless&width=390&height=198",
+		loc:prefix+"1262334625703919636/image.png?ex=6696383b&is=6694e6bb&hm=82a1f996fc51913158df321139d8e4b58275c4efab6f68b625daaad6a969be90&=&format=webp&quality=lossless&width=494&height=306",
+		tags:["greek","ancient","pillars","white","athens"]
+	},{
+		name:"Hoover Dam",
+		img:prefix+"1262334851252617217/Screenshot_2024-07-15_152536.png?ex=66963871&is=6694e6f1&hm=8fae62cae48e662e2bbbe4d0d201293bd71102d319f673fd7d71fc32e3c559d7&=&format=webp&quality=lossless&width=509&height=254",
+		loc:prefix+"1262334979539472384/image.png?ex=66963890&is=6694e710&hm=cd1bebb28657b7045bc781ac991f648483d70f4362be84dc413f2323ec5335b4&=&format=webp&quality=lossless&width=581&height=449",
+		tags:["dam","water"]
+	},{
+		name:"Spanish Steps",
+		img:prefix+"1262335554989588520/Screenshot_2024-07-15_152609.png?ex=66963919&is=6694e799&hm=9de6d31317211b6df99f0003c73df2d444e52405abe27ae17b4065489e1d7e88&=&format=webp&quality=lossless&width=494&height=250",
+		loc:prefix+"1262335556537552916/image.png?ex=66963919&is=6694e799&hm=16e7a4a480147c388276dc3387ca7783aa141bacca71ce4195fc34e2d1f65c1e&=&format=webp&quality=lossless&width=440&height=314",
+		tags:["stairs","steps","spanish","2"]
+	},{
+		name:"Cloud Gate",
+		img:prefix+"1262335878576214026/Screenshot_2024-07-15_152654.png?ex=66963966&is=6694e7e6&hm=31aed7bce0d75d10fba4190d381adb4607caddc992b1edbabaff1c61d3f3c997&=&format=webp&quality=lossless&width=377&height=181",
+		loc:prefix+"1262335883240013844/image.png?ex=66963967&is=6694e7e7&hm=0136ec1c64d7abe839584267ecb136b2f74ae07bd72faac3ce41c7e371c4b17d&=&format=webp&quality=lossless&width=350&height=314",
+		tags:["bean"]
+	},{
+		name:"Dead Sea",
+		img:prefix+"1262336206017138780/Screenshot_2024-07-15_152717.png?ex=669639b4&is=6694e834&hm=050f2885f9227c270d3b55c93b7ada7d81b7741aa09b3eb8616eda6603ace3cc&=&format=webp&quality=lossless&width=233&height=123",
+		loc:prefix+"1262336275663425567/image.png?ex=669639c5&is=6694e845&hm=b48ad607b026c854a7c0b2f2ad7df2e53eea1057ee34bc55d159210a67e986b7&=&format=webp&quality=lossless&width=576&height=399",
+		tags:["dead","sea","water","lake","red"]
+	},{
+		name:"Bridge of Sighs",
+		img:prefix+"1262336433537028176/Screenshot_2024-07-15_152739.png?ex=669639ea&is=6694e86a&hm=d31c2ad7005401ff3cde2d4b58851dd222ea1cd91a1efcbf92e31ecb3b0b003c&=&format=webp&quality=lossless&width=470&height=247",
+		loc:prefix+"1262336555285086252/image.png?ex=66963a07&is=6694e887&hm=95d801de7c21a589f6998bfdac6a9d1c72769cf9e3af1ac86d66412873bb1415&=&format=webp&quality=lossless&width=419&height=403",
+		tags:["bridge","water","canal","river","sighs"]
+	},{
+		name:"Buckingham Palace",
+		img:prefix+"1262336868008198184/Screenshot_2024-07-15_152807.png?ex=66963a52&is=6694e8d2&hm=7c234689c954903d98fd426c1cf32e0a45ed5da7c94e783c43895346f8d94cfc&=&format=webp&quality=lossless&width=395&height=203",
+		loc:prefix+"1262336870885625949/image.png?ex=66963a53&is=6694e8d3&hm=fbc990af63e64c65378bdd5c21fecaa2221882da2b07d18599ebe268b4e0768a&=&format=webp&quality=lossless&width=424&height=314",
+		tags:["gold","statue","palace"]
+	},{
+		name:"Victoria Peak",
+		img:prefix+"1262387035969159290/Screenshot_2024-07-15_171821.png?ex=6696690b&is=6695178b&hm=0ccc1138b8b37ed73392b0148c89bdc6f38ca556f77185a435118972a99129c9&=&format=webp&quality=lossless&width=323&height=160",
+		loc:prefix+"1262387125400109076/image.png?ex=66966920&is=669517a0&hm=acbc7c8163912aec6d198f86328fc6e90de02137b309b91b05f5d5f0201e0356&=&format=webp&quality=lossless&width=260&height=223",
+		tags:["mt","buildings","mountain"]
+	},{
+		name:"Golden Gate",
+		img:prefix+"1262387320993087550/Screenshot_2024-07-15_171840.png?ex=6696694f&is=669517cf&hm=285c722fe59d36e8467d188f721d5700f18e65def7b9069498a4d48695d53997&=&format=webp&quality=lossless&width=333&height=167",
+		loc:prefix+"1262387530331062323/image.png?ex=66966981&is=66951801&hm=7750eea06f10862e1ad47e26085641024a1d47a9a54ae26bcc7feadf28c10a3f&=&format=webp&quality=lossless&width=379&height=268",
+		tags:["bridge","golden","gate","water"]
+	},{
+		name:"Central Park",
+		img:prefix+"1262387823814639697/Screenshot_2024-07-15_171957.png?ex=669669c7&is=66951847&hm=f4b5955272e2dbf5bd5091121eec09be131977101d355c77ca42c0fdf6d49c66&=&format=webp&quality=lossless&width=421&height=230",
+		loc:prefix+"1262388098096955422/image.png?ex=66966a08&is=66951888&hm=818d938e010e80d80a0602154cc7a03432e82bf5cda9f7f47b8930447cde8e34&=&format=webp&quality=lossless&width=488&height=282",
+		tags:["park","field","buildings","central"]
+	},{
+		name:"Gamla Stan",
+		img:prefix+"1262388357715988571/Screenshot_2024-07-15_172415.png?ex=66966a46&is=669518c6&hm=b2e45b60fcae48f038809143deaf93d4ca8771b088ae7bc8a93ac84056a306e4&=&format=webp&quality=lossless&width=387&height=206",
+		loc:prefix+"1262388783966584925/image.png?ex=66966aac&is=6695192c&hm=8cc45f0f35cb76220f06f7c7635031ddaca033cebe2cd0880d3aa9b29d0d0149&=&format=webp&quality=lossless&width=457&height=270",
+		tags:["boat","buildings","water","river","pointed"]
+	},{
+		name:"The Grand Palace",
+		img:prefix+"1262389235294535731/Screenshot_2024-07-15_172549.png?ex=66966b17&is=66951997&hm=e5403c645bbaf0db74301c5af4aced894e9c70778afa796f779ccac5799333c2&=&format=webp&quality=lossless&width=419&height=215",
+		loc:prefix+"1262389331511869480/image.png?ex=66966b2e&is=669519ae&hm=698d2b94c8a1a1d51ee3831f71c44c13ea938367f1764cfeeaa5b5077dc76a84&=&format=webp&quality=lossless&width=488&height=232",
+		tags:["grand","palace","china","asian","gold"]
+	},{
+		name:"Grand Canyon",
+		img:prefix+"1262389503700766831/Screenshot_2024-07-15_172616.png?ex=66966b57&is=669519d7&hm=3ea14da41e555310d7e37123d3694442da2d8c3f422769c4152c0a2cdeabb7a9&=&format=webp&quality=lossless&width=416&height=211",
+		loc:prefix+"1262389704779763732/image.png?ex=66966b87&is=66951a07&hm=fe18be45969ce347ae03ddb333ca389e1a283ec40affec3ac4b012e479a150ab&=&format=webp&quality=lossless&width=360&height=242",
+		tags:["grand","canyon","river","cliff","red"]
+	},{
+		name:"Svalbard",
+		img:prefix+"1262390230821109780/Screenshot_2024-07-15_172749.png?ex=66966c05&is=66951a85&hm=e3b3e64a47733c8b1b13b48dfee03897e25bf439ee3fc7444c2cd608ef912f05&=&format=webp&quality=lossless&width=299&height=161",
+		loc:prefix+"1262390439076560947/image.png?ex=66966c36&is=66951ab6&hm=ce6db7f60b3ec4ab43d3d6b76af1bb7ddb1df697d576bf8f696237dff6795dce&=&format=webp&quality=lossless&width=337&height=294",
+		tags:["red","mt","mountain","svalbard"]
+	},{
+		name:"Guggenheim Museum",
+		img:prefix+"1262391074542846043/Screenshot_2024-07-15_172851.png?ex=66966cce&is=66951b4e&hm=a200098cbea7b76372af20548da566fda3a8e10688cdce5389afa246c2fc203f&=&format=webp&quality=lossless&width=462&height=252",
+		loc:prefix+"1262391080759070750/image.png?ex=66966ccf&is=66951b4f&hm=91af8a335cc872bda7e1ad50cc16be1816a7339cc1b2e9f4318dcd7dbb00b48a&=&format=webp&quality=lossless&width=494&height=264",
+		tags:["abstract","metal","odd"]
+	},{
+		name:"Meteor Crater",
+		img:prefix+"1262391349802434644/Screenshot_2024-07-15_172926.png?ex=66966d0f&is=66951b8f&hm=2ba9cbcbc50d78690a6c063d5a2d37c180a531b54f8a33830ea79aae1d4dc7d4&=&format=webp&quality=lossless&width=494&height=247",
+		loc:prefix+"1262391470674153513/image.png?ex=66966d2c&is=66951bac&hm=b4b8a78ac6207cfe2286840ca7a45a2d2285ab29dff37f6be56336ba2da656aa&=&format=webp&quality=lossless&width=571&height=271",
+		tags:["crater","meteor","desert","circle"]
+	},{
+		name:"Cappadocia",
+		img:prefix+"1262392617904242798/Screenshot_2024-07-15_173135.png?ex=66966e3e&is=66951cbe&hm=330798f4c1a1db29f60b7d18dc98f43643ece5d761baaaba5d649ff26f6f5a10&=&format=webp&quality=lossless&width=420&height=215",
+		loc:prefix+"1262392621683441714/image.png?ex=66966e3f&is=66951cbf&hm=34e1af504eed589902c8a51993020fb43cee6e186774c69d879cbc7c3b0c6edc&=&format=webp&quality=lossless&width=437&height=151",
+		tags:["cave","carve","desert","houses"]
+	},{
+		name:"Piezza",
+		img:prefix+"1262392845860470855/Screenshot_2024-07-15_173200.png?ex=66966e74&is=66951cf4&hm=38239794c796157e84abe4a2e447f314a906671b647880f059b4ef877f0e5085&=&format=webp&quality=lossless&width=484&height=241",
+		loc:prefix+"1262392989167124541/image.png?ex=66966e96&is=66951d16&hm=4d96c58267e91248c155c987e23d598b69bf1081f3238c9937150cb93a2bb203&=&format=webp&quality=lossless&width=352&height=185",
+		tags:["via","dele","amor","tower","orange"]
+	},{
+		name:"Empire State Building",
+		img:prefix+"1262393398677999666/Screenshot_2024-07-15_173254.png?ex=66966ef8&is=66951d78&hm=c0089d3029bfef1bfc9a4b3b2b1c4d278f0dacec84f0b6315d7d15d398b4e534&=&format=webp&quality=lossless&width=490&height=251",
+		loc:prefix+"1262393403191332916/image.png?ex=66966ef9&is=66951d79&hm=ffee77987845e12b5fe6a7394e2c0c36a10912d1f90fd2efa803a4903699391c&=&format=webp&quality=lossless&width=415&height=177",
+		tags:["empire","state","buildings","city"]
+	},{
+		name:"Pentagon",
+		img:prefix+"1262393727788384346/Screenshot_2024-07-15_173440.png?ex=66966f46&is=66951dc6&hm=c65b06fb1012e5294d2013a6966111e59a4da39d4011524d91b62d50d2cb8494&=&format=webp&quality=lossless&width=273&height=145",
+		loc:prefix+"1262393731290763304/image.png?ex=66966f47&is=66951dc7&hm=639bfac4853554416b1c08d2bc5535a9cd67f41c86c32a85cc23ac56b70ce853&=&format=webp&quality=lossless&width=338&height=224",
+		tags:["pentagon"]
+	},{
+		name:"St. Paul's Cathedral",
+		img:prefix+"1262394102742384660/Screenshot_2024-07-15_173716.png?ex=66966fa0&is=66951e20&hm=ca0f8d11019048fe6fdcd1b49228d592d85bc8e9d303af145b652a654d94bcb2&=&format=webp&quality=lossless&width=364&height=194",
+		loc:prefix+"1262394430065999975/image.png?ex=66966fee&is=66951e6e&hm=e92b05de8badafece14f3d0d5ab7af0e3d8a7d3b18c4885dc7e39a13121dca2b&=&format=webp&quality=lossless&width=437&height=267",
+		tags:["paul","cathedral","round"]
+	},{
+		name:"Charles Bridge",
+		img:prefix+"1262394692889215048/Screenshot_2024-07-15_173736.png?ex=6696702c&is=66951eac&hm=5df2b221e892bfdc07b729eb47b60bb55891f21a1848fde1f17e0e3a0d5b1874&=&format=webp&quality=lossless&width=493&height=271",
+		loc:prefix+"1262395009798242407/image.png?ex=66967078&is=66951ef8&hm=73399d94e9edc37664725cdca34cc475d40513d0de2967a579cac93cd54b87d7&=&format=webp&quality=lossless&width=276&height=271",
+		tags:["bridge","water","charlse"]
+	},{
+		name:"Trolltunga",
+		img:prefix+"1262395196663140454/Screenshot_2024-07-15_174010.png?ex=669670a5&is=66951f25&hm=62ba688fd31c30af0193a52a99885e377283ad671c60da797cce7590e80530e1&=&format=webp&quality=lossless&width=494&height=250",
+		loc:prefix+"1262395332978020462/image.png?ex=669670c5&is=66951f45&hm=b0e2fcd8e4682a5264cad3e474fd6be66d856c06f119b41bc925fe4ac9e1d92b&=&format=webp&quality=lossless&width=345&height=247",
+		tags:["rock","trolltunga","cliff","mt","mountain"]
+	},{
+		name:"The White House",
+		img:prefix+"1262395485738504322/Screenshot_2024-07-15_174418.png?ex=669670e9&is=66951f69&hm=328dbde009cf29d48b13952da277f04a6d89a51c3912614443021ecac1bdbc26&=&format=webp&quality=lossless&width=220&height=114",
+		loc:prefix+"1262395771433517137/image.png?ex=6696712e&is=66951fae&hm=a7143e97e843fa09ac084305b73aeda9f38da7fb12472ecbd86758a564cf5acc&=&format=webp&quality=lossless&width=269&height=254",
+		tags:["white","house"]
+	},{
+		name:"Zion National Park",
+		img:prefix+"1262395958118060033/Screenshot_2024-07-15_174601.png?ex=6696715a&is=66951fda&hm=efbc8ac95bb2fe37df160737adcc0ad819f9fead0d226014e83e94a77e868ec4&=&format=webp&quality=lossless&width=240&height=128",
+		loc:prefix+"1262396020755791962/image.png?ex=66967169&is=66951fe9&hm=fbd47ebf6b5cc2821c42ba1e83f1bcf339d0f15fad40f7a0bd01b83cda6357c6&=&format=webp&quality=lossless&width=327&height=217",
+		tags:["zion","cliff","mt","mountain"]
+	},{
+		name:"Pont du Gard",
+		img:prefix+"1262396393725886464/Screenshot_2024-07-15_174624.png?ex=669671c2&is=66952042&hm=a02967047e1f2356b9c995e9e95e95d2d82753c00e9b39298bd82efe72354017&=&format=webp&quality=lossless&width=377&height=206",
+		loc:prefix+"1262396401363451966/image.png?ex=669671c4&is=66952044&hm=fa82525ab5cfcd9d07774f71ab2cf27d87afca92815452a697655f46961500eb&=&format=webp&quality=lossless&width=451&height=242",
+		tags:["bridge","water","kayak"]
+	},{
+		name:"Stonehenge",
+		img:prefix+"1262396642955628564/Screenshot_2024-07-15_174655.png?ex=669671fd&is=6695207d&hm=b0bee26ea815ed6a066a91b6c9d12c429a9ecc01f84b1e000dc3cf10523d0c07&=&format=webp&quality=lossless&width=353&height=195",
+		loc:prefix+"1262396798027304983/image.png?ex=66967222&is=669520a2&hm=6326f553de094d9f3d8d05f06b037cefbbcc57f9d50d33139f0743693d2f4e6a&=&format=webp&quality=lossless&width=401&height=271",
+		tags:["stonehenge"]
+	},{
+		name:"Ganges River",
+		img:prefix+"1262397204048511028/Screenshot_2024-07-15_174948.png?ex=66967283&is=66952103&hm=4af375f7bf038c4462c1fbb2b278592bbee98a2d9c2f230c92a5ffa34d14d98b&=&format=webp&quality=lossless&width=443&height=233",
+		loc:prefix+"1262397209563889763/image.png?ex=66967284&is=66952104&hm=1584edbe94140de388449ff4411d2c5720054c1f2ec8f4146a72da6753ad1fdd&=&format=webp&quality=lossless&width=425&height=207",
+		tags:["pink","river","india","water"]
+	},{
+		name:"Kremlin",
+		img:prefix+"1262397410915651635/Screenshot_2024-07-15_175456.png?ex=669672b4&is=66952134&hm=ba49a6dc4f33fc30598710ccb48bfc06c649f78e6ac7674292732ce17bfb4a22&=&format=webp&quality=lossless&width=490&height=244",
+		loc:prefix+"1262397574829178990/image.png?ex=669672dc&is=6695215c&hm=0a4f2109891a5e6e609c26a6451c7fd3ddae514a60ebf7003c0be347a7bcc09e&=&format=webp&quality=lossless&width=348&height=271",
+		tags:["red","russia","green","round","tower"]
+	},{
+		name:"Sydney Harbour Bridge",
+		img:prefix+"1262397766458675272/Screenshot_2024-07-15_175524.png?ex=66967309&is=66952189&hm=536629cfb2025cfed866328336064ff73ac4aab7d1a29f74c46fa45568ac4d88&=&format=webp&quality=lossless&width=494&height=245",
+		loc:prefix+"1262398101511999560/image.png?ex=66967359&is=669521d9&hm=eaea0d7f05cd6b9fc082027d8b372d0c2b207c16956365c40649bc8dcc2e7c2c&=&format=webp&quality=lossless&width=419&height=271",
+		tags:["bridge","water"]
+	},{
+		name:"Palace of Versailles",
+		img:prefix+"1262398347696934994/Screenshot_2024-07-15_175549.png?ex=66967394&is=66952214&hm=9d42a60d18719c06f2f5e690bb78ce4b5faf11a018392c26b85e6023e3897c93&=&format=webp&quality=lossless&width=439&height=227",
+		loc:prefix+"1262398351622537377/image.png?ex=66967395&is=66952215&hm=80e4d9be40c42b3696c7b0b0271c711e5c680ad3f9032564072efe3864bb4b45&=&format=webp&quality=lossless&width=534&height=271",
+		tags:["statue","building"]
+	},{
+		name:"Tivoli Gardens",
+		img:prefix+"1262398639091879946/Screenshot_2024-07-15_175616.png?ex=669673d9&is=66952259&hm=cb97541c03a5441c3f35f8f8420c6be6a42eec93e28678d835f9e8a27e8c88d5&=&format=webp&quality=lossless&width=490&height=257",
+		loc:prefix+"1263059253262815303/image.png?ex=6698db18&is=66978998&hm=14d6665d1918751e2934a83778ce0ca7b52c8466f3f85c79dc66872f5b943b83&=&format=webp&quality=lossless&width=428&height=314",
+		tags:["foundtain","water","rides"]
+	},{
+		name:"Lincoln Memorial",
+		img:prefix+"1262398966176415845/Screenshot_2024-07-15_175921.png?ex=66967427&is=669522a7&hm=566f3b47ad77dc5434997afe7578f18554169eb5ef0332663ccda6c7178d0472&=&format=webp&quality=lossless&width=274&height=141",
+		loc:prefix+"1262399092085100594/image.png?ex=66967445&is=669522c5&hm=056c2e9b93690ef9c3442408075e81afadfa7b42dd516b8a26690e74f04d17a9&=&format=webp&quality=lossless&width=170&height=154",
+		tags:["monument","square","white","pillars"]
+	},{
+		name:"Uyuni Salt Flat",
+		img:prefix+"1262399320578064547/Screenshot_2024-07-15_180123.png?ex=6696747c&is=669522fc&hm=fcd799c087587fd417952719f68dea3c336f2fa058729ccc92b7db4e744d8a63&=&format=webp&quality=lossless&width=456&height=233",
+		loc:prefix+"1262399325657366539/image.png?ex=6696747d&is=669522fd&hm=a1630540fa1ca77d23455e29ae1c071b4f59e1bc8789a5fe65c4327c18fb9965&=&format=webp&quality=lossless&width=241&height=260",
+		tags:["sky","clear","salt","reflect"]
+	},{
+		name:"Hollywood Sign",
+		img:prefix+"1262399540003078194/Screenshot_2024-07-15_180225.png?ex=669674b0&is=66952330&hm=065974d65e8c319c1c6488d520e418f191c7f3f60e10551445444b28737dbc1c&=&format=webp&quality=lossless&width=270&height=148",
+		loc:prefix+"1262399816483475628/image.png?ex=669674f2&is=66952372&hm=1513d54a8b3b6965543e6373e8ec4a0732776fcd65d6d57ca3cc0741b581be80&=&format=webp&quality=lossless&width=296&height=247",
+		tags:["hollywood","mt","mountain"]
+	},{
+		name:"Great Geysir",
+		img:prefix+"1262400170734129214/Screenshot_2024-07-15_180318.png?ex=66967546&is=669523c6&hm=3d8b3c6677290e225e6e02c631305d0ce980eeaeeabac43e4808f6d02418235e&=&format=webp&quality=lossless&width=321&height=170",
+		loc:prefix+"1262400174907719700/image.png?ex=66967547&is=669523c7&hm=d5cc67eddc2748bac0285dd64403ba155fe3c394e7741462ccd4d50072db7c08&=&format=webp&quality=lossless&width=460&height=215",
+		tags:["great","geysir"]
+	},{
+		name:"Trevi Fountain",
+		img:prefix+"1262400360832827392/Screenshot_2024-07-15_180621.png?ex=66967574&is=669523f4&hm=bf7d6f9d6fcf32d1e2d81e071805c2ca91402135ff79423ac43fab369464f13d&=&format=webp&quality=lossless&width=503&height=250",
+		loc:prefix+"1262400545314967648/image.png?ex=669675a0&is=66952420&hm=4bd51ce10c80be58231a93186bcf32c44e9d019c9f659ea70eaa9cd80ff4bd63&=&format=webp&quality=lossless&width=329&height=271",
+		tags:["fountain","statue"]
+	},{
+		name:"Louvre Pyramid",
+		img:prefix+"1262400642203390043/Screenshot_2024-07-15_180935.png?ex=669675b7&is=66952437&hm=d0d02d16d59eaba9905f3ff3df043581c709860a297ceb5818cef348e2ffca09&=&format=webp&quality=lossless&width=292&height=154",
+		loc:prefix+"1262400748700831795/image.png?ex=669675d0&is=66952450&hm=7010b087ee51876187de15104d1f08da7073ac07f2e0f95650142d0716899d7b&=&format=webp&quality=lossless&width=404&height=271",
+		tags:["triangle","pyramid","glass"]
+	},{
+		name:"The Gateway Arch",
+		img:prefix+"1262400933355196519/Screenshot_2024-07-15_181152.png?ex=669675fc&is=6695247c&hm=8818e697d3885cc4a00dae47985cf7c88b67d63ffce67142c249391a82b55b72&=&format=webp&quality=lossless&width=271&height=143",
+		loc:prefix+"1262401045510881300/image.png?ex=66967617&is=66952497&hm=7f4f9a58a8ebae29c015b7cf8d20bd1f9be1e47b5c120af24117e3df18eab74c&=&format=webp&quality=lossless&width=341&height=271",
+		tags:["arch"]
+	},{
+		name:"Nice",
+		img:prefix+"1262401424147349534/Screenshot_2024-07-15_181355.png?ex=66967671&is=669524f1&hm=fe3842f440dc81b819ae58c93fb5874fb6f7ce5deaf5e64364000ce5a50a853f&=&format=webp&quality=lossless&width=480&height=262",
+		loc:prefix+"1262401423824654386/image.png?ex=66967671&is=669524f1&hm=e29c232751f6c30a07b08d41cc392803670e3d06c2273b6801711f6e1868f0cd&=&format=webp&quality=lossless&width=385&height=227",
+		tags:["reflect","nice","palm"]
+	},{
+		name:"Banff National Park",
+		img:prefix+"1262401746748051476/Screenshot_2024-07-15_181625.png?ex=669676be&is=6695253e&hm=de8bcf9aa5909bebf71fb99fe0fb5d7d7094a4b74c0ee66d6836628caf70623f&=&format=webp&quality=lossless&width=439&height=228",
+		loc:prefix+"1262401925530521640/image.png?ex=669676e9&is=66952569&hm=87dd76e7d55e3e353046a153dd7e649b0f22626a405def0a8848597afddb6224&=&format=webp&quality=lossless&width=460&height=271",
+		tags:["lake","water","mt","mountain"]
+	},{
+		name:"Edinburgh Castle",
+		img:prefix+"1262402098247761920/Screenshot_2024-07-15_181701.png?ex=66967712&is=66952592&hm=c7aa56cf7a2582b37a47f20a45dfc1398bb238b2c5849f6360f1d87380d35325&=&format=webp&quality=lossless&width=327&height=171",
+		loc:prefix+"1262402226287153216/image.png?ex=66967731&is=669525b1&hm=7c03b742224b1b58ed928802b0c0384fc136f15e703201ab4ccda63682d5f5a3&=&format=webp&quality=lossless&width=352&height=202",
+		tags:["elevated","castle","mt","mountain"]
+	},{
+		name:"Ponte di Rialto",
+		img:prefix+"1262402468982161461/Screenshot_2024-07-15_181822.png?ex=6696776a&is=669525ea&hm=01093939fbe6cbb21f85d5ef2c48639a8853a038fcb25a6bda8f05fedd69e4c8&=&format=webp&quality=lossless&width=346&height=194",
+		loc:prefix+"1262402706107269213/image.png?ex=669677a3&is=66952623&hm=e1ab690b2f98cfabaf989c8af517b60ef40e37c64556fbd411f49cd02791eb1e&=&format=webp&quality=lossless&width=376&height=230",
+		tags:["bridge","water"]
+	},{
+		name:"Schönbrunn Palace",
+		img:prefix+"1262402922826825738/Screenshot_2024-07-15_181841.png?ex=669677d7&is=66952657&hm=14c6fd703d0c18931728edd748596bef5d1e06ede50b81752049f099bd5f59d0&=&format=webp&quality=lossless&width=494&height=257",
+		loc:prefix+"1262403111809581077/image.png?ex=66967804&is=66952684&hm=653e727f575282d8573e7d47daa8bef370e6a9ccf6d3ceabb34885c8dc3869c8&=&format=webp&quality=lossless&width=458&height=270",
+		tags:["palace","yellow","building"]
+	},{
+		name:"Arena di Verona",
+		img:prefix+"1262403414621552751/Screenshot_2024-07-15_181954.png?ex=6696784c&is=669526cc&hm=5f6653d16a43f6ce6dbf2ee4bdd412c89491d1cb3b670f075c71c7c6f51b345b&=&format=webp&quality=lossless&width=333&height=170",
+		loc:prefix+"1262403486537089095/image.png?ex=6696785d&is=669526dd&hm=e2686f3a00056f225083cc6dd38fc75fc6826ca378f59fceb773f41fe2463bf5&=&format=webp&quality=lossless&width=302&height=260",
+		tags:["arena"]
+	},{
+		name:"Brighton Palace Pier",
+		img:prefix+"1262403606062170172/Screenshot_2024-07-15_182021.png?ex=6696787a&is=669526fa&hm=8e66508afd034894430aac4d1add6cea154cba2699f4c1ba6e7bc3616fee3252&=&format=webp&quality=lossless&width=494&height=248",
+		loc:prefix+"1262403786962370590/image.png?ex=669678a5&is=66952725&hm=4928458fe3b44bca59242d5050b6738272b7326b451036c612acc2ea91b456eb&=&format=webp&quality=lossless&width=268&height=201",
+		tags:["brighton","pier","water"]
+	},{
+		name:"Colosseum",
+		img:prefix+"1262404259039936613/Screenshot_2024-07-15_182048.png?ex=66967915&is=66952795&hm=1e5e130735f0dc588ff71f54e67583c3eb42e53655b515a40e1eb52d7b775c41&=&format=webp&quality=lossless&width=338&height=188",
+		loc:prefix+"1262404262529597501/image.png?ex=66967916&is=66952796&hm=41ad07a22e6bbe13a6e0a458fa66be01468915333881763a09633323bd4e8804&=&format=webp&quality=lossless&width=412&height=258",
+		tags:["arena"]
+	},{
+		name:"Cologne Cathedral",
+		img:prefix+"1262404425922642032/Screenshot_2024-07-15_182143.png?ex=6696793d&is=669527bd&hm=800cb87be2d5bb2b7619dc7b3b184957b07d2c92de74f929998b07c1f3e2c81b&=&format=webp&quality=lossless&width=494&height=255",
+		loc:prefix+"1262404455068995605/image.png?ex=66967944&is=669527c4&hm=4d44c3df42341f91480c61a083437710e5e7d54dccdd3bab1ff8c2be1cf1b4bf&=&format=webp&quality=lossless&width=225&height=179",
+		tags:["2"]
+	},{
+		name:"Marrakech",
+		img:prefix+"1262404799089868871/Screenshot_2024-07-15_182213.png?ex=66967996&is=66952816&hm=cd638b28f4ea86cb26f810a5b6bdb173c772dcb55762b5376c43eb925ec2908d&=&format=webp&quality=lossless&width=459&height=236",
+		loc:prefix+"1262404947740332052/image.png?ex=669679b9&is=66952839&hm=1c6d72cc1e2b877585a041f3f6a803733c7c7449361d62262022cc7b869e9a20&=&format=webp&quality=lossless&width=339&height=232",
+		tags:["tower","palm","red"]
+	},{
+		name:"Wailing Wall",
+		img:prefix+"1262405216309870662/Screenshot_2024-07-15_182241.png?ex=669679f9&is=66952879&hm=b674c92131c3e8e83148ca4677719688ebc2049b252f376bf734a2f04cd04343&=&format=webp&quality=lossless&width=481&height=246",
+		loc:prefix+"1262405452323491860/image.png?ex=66967a32&is=669528b2&hm=824133a1d9123f3f0dd9824e568d5c09b0fd93c351d75be7073eef1607e06710&=&format=webp&quality=lossless&width=440&height=271",
+		tags:["wall"]
+	},{
+		name:"Machu Picchu",
+		img:prefix+"1262405728191254558/Screenshot_2024-07-15_182401.png?ex=66967a73&is=669528f3&hm=33222191e92ab0a9b1e010041370b424eb7f72c80c9fb8d8f9670a051e7d22b1&=&format=webp&quality=lossless&width=318&height=166",
+		loc:prefix+"1262406457681514578/image.png?ex=66967b21&is=669529a1&hm=263fc15ef34bad08ff934d9dbda96a9f530fb0cee7f99b5a5b49ddcae93ca3ee&=&format=webp&quality=lossless&width=173&height=195",
+		tags:["machu","picchu","mt","mountain"]
+	},{
+		name:"Lake Titicaca",
+		img:prefix+"1262407228699443310/Screenshot_2024-07-15_182512.png?ex=66967bd9&is=66952a59&hm=72fa6abe11bfe692dc5f207dca514ac00f7b14029a0ce6c2ca11be191bdb4f49&=&format=webp&quality=lossless&width=485&height=251",
+		loc:prefix+"1262407403207528569/image.png?ex=66967c03&is=66952a83&hm=e3fb55c819f3a384bed29aae858a3ee9d311dc9ac9b203559bd2ae362844ee53&=&format=webp&quality=lossless&width=303&height=245",
+		tags:["water","mt","mountain","hill","lake"]
+	},{
+		name:"Victoria Falls",
+		img:prefix+"1262407648716914759/Screenshot_2024-07-15_182626.png?ex=66967c3d&is=66952abd&hm=8d63d1c1fc33c23de970e1dd9d6be1b8402bba9364b0cf1e8e79ddb6a2107ff2&=&format=webp&quality=lossless&width=375&height=187",
+		loc:prefix+"1262407744628064256/image.png?ex=66967c54&is=66952ad4&hm=f98af42aacc2d3405acd34018b7c2a87b416e56795f8ca77a2b3e116761c07b3&=&format=webp&quality=lossless&width=409&height=241",
+		tags:["falls","victoria"]
+	},{
+		name:"Delphi",
+		img:prefix+"1262486646360637501/Screenshot_2024-07-15_182701.png?ex=6696c5d0&is=66957450&hm=23eacd675672a7fe56cc676b4bb67496222c8329c716a44845249ebe7b2f7507&=&format=webp&quality=lossless&width=278&height=150",
+		loc:prefix+"1262486646021161100/image.png?ex=6696c5d0&is=66957450&hm=12bd8882027643fa5e48f7af4b0c03f6aaf74e0637661a76e2e4a00d456c1f9c&=&format=webp&quality=lossless&width=297&height=215",
+		tags:["mt","mountain","circle","delphi","ruins"]
+	},{
+		name:"Tower of London",
+		img:prefix+"1262489930207330334/Screenshot_2024-07-15_183048.png?ex=6696c8df&is=6695775f&hm=601ebd436e3970ac6664bce9dda8bcdc055d698ebf8ca5f94a5353c3481cd65e&=&format=webp&quality=lossless&width=484&height=250",
+		loc:prefix+"1262489930450337875/image.png?ex=6696c8df&is=6695775f&hm=97779f5de00b9aa8b7a2cb3034abfd96bcfbc095d133907dfc63546739c8632e&=&format=webp&quality=lossless&width=236&height=232",
+		tags:["tower","castle","white","river","4","3"]
+	},{
+		name:"Burj Khalifa",
+		img:prefix+"1262490825397375046/Screenshot_2024-07-15_183140.png?ex=6696c9b4&is=66957834&hm=62409206f901282c06ac13f6e6b1f65ca0a65c35925d3590dbfd323310345b3e&=&format=webp&quality=lossless&width=401&height=206",
+		loc:prefix+"1262490825640902776/image.png?ex=6696c9b4&is=66957834&hm=161187382d62e5b9c87d2fb20ece3bd8aee06e1340534f1942cb0477bc0864d6&=&format=webp&quality=lossless&width=358&height=257",
+		tags:["burj","khalifa","tower","dubai"]
+	},{
+		name:"Amalienborg Palace",
+		img:prefix+"1262491404911906958/Screenshot_2024-07-15_183242.png?ex=6696ca3e&is=669578be&hm=80bba6cedc814c8e20ce53197d3045b8ee201b594e183a7ae3c776a4e3dc492a&=&format=webp&quality=lossless&width=364&height=189",
+		loc:prefix+"1262491405155303466/image.png?ex=6696ca3e&is=669578be&hm=3ca3b9644493798a554d8cdfc6e7cb9025903c1ce54a0689dcea647cba9830cc&=&format=webp&quality=lossless&width=380&height=271",
+		tags:["horse","statue"]
+	},{
+		name:"Belém Tower",
+		img:prefix+"1262491825487220846/Screenshot_2024-07-15_183512.png?ex=6696caa3&is=66957923&hm=bf777101388f27eaa329f8fe331b02c566bd8f8f5a2714661b5ee8ce326eba4c&=&format=webp&quality=lossless&width=338&height=184",
+		loc:prefix+"1262491825814634680/image.png?ex=6696caa3&is=66957923&hm=99ddc1ed984c4468ecff219a9b2430d92efb03b5770e0fead186e6b538b69260&=&format=webp&quality=lossless&width=490&height=236",
+		tags:["belem","tower","water","square"]
+	},{
+		name:"Shanghai",
+		img:prefix+"1262492297971630121/Screenshot_2024-07-15_183745.png?ex=6696cb13&is=66957993&hm=ee9edfdd41bee8e56d84f4078d1be25d68c01c3551ea7ab8e746c3f3414e0698&=&format=webp&quality=lossless&width=497&height=250",
+		loc:prefix+"1262492298307047465/image.png?ex=6696cb13&is=66957993&hm=bb939c8c70ea90970437c800b5f2a07061cbd8d3d0d53f84d538ac2f5fab09b6&=&format=webp&quality=lossless&width=340&height=269",
+		tags:["round","bridge","river","water","buildings"]
+	},{
+		name:"Ponte Vecchio",
+		img:prefix+"1262492703975800904/Screenshot_2024-07-15_184318.png?ex=6696cb74&is=669579f4&hm=444fbb1bd579b2b4771afc918a9dc411936f1ac1ab544ee4ebf27245df3edb83&=&format=webp&quality=lossless&width=512&height=271",
+		loc:prefix+"1262492704235982981/image.png?ex=6696cb74&is=669579f4&hm=4da3ca7ec0f4d02ba4986688a30edd1fd8c7d50d0509c32d7147b72651974db0&=&format=webp&quality=lossless&width=353&height=262",
+		tags:["bridge","river","water"]
+	},{
+		name:"Grand Place",
+		img:prefix+"1262493115269386360/Screenshot_2024-07-15_184427.png?ex=6696cbd6&is=66957a56&hm=ce2b0f4eb5ab781c962b4caccfa1c15c36257c6255eafc7f0979e23bdee77826&=&format=webp&quality=lossless&width=477&height=246",
+		loc:prefix+"1262493115550535801/image.png?ex=6696cbd6&is=66957a56&hm=fceb873d91e09cc71acc2c0553c42370df32d2d2864649237e53d962d2d7d816&=&format=webp&quality=lossless&width=365&height=259",
+		tags:["buildings","round","eu"]
+	},{
+		name:"White Cliffs of Dover",
+		img:prefix+"1262494025189949492/Screenshot_2024-07-15_185026.png?ex=6696ccaf&is=66957b2f&hm=ddb34a71ae622d98dfac0b2fab0165e84d4a7d4608f80925c05d7fff2551f284&=&format=webp&quality=lossless&width=501&height=258",
+		loc:prefix+"1262494025517367367/image.png?ex=6696ccaf&is=66957b2f&hm=a575a60d5bb4c0a7222b9995f7b7fc8afc736cd9bca6686ec5a17bc366c96360&=&format=webp&quality=lossless&width=227&height=219",
+		tags:["cliff","white"]
+	},{
+		name:"Pyramid of Giza",
+		img:prefix+"1262495021353926706/Screenshot_2024-07-15_185450.png?ex=6696cd9d&is=66957c1d&hm=a22975f99bc9359de99df8614747bfe6911b04c287398024d294893d758e10f3&=&format=webp&quality=lossless&width=375&height=195",
+		loc:prefix+"1262495021547131000/image.png?ex=6696cd9d&is=66957c1d&hm=5b28c1de2acf7a3732fb3e4c63c1b57a312482936191504cba39d1f0e59f4d6f&=&format=webp&quality=lossless&width=520&height=258",
+		tags:["pyramid","giza","desert"]
+	},{
+		name:"Old City of Jerusalem",
+		img:prefix+"1262495418315575316/Screenshot_2024-07-15_185636.png?ex=6696cdfb&is=66957c7b&hm=1e7495f7cd3769925d4d49a5a284b2012b51a9c3011f55dbdf9945932b484175&=&format=webp&quality=lossless&width=394&height=174",
+		loc:prefix+"1262495418600652841/image.png?ex=6696cdfb&is=66957c7b&hm=c0bc3cfbdf475dc7831d65135d198629a7c833658f039b8d38a44579e31e79a1&=&format=webp&quality=lossless&width=436&height=271",
+		tags:["white","statue","town","jerusalem"]
+	},{
+		name:"Amsterdam",
+		img:prefix+"1262495848898494535/Screenshot_2024-07-15_190107.png?ex=6696ce62&is=66957ce2&hm=ac6ece24437fe358455b54481240fc335cbb954da8bbe070e2d1923f639f8d61&=&format=webp&quality=lossless&width=328&height=176",
+		loc:prefix+"1262495849167065138/image.png?ex=6696ce62&is=66957ce2&hm=e41f144217337bce2eec2c563f617001d92093a9340e02c3a54d2aca18677a2b&=&format=webp&quality=lossless&width=370&height=266",
+		tags:["boats","river","canal"]
+	},{
+		name:"Uffizi Galleries",
+		img:prefix+"1262496228160307262/Screenshot_2024-07-15_190128.png?ex=6696cebc&is=66957d3c&hm=028418dc5efb12501d3d455df6ad776cd6e23a6014624221f42a6c35fda57764&=&format=webp&quality=lossless&width=324&height=171",
+		loc:prefix+"1262496228453650512/image.png?ex=6696cebc&is=66957d3c&hm=05c23fab300e42169c154a58fe4eb717b1cbf7f69225b5ac1e86205859b2bb0d&=&format=webp&quality=lossless&width=242&height=175",
+		tags:["inside","eu","arc"]
+	},{
+		name:"Yosemite Valley",
+		img:prefix+"1262497320704934040/Screenshot_2024-07-15_191240.png?ex=6696cfc1&is=66957e41&hm=803896e34505a4aaa78761a838218a4874f82bd8a5031be3e03a1c2e2770967c&=&format=webp&quality=lossless&width=512&height=271",
+		loc:prefix+"1263038462638948352/image.png?ex=6698c7bb&is=6697763b&hm=0c9b15c4d3790aa4c496341a182f375017ca2421db39bfcfa880bfab02db9266&=&format=webp&quality=lossless&width=334&height=314",
+		tags:["mt","mountain","yosemite","valley","forest"]
+	},{
+		name:"Capitol Hill",
+		img:prefix+"1262497961066238063/Screenshot_2024-07-15_191328.png?ex=6696d059&is=66957ed9&hm=bedf178604f88cbb188fbb8ffbb06994c0e5196022596356d775c86c52ad9091&=&format=webp&quality=lossless&width=561&height=270",
+		loc:prefix+"1262497961443852308/image.png?ex=6696d05a&is=66957eda&hm=c8d80f84f384e05171747e1ced0ddc45dc2a5158f8483abf6c5cbd3c271b64f4&=&format=webp&quality=lossless&width=242&height=168",
+		tags:["round","elevated","capitol","hill"]
+	},{
+		name:"Tokyo Tower",
+		img:prefix+"1262498348376789042/Screenshot_2024-07-15_220119.png?ex=6696d0b6&is=66957f36&hm=d9b6f79ee35763af9039ed911db77a0ed408a11499806e05145f6c8d760749bd&=&format=webp&quality=lossless&width=384&height=198",
+		loc:prefix+"1262498348712202260/image.png?ex=6696d0b6&is=66957f36&hm=ac9ee166bed71f823376275010a159c44d3b8df3d2e9d7f645d0c6fdfa18abe7&=&format=webp&quality=lossless&width=334&height=223",
+		tags:["tower","tokyo","japan","red"]
+	},{
+		name:"Chichen Itza",
+		img:prefix+"1262499140223373402/Screenshot_2024-07-15_220218.png?ex=6696d173&is=66957ff3&hm=8ea63a647f67da7d8e3a3ade3776e3be7cebd977f8150206a548e31099db5b75&=&format=webp&quality=lossless&width=503&height=253",
+		loc:prefix+"1262499140504653865/image.png?ex=6696d173&is=66957ff3&hm=bf0cc6e0c55c050a6e7572f28cb9b29fd75e3ab499dd914266c957c06a9e331b&=&format=webp&quality=lossless&width=441&height=269",
+		tags:["pyramid","chichen","itza"]
+	},{
+		name:"Berlin Wall",
+		img:prefix+"1262500260358651985/Screenshot_2024-07-15_220242.png?ex=6696d27e&is=669580fe&hm=1327c3c182f2ccebd958b12920d4cfda7d3c9b8c73e33f4af64c8eb61a5e17e8&=&format=webp&quality=lossless&width=488&height=254",
+		loc:prefix+"1262500260639539261/image.png?ex=6696d27e&is=669580fe&hm=dc3ede5e05f8f3aaea2a8aa503476e02776d84af7a3dd78fbe5e00b09eed39f2&=&format=webp&quality=lossless&width=340&height=271",
+		tags:["wall","berlin","road"]
+	},{
+		name:"Petra",
+		img:prefix+"1262500870663311490/Screenshot_2024-07-15_220307.png?ex=6696d30f&is=6695818f&hm=c69b6c8085387ab7f223efd24bc57723b5dbe653ac90edcdc37b63a0307bbf85&=&format=webp&quality=lossless&width=462&height=244",
+		loc:prefix+"1262500870994530445/image.png?ex=6696d30f&is=6695818f&hm=ad48ccdca087d8823ecdef333cd8fbd5ff644a2d091fc14b5b0bbd7329e1701c&=&format=webp&quality=lossless&width=217&height=195",
+		tags:["petra","carved","desert","mt"]
+	},{
+		name:"Fuji",
+		img:prefix+"1262501226617110538/Screenshot_2024-07-15_220450.png?ex=6696d364&is=669581e4&hm=e7bce5a228674b79174c9d17032ef410b9f31780928ca9df63e0c4eef920cc7a&=&format=webp&quality=lossless&width=474&height=243",
+		loc:prefix+"1262501226923167921/image.png?ex=6696d364&is=669581e4&hm=f047c6a28508002b9d91925228ff65b29a95f183e1229eaace4e87661dd9c1af&=&format=webp&quality=lossless&width=231&height=213",
+		tags:["japan","fuji","mt","mountain","volcano"]
+	},{
+		name:"Bora Bora",
+		img:prefix+"1262501933277773885/Screenshot_2024-07-15_220637.png?ex=6696d40d&is=6695828d&hm=ce5421bb0588c7650a50148ffd1f37f1a6bc7e96b03778287c6712f90d0a2180&=&format=webp&quality=lossless&width=486&height=248",
+		loc:prefix+"1262501933520781343/image.png?ex=6696d40d&is=6695828d&hm=bad1c8b7ab5f1d314404fb26969da060651061754a7a1a03c1db470a48ce6fd7&=&format=webp&quality=lossless&width=377&height=268",
+		tags:["bora","mt","mountain","water"]
+	},{
+		name:"Pompeii/Vesuvius",
+		img:prefix+"1262502518366404748/Screenshot_2024-07-15_220702.png?ex=6696d498&is=66958318&hm=b42b2a10fa5e219cfb7192d718d35175a23417b4c26b68e0324f13c0d163f755&=&format=webp&quality=lossless&width=441&height=232",
+		loc:prefix+"1262502448333979708/image.png?ex=6696d487&is=66958307&hm=faf834df1c8b8aee8427439468d5c8b4c314c2a3586633bdb9a0fb4a07e95ad5&=&format=webp&quality=lossless&width=325&height=271",
+		tags:["mt","ruins","volcano","mountain"]
+	},{
+		name:"Washington Monument",
+		img:prefix+"1262502926191169568/Screenshot_2024-07-15_220800.png?ex=6696d4f9&is=66958379&hm=773c9c1f398557711802a15d7a36cb6377eaf03c167aacd632a9ba30f5facf99&=&format=webp&quality=lossless&width=350&height=179",
+		loc:prefix+"1262502926446756012/image.png?ex=6696d4f9&is=66958379&hm=0ad3ff09999210871b25a0c31a5cf852b88d3dfd87a6e53b044259cb332a53f8&=&format=webp&quality=lossless&width=296&height=194",
+		tags:["obelisk","pillar","monument","washington"]
+	},{
+		name:"Mount Rushmore",
+		img:prefix+"1262503450500010004/Screenshot_2024-07-15_221002.png?ex=6696d576&is=669583f6&hm=a6539e97d0ca39b16301e1f95534ea490770a7bba5e8b09856ec206844c39447&=&format=webp&quality=lossless&width=435&height=229",
+		loc:prefix+"1262503451171094598/image.png?ex=6696d576&is=669583f6&hm=645b363ca7cefc3540c2d405d62634ef6472f7dbfde6e7ada95c7bc3c125e7bb&=&format=webp&quality=lossless&width=440&height=271",
+		tags:["rushmore","mountain","presidents","mt"]
+	},{
+		name:"Kilimanjaro",
+		img:prefix+"1262503835524399144/Screenshot_2024-07-15_221335.png?ex=6696d5d2&is=66958452&hm=7cfea5533f110dc5b0340f8b3f650dbf570d7f2b41b37fc6fb07f79667c42e08&=&format=webp&quality=lossless&width=332&height=162",
+		loc:prefix+"1262503835943964847/image.png?ex=6696d5d2&is=66958452&hm=2506f45de031073edfe09e5330ee9e7b40bc994b5dc11355c9322e0264c84e35&=&format=webp&quality=lossless&width=366&height=260",
+		tags:["african","mt","mountain"]
+	},{
+		name:"Sacre-Coeur Basilica",
+		img:prefix+"1262504344910303253/Screenshot_2024-07-15_221403.png?ex=6696d64c&is=669584cc&hm=c95209bd04fe87a14208bf14d6a80c30ad96073cdfed8d78d886c648c4a84de0&=&format=webp&quality=lossless&width=317&height=167",
+		loc:prefix+"1262504345652559882/image.png?ex=6696d64c&is=669584cc&hm=34813992d39995ffcff0e85dd164a273b6e3691bca0f39415f3f130bc5dbd201&=&format=webp&quality=lossless&width=341&height=215",
+		tags:["blurred","round","cathedral","3"]
+	},{
+		name:"Matterhorn",
+		img:prefix+"1262504693112901642/Screenshot_2024-07-15_221604.png?ex=6696d69f&is=6695851f&hm=9e5eedc2ffdf05cdc1144100b4951539f860524cb902745c62b9bbc60df995c2&=&format=webp&quality=lossless&width=497&height=260",
+		loc:prefix+"1262504693674934312/image.png?ex=6696d69f&is=6695851f&hm=c3c6d4e6d971d67a8526555930828a617d528d6f4d2b0c1817885927e01a042c&=&format=webp&quality=lossless&width=456&height=256",
+		tags:["mountain","mt","lake","reflection"]
+	},{
+		name:"Summer Palace",
+		img:prefix+"1262505084626010153/Screenshot_2024-07-15_222257.png?ex=6696d6fc&is=6695857c&hm=7d15638d527a415788ba99b3705c0e6f40c66347f293c8758a44963afd90c786&=&format=webp&quality=lossless&width=494&height=260",
+		loc:prefix+"1262505084852633732/image.png?ex=6696d6fc&is=6695857c&hm=0c4893c7932ec682ce4f27f0f06b66abf2b0a9518cc966b9abb6b98fdcb447de&=&format=webp&quality=lossless&width=392&height=244",
+		tags:["china","asian","elevated"]
+	},{
+		name:"Statue of Liberty",
+		img:prefix+"1262505561023316028/Screenshot_2024-07-15_222600.png?ex=6696d76d&is=669585ed&hm=4956932e8bff8b58e5d4ec6bc069d9c10cfc91882acebf9d57cba1d83f65b428&=&format=webp&quality=lossless&width=476&height=236",
+		loc:prefix+"1262505561262526635/image.png?ex=6696d76e&is=669585ee&hm=0994a86ea4dba1ee0aa25b25edf64426df6ce108baef6be4f7596d7ae7534e46&=&format=webp&quality=lossless&width=384&height=211",
+		tags:["liberty","statue"]
+	},{
+		name:"Brooklyn Bridge",
+		img:prefix+"1262505867010642021/Screenshot_2024-07-15_222743.png?ex=6696d7b6&is=66958636&hm=6d584cdfa4a192b25b476a38af2a8f4de298892c35dbd19fe9c3092809311c3f&=&format=webp&quality=lossless&width=386&height=201",
+		loc:prefix+"1262505867257843783/image.png?ex=6696d7b6&is=66958636&hm=9cd08132fd07cc39170d20e76e70c7183a227cc7c248798246aa4039f6ad0163&=&format=webp&quality=lossless&width=477&height=227",
+		tags:["bridge","trade","tower","center"]
+	},{
+		name:"Carcassonne",
+		img:prefix+"1262506274319237130/Screenshot_2024-07-15_223228.png?ex=6696d818&is=66958698&hm=6dc9cf01648a83f37d563dfa6b8b39b7fa31e62a23fe9c443c534b4c444eb131&=&format=webp&quality=lossless&width=461&height=235",
+		loc:prefix+"1262506274596065432/image.png?ex=6696d818&is=66958698&hm=78f6e6d143c42784185e80957594b011262f63460a84f55b94223a5daad81311&=&format=webp&quality=lossless&width=506&height=224",
+		tags:["british","bridge","castle"]
+	},{
+		name:"Ha Long Bay",
+		img:prefix+"1262506859596746792/Screenshot_2024-07-15_223805.png?ex=6696d8a3&is=66958723&hm=580b0784d025f4c764cc4981e9f27e544d77f53bbc1a640381c4a05ea3fa29f2&=&format=webp&quality=lossless&width=517&height=267",
+		loc:prefix+"1262506859928227870/image.png?ex=6696d8a3&is=66958723&hm=aea50b9d55d511f26298b252a58c356d490ce16741a4be94001c8f4c7d73dcb9&=&format=webp&quality=lossless&width=405&height=271",
+		tags:["palawan","mt","mountain","cliff"]
+	},{
+		name:"Blue Lagoon",
+		img:prefix+"1262507374116077621/Screenshot_2024-07-15_224128.png?ex=6696d91e&is=6695879e&hm=b5d65331ac7bac37c9e445e986c3e673e6208c31a9b550ca47b5592c7c5b1f01&=&format=webp&quality=lossless&width=549&height=271",
+		loc:prefix+"1262507374376386620/image.png?ex=6696d91e&is=6695879e&hm=8688a8bd70cbca37e767bc86c502f3f3ed05ae1575dfce1fa89f490717e0a220&=&format=webp&quality=lossless&width=292&height=271",
+		tags:["lake","blue","geysir","lagoon"]
+	},{
+		name:"Sagrada Família",
+		img:prefix+"1262508160552276160/Screenshot_2024-07-15_224318.png?ex=6696d9d9&is=66958859&hm=7d742eef2c2632967e933c4f7d8e0ed02a3fbb1151290d463d5f5c1636dd4a44&=&format=webp&quality=lossless&width=349&height=170",
+		loc:prefix+"1262508160955060406/image.png?ex=6696d9d9&is=66958859&hm=9d9f40558e110149cd0ddab3be84118ffa04220acdb5448b145d6cfe37c84bfa&=&format=webp&quality=lossless&width=417&height=198",
+		tags:["cranes","tall","thin","towers"]
+	},{
+		name:"Oxford University",
+		img:prefix+"1262508658646978680/Screenshot_2024-07-15_224404.png?ex=6696da50&is=669588d0&hm=ff018765bad21861313700feb8e081fbb1ec458dd814b8743b2fd3bdd4c2cb5b&=&format=webp&quality=lossless&width=487&height=244",
+		loc:prefix+"1262508658877534249/image.png?ex=6696da50&is=669588d0&hm=04cf7bc20ddf7d4c8cbd95d4fa650d7c9185fb0ceb4c7dfaac84fb758dd10429&=&format=webp&quality=lossless&width=320&height=255",
+		tags:["oxford","round","field","surround"]
+	},{
+		name:"Terracotta Army",
+		img:prefix+"1262509180896415836/Screenshot_2024-07-15_224508.png?ex=6696dacd&is=6695894d&hm=e92d485753f3958fad28890cd5fce6ae7779f6e8ca80ddb1c7e40c7fadb09cae&=&format=webp&quality=lossless&width=496&height=271",
+		loc:prefix+"1262509180556808283/image.png?ex=6696dacc&is=6695894c&hm=ae5d6ad5d33bf37521030b35a4261bcebb89bfd3478d9d176c206fed92ba96d6&=&format=webp&quality=lossless&width=261&height=261",
+		tags:["terracotta","army","soldiers","warrions"]
+	},{
+		name:"Loch Ness",
+		img:prefix+"1262509713459773502/Screenshot_2024-07-15_224656.png?ex=6696db4b&is=669589cb&hm=cf48b7f8b53f75b47db203f4a90e5a0311ebeea98ffb26e4b2f383d9bc0b6442&=&format=webp&quality=lossless&width=530&height=271",
+		loc:prefix+"1262509713741058098/image.png?ex=6696db4c&is=669589cc&hm=efff95b34357adc3956758c60b113f5b5bdbe6e7d27d0ac9b9618598d1b0588c&=&format=webp&quality=lossless&width=264&height=271",
+		tags:["lake","square","loch","ness","hill"]
+	},{
+		name:"Great Wall of China",
+		img:prefix+"1262510101617573918/Screenshot_2024-07-15_225518.png?ex=6696dba8&is=66958a28&hm=a9b433cb28875e3e3081606bcf3d4a1edf42092df038ccac9a9f65c65f8ef536&=&format=webp&quality=lossless&width=472&height=235",
+		loc:prefix+"1262510102036877466/image.png?ex=6696dba8&is=66958a28&hm=3a256407d5e43694e64297ac68c222ce1b3e6977c662877c4ac09e3356d68df4&=&format=webp&quality=lossless&width=323&height=271",
+		tags:["great","wall","china"]
+	},{
+		name:"Sequoia National Park",
+		img:prefix+"1262510400226721994/Screenshot_2024-07-15_230136.png?ex=6696dbef&is=66958a6f&hm=91f8c6c83cddd399ab083277783eee0142a8a39d349844a078b7ffa1ba00d027&=&format=webp&quality=lossless&width=340&height=176",
+		loc:prefix+"1262510400604475422/image.png?ex=6696dbef&is=66958a6f&hm=05e1c99d3aa2f1ff7e7571c809aaa4608e624e1747fc5d093ac5f1309b47f524&=&format=webp&quality=lossless&width=257&height=271",
+		tags:["forest","redwood"]
+	},{
+		name:"London Eye",
+		img:prefix+"1262510717358309436/Screenshot_2024-07-15_231703.png?ex=6696dc3b&is=66958abb&hm=7d26cd9490556e1f11f18996c1e51d05363532d6c6e13620c6e41fb8f1b25cb4&=&format=webp&quality=lossless&width=510&height=260",
+		loc:prefix+"1262510717752315954/image.png?ex=6696dc3b&is=66958abb&hm=007fd0381f94c9c1f0344f3827f323f604f87fda44ad708593eb174f7ff2ab9a&=&format=webp&quality=lossless&width=522&height=271",
+		tags:["ferris","london","eye"]
+	},{
+		name:"Fort Forno",
+		img:prefix+"1262511306125344780/Screenshot_2024-07-15_231810.png?ex=6696dcc7&is=66958b47&hm=ab8972d496e5574816c66e857dafc99345b3d24444439447ac362a4e3efd37b0&=&format=webp&quality=lossless&width=511&height=243",
+		loc:prefix+"1262511306393518180/image.png?ex=6696dcc7&is=66958b47&hm=1a1e0363a3501ceaec77cc245ac13da073490c9e0d4e0184f2af0288845089f3&=&format=webp&quality=lossless&width=374&height=271",
+		tags:["elevated","fort","wall","slanted"]
+	},{
+		name:"Rockefeller Center",
+		img:prefix+"1263018242990149662/Screenshot_2024-07-16_150024.png?ex=6698b4e6&is=66976366&hm=1f4d44cd22d717c62c8793b82efc45c935ef91c4517545af68aa0ce76442b4f2&=&format=webp&quality=lossless&width=503&height=259",
+		loc:prefix+"1263018243292008548/image.png?ex=6698b4e6&is=66976366&hm=fe1ef6eaa7607122b1b8a75357ba7b753d1b570c4d570d2d4a520cb3c952cf23&=&format=webp&quality=lossless&width=501&height=239",
+		tags:["pond","water","statue","flags","gold","rockefeller"]
+	},{
+		name:"Pompidou",
+		img:prefix+"1263018859590324255/Screenshot_2024-07-16_172930.png?ex=6698b579&is=669763f9&hm=67a6c16f4ec0e42104e10155c80a8feccaa0b808f343114e826dd46b4e3f57a2&=&format=webp&quality=lossless&width=446&height=227",
+		loc:prefix+"1263018859862949959/image.png?ex=6698b579&is=669763f9&hm=041876daf29a072fb87770e633a43fe65c90f3df5f1237b5f6805013661a4572&=&format=webp&quality=lossless&width=420&height=255",
+		tags:["metal","stairs","pompidou"]
+	},{
+		name:"Atomium",
+		img:prefix+"1263019431924207748/Screenshot_2024-07-16_173631.png?ex=6698b602&is=66976482&hm=92e6f652fa3ebcbc9bbe4caddf9a39f626fdb9ed6395a5df8eae6a8652d5222f&=&format=webp&quality=lossless&width=404&height=214",
+		loc:prefix+"1263019432188575744/image.png?ex=6698b602&is=66976482&hm=a24ea5ab13baae7c274c1cc4ad9057ead3911b73205e6688db42fa837217959e&=&format=webp&quality=lossless&width=524&height=271",
+		tags:["atomium","structure","metal"]
+	},{
+		name:"Tsarskoye Selo",
+		img:prefix+"1263020125314093147/Screenshot_2024-07-16_174931.png?ex=6698b6a7&is=66976527&hm=953c08caffdfe9d3eec08b022b5445323c5255e70fca896ab9262438a3aeddd8&=&format=webp&quality=lossless&width=409&height=211",
+		loc:prefix+"1263057976596496434/image.png?ex=6698d9e8&is=66978868&hm=f4d04ee2c196f6f1bd14984de11010277254877b9542e75dcb09799452567ef7&=&format=webp&quality=lossless&width=350&height=314",
+		tags:["bridge","autumn","park","white"]
+	},{
+		name:"Kronborg Castle",
+		img:prefix+"1263049674890416158/Screenshot_2024-07-17_144553.png?ex=6698d22c&is=669780ac&hm=2553257dc00940e2fd59b2fa83a79bd1aa0dd3970c22908d42b9f42d1e0eaf69&=&format=webp&quality=lossless&width=521&height=271",
+		loc:prefix+"1263049675204726894/image.png?ex=6698d22c&is=669780ac&hm=df32034ff69ca63b5491b126721e5f9fe25bf39261407c836cb52a8e41e6b0a8&=&format=webp&quality=lossless&width=425&height=271",
+		tags:["castle","denmark","flag","towers"]
+	},{
+		name:"Bryce Canyon National Park",
+		img:prefix+"1263050294544302090/Screenshot_2024-07-17_151723.png?ex=6698d2c0&is=66978140&hm=a6929ce0e10be6c8d93d0285f6333ccb01fa5413f9283a78d3e732b5db4cb5c3&=&format=webp&quality=lossless&width=490&height=269",
+		loc:prefix+"1263050294875394110/image.png?ex=6698d2c0&is=66978140&hm=d5b031a7eb87257ef906255c235121d210bc46f0800b9621f4164580b8b3784b&=&format=webp&quality=lossless&width=350&height=271",
+		tags:["canyon","bryce","red","mt","mountain"]
+	},{
+		name:"Komodo Island",
+		img:prefix+"1263050817619890236/Screenshot_2024-07-17_152416.png?ex=6698d33d&is=669781bd&hm=64993c1080c638e18237393b9f76a24eb581f41a3036021a7c94ffdf3976f4f8&=&format=webp&quality=lossless&width=523&height=271",
+		loc:prefix+"1263050817930530847/image.png?ex=6698d33d&is=669781bd&hm=346229f4e9f40eb2177c49a19cd029d9c3705e93320f094b0b6c207cf5aede52&=&format=webp&quality=lossless&width=521&height=238",
+		tags:["komodo","island","islands","lake"]
+	},{
+		name:"Prague Castle",
+		img:prefix+"1263051566215200808/Screenshot_2024-07-17_153806.png?ex=6698d3ef&is=6697826f&hm=bf1ca8d83f944557a411634c6eee2f700ae3a04d6d575d37c60aa896b86a387d&=&format=webp&quality=lossless&width=530&height=271",
+		loc:prefix+"1263051566475116584/image.png?ex=6698d3ef&is=6697826f&hm=bf8b82a7d602d4b3a936cade96ddf82af696a72486af6623c882fa6905580105&=&format=webp&quality=lossless&width=372&height=271",
+		tags:["bridge","boats"]
+	},{
+		name:"Eiffel Tower",
+		img:prefix+"1263058656530796604/Screenshot_2024-07-17_163946.png?ex=6698da8a&is=6697890a&hm=730e3ca4f736c73b2427835521e7f8cdf811509b27c312301d0a929f02c9f7d4&=&format=webp&quality=lossless&width=463&height=242",
+		loc:prefix+"1263058656862142535/image.png?ex=6698da8a&is=6697890a&hm=e9f12a809aa698c431904201d4204643ca2374cc9f75cb47871ff4528fd7bb07&=&format=webp&quality=lossless&width=791&height=621",
+		tags:["eiffel","tower","paris","france"]
+	}
+];
+function searchTags(ts){
+	if(ts.length<1)return;
+	if(ts=="_")return displayMatched(data);
+	let matched=[];
+	let tags=ts.split(" ");
+	for(let k=0;k<data.length;k++){
+		let tm=0;
+		for(let t=0;t<tags.length;t++){
+			for(let dt=0;dt<data[k].tags.length;dt++){
+				let dtv=data[k].tags[dt];
+				let tv=tags[t];
+				if(dtv==tv||dtv.startsWith(tv)){
+					tm++;
+				}
+			}
+		}
+		if(tm>=tags.length)matched.push(data[k]);
+	}
+	displayMatched(matched);
+}
+function appendHtml(par,h){
+	let d=document.createElement("div");
+	d.innerHTML=h;
+	par.appendChild(d.children[0]);
+}
+function displayMatched(m){
+	results.innerHTML="";
+	for(let i=0;i<m.length;i++){
+		let e=m[i];
+		appendHtml(results,`
+		<div class=item>
+			<h2>${e.name}</h2>
+			<img src='${e.img}'></img>
+			<img src='${e.loc}'></img>
+			<span>${e.tags.join(", ")}</span>
+		</div>
+		`);
+	}
+}
+data.sort(({name:a},{name:b})=>a.localeCompare(b));
+console.log([...data].filter(e=>e.name.length>1).length+" places");
+/*
+guggenheim wrong loc
+sequoia wrong loc
+*/
+		</script>
+	</body>
+</html>
