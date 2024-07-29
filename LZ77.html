@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Compress</title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+			body{
+				background:#000;
+				color:#fff;
+			}
+			textarea{
+				background-color:#1e252a;
+				font-family:monospace;
+				font-weight:600;
+				height:40%;
+				color:#eee;
+				width:100%;
+			}
+		</style>
+	</head>
+	<body>
+		<select id=mode><option value=0>Compress</option><option value=1>Decompress</option></select><br>
+		<textarea id=input></textarea><br>
+		<textarea id=result readonly></textarea><br>
+		<button id=compressBtn>Button</button><br>
+		<span id=info></span>
+		<fieldset>
+			<p>Efficient with repetitive data</d>
+			<p>Data cannot contain <mark>,</mark> and <mark>|</mark></d>
+		</fieldset>
+		<script>
+(function(){
+	const d="0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	const t62=n=>{
+		if(isNaN(n))return n;
+		if(n==0)return"0";
+		let r="";
+		while(n>0){
+			r=d[n%62]+r;
+			n=n/62|0;
+		}
+		return r;
+	}
+	const f62=s=>[...s,"0"].reverse().reduce((a,b,i)=>{
+		let p=d.indexOf(b);
+		if(p<0)return NaN;
+		return+a+p*62**--i;
+	});
+	const compress=d=>{
+		let c=[],i=0,l=d.length;
+		while(i<l){
+			let ml=0,md=0;
+			for(let j=Math.max(0,i-l);j<i;j++){
+				let n=0;
+				while(n<l&&d[j+n]===d[i+n])n++;
+				if(n>ml)ml=n,md=i-j;
+			}
+			if(ml>0){
+				let p=md==ml?t62(ml):t62(md)+`|`+t62(ml);
+				c.push(p+`|${d[i+ml]||""}`);
+				i+=ml+1;
+			}else c.push(d[i++]||"");
+		}
+		return c.join(",");
+	}
+	const decompress=s=>{
+		const c=s.split(",").map(e=>{
+			let p=e.split("|"),[p0,p1]=p.map(f62),L=p.length;
+			return{d:L>1?L>2?p0:p0:0,l:L>1?L>2?p1:p0:0,n:L>1?L>2?p[2]:p[1]:p};
+		});
+		const d=[];
+		for(let e of c)
+			if(e.d+e.l<1)d.push(e.n);
+			else{
+				let s=d.length-e.d;
+				for(let i=0;i<e.l;i++)d.push(d[s+i]);
+				d.push(e.n);
+			}
+		return d.join("");
+	}
+	compressBtn.onclick=function(){
+		info.textContent="";
+		if(mode.value==="0"){
+			let res=compress(input.value);
+			result.value=res;
+			info.textContent=decompress(res)===input.value&&res.length<input.value.length?"Successful compression":"Unsuccessful compression";
+		}else if(mode.value==="1"){
+			let res=decompress(input.value);
+			result.value=res;
+		}
+	}
+})();
+		</script>
+	</body>
+</html>
