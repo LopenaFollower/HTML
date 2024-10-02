@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>J to JS</title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+			body{
+				background:#000;
+				color:#fff;
+			}
+			textarea{
+				background-color:#1e252a;
+				font-family:monospace;
+				overflow-wrap:normal;
+				overflow-x:scroll;
+				white-space:pre;
+				font-weight:600;
+				font-size:0.1px;
+				height:40%;
+				color:#eee;
+				width:100%;
+			}
+		</style>
+	</head>
+	<body>
+		<input type=file id=fileIn /><br><br>
+		<button onclick='input.value=input.value.replaceAll("\n","\n\t")'>increase indent</button>
+		<button onclick='input.value=input.value.replaceAll("\n\t","\n")'>reduce indent</button>
+		<textarea id=input></textarea><br>
+		<textarea id=output></textarea><br>
+		<button onclick='format()'>format</button>
+		<pre id=info></pre>
+		<table><tbody id=tpar></tbody></table>
+		<script>
+fileIn.onchange=e=>{
+	let fr=new FileReader(),f=e.target.files[0];
+	fr.onload=function(){
+		input.value=fr.result;
+		setTimeout(format,2e2);
+	}
+	fr.readAsText(f);
+}
+String.prototype.has=function(str){
+	return this.indexOf(str)+1;
+}
+function addOption(n,id,c){
+	let[tr,tdn,tdc,cb]=[document.createElement("tr"),document.createElement("td"),document.createElement("td"),document.createElement("input")];
+	tdn.innerText=n;
+	cb.type="checkbox";cb.id=id;cb.checked=c;
+	tpar.appendChild(tr);tr.appendChild(tdn);tr.appendChild(tdc);tdc.appendChild(cb);
+}
+function fixTabulationErrors(s){
+	let r=false,a=0;
+	return s.split("").map(e=>{
+		if(e.match(/[a-zA-Z0-9]/g))r=a=true;
+		if(r){
+			let h=e.has("\t");
+			e=e.replaceAll("\t",a?" ":"");
+			if(h)a=false;
+		}
+		return e;
+	}).join("");
+}
+function removeRedundantLines(s){
+	return s.split("\n").map(e=>e.replaceAll("    ","\t").replaceAll("   ","\t").replaceAll("  ","\t").replaceAll("\t ","\t").replaceAll(" 0."," .")).filter(e=>{
+		e=e.trim();
+		let h=false;
+		for(let v of["Highlights.","System.","startLap()","stopLap()","recordDepth(","addComparison","recursion()","changeAuxWrites","changeReversals","Delays.","@","setRunAllSortsName","setExtraHeading","deleteExternalArray","changeAllocAmount","deleteArrayList"])
+			h=e.has(v)||h;
+		if(e.startsWith("//"))h=true;
+		return e.length&&!h;
+	}).map(fixTabulationErrors).join("\n");
+}
+function removeBlockComments(s){
+	let lines=s.split("\n").map(e=>e.replaceAll(/\/\/.*/g,"")),n=[],m=true;
+	for(let v of lines)if(m)if(v.indexOf("/*")+1)m=v.indexOf("*/")+1;else n.push(v);else m=v.indexOf("*/")+1||m;
+	return s;
+	return n.join("\n");
+}
+function getMainFunctions(s){
+	let hbgs=s.indexOf("setBogoSort")+1,lines=s.split("\n"),cs=lines[0];lines.pop();
+	do cs=lines.shift();while(lines.length&&(hbgs?!cs.has("setBogoSort"):!cs.has("super")));lines.shift();
+	if(lines[0].trim()=="}")lines.shift();
+	return lines.join("\n");
+}
+function removeSpaces(s){
+	for(let i=0;i<10&&rsp.checked;i++)
+		for(let v of["+","-","*","/",",",",\t",";","?","&","%","|",":",")","(","{","}","=","!",">","<","^"])
+			s=s.replaceAll(" "+v,v).replaceAll(v+" ",v).replaceAll(v+"\t",v);
+	for(let i=0;i<10;i++)for(let j=0;j<5;j++)s=s.replaceAll(")\n"+"\t".repeat(i)+"{","){").replaceAll("}\n"+"\t".repeat(i)+"else","}else");
+	return s;
+}
+function refactorSyntax(s){
+	return s.split("\n").map(e=>{
+		let bna=[[",int ",","],[",double ",","],[",boolean ",","],[",int[] ",","],["public void ","function "],["public boolean ","function "],["public int ","function "],["public long ","function "],["protected void","function"],["protected int[]","function"],["protected int ","function "],["protected boolean","function"],["private void","function"],["private int[]","function"],["private int ","function "],["private double","function"],["private boolean","function"],["private static boolean ","function "],["private static double ","function "],["private static int ","function "],["public static int ","function "],["public int[] ","function "],["void ","function "],["Writes.swap","await swap"],["Writes.write","await write"],["Writes.multiSwap","await multiSwap"],["Writes.reversal","await reversal"],["Writes.insert","await Wr.insert"],["Writes.",""],["Reads.",""],["(int[] ","("],["for(int ","for(let "],["(int ","("],["(double ","("],["private static final int","let"],["private final int","let"],["int[] ","let "],["int ","let "],["boolean[] ","let "],["boolean ","let "],["double ","let "],["Math.min","minVal"],["Math.max","maxVal"],["Math.ceil","ceil"],["Math.sqrt","sqrt"],["Math.abs","abs"],["Math.log","log"],["Math.pow","pow"],["Math.floor","floor"],["Math.round","round"],["Math.",""],["runSort","sort"],["createExternalArray","new Array"],["createArrayList","new Array"],["ArrayList<Integer>[]","let"],["compareOriginal","compare"],["Integer.numberOfLeadingZeros","clz32"],["while(true)","while(1)"],["this.",rthis.checked?"":"this."],["LinkedList<Integer>","let "],["new LinkedList<>","new Array"],["removeLast","pop"],["addLast","push"],["peekLast()","at(-1)"],["private class","class"],["throws Exception",""]];
+		for(let v of bna)e=e.replaceAll(...v);
+		if(cln.checked)e=e.replaceAll("currentLength","len").replaceAll("sortLength","len").replaceAll("currentLen","len");
+		return e;
+	}).join("\n");
+}
+function finalize(s){
+	return s.split("\n").map(e=>{
+		if(e.has("compareValues")||e.has("compareIndices")||e.has("compareIndexValue")||e.has("compareValueIndex"))
+			for(let n of["(\\d+).(\\d+)",".(\\d+)","(\\d+)"])
+				for(let c of[">=","<=",">","<","==","!="])
+					for(let p of[["<=0","<1"],[">=0","+1"],["!=0",""],["==1",">0"],["==-1","<0"]])
+						e=e.replace(new RegExp(","+n+",(\\w+)\\)","g"),")").replace(...p);
+		if(e.has("function")&&!e.has("("))e=e.replace("function","let");
+		if(e.has("let ")&&!(e.has("=")||!e.has("(")))e=e.replace("let","function");
+		return e;
+	}).join("\n");
+}
+function count(s,w){
+	return s.length-s.replaceAll(w,"").length;
+}
+function wholeWord(s){
+	return new RegExp("\\b"+s+"\\b","g");
+}
+function miscRefactoring(str){
+	function addAsync(s){
+		let funcs=[];
+		let asyfunc=[];
+		s.split("\n").forEach(e=>{
+			if(count(e,"\t")==1&&e.has("function")){
+				funcs.push(e.split(" ")[1].split("(")[0]);
+			}
+		});
+		function recursion(d){
+			if(!d)return;
+			let cd=false,fi=-1;
+			s=s.split("\n").map(e=>{
+				if(count(e,"\t")==1&&e.has("function"))++fi;
+				else if(count(e,"\t")>1)
+					if(e.has("await")||asyfunc.find(v=>e.has(v)))
+						if(!asyfunc.includes(funcs[fi])){
+							asyfunc.push(funcs[fi]);
+							cd=true;
+						}else if(asyfunc.find(v=>e.has(v))&&!e.has("await"))
+							asyfunc.forEach(v=>{
+								if(e.has(v)&&!e.has("await "+v))e=e.replaceAll(wholeWord(v),"await "+v);
+							});
+				return e;
+			}).join("\n");
+			recursion(cd);
+		}
+		recursion(true);
+		return s.split("\n").map(e=>{
+			if(count(e,"\t")==1&&e.has("function")&&asyfunc.find(v=>e.match(wholeWord(v))))e=e.replace("function","async function");
+			return e;
+		}).join("\n");
+	}
+	function normalizeDataType(s){
+		return s.split("\n").map(e=>{
+			let append={"boolean":".fill(!1)","int":".fill(0)"};
+			for(let v of Object.keys(append))
+				if(e.has(v))
+					e=e.replace("new "+v+"[","new Array(").replace("]",")"+append[v]);
+			return e;
+		}).join("\n");
+	}
+	str=addAsync(str);
+	str=normalizeDataType(str);
+	return str;
+}
+function getInfo(str){
+	let obj={lines:str.split("\n").length,characters:str.length,func_lens:{}},c=0,name="";
+	str.split("\n").map(e=>{
+		if(count(e,"\t")==2&&!c&&e.has("function"))name=e.replace("async ","").split(" ")[1].split("(")[0];
+		else if(count(e,"\t")>2)c++;
+		else if(e.has("}")&&count(e,"\t")==2){
+			if(name.length)obj.func_lens[name]=c;
+			c=0;
+		}
+	});
+	obj.func_lens=Object.entries(obj.func_lens).sort(([,a],[,b])=>a-b).reduce((r,[k,v])=>({...r,[k]:v}),{});
+	return JSON.stringify(obj,null,2).replaceAll("  ","\t");
+}
+function getSortName(s){
+	s=s.split("\n").filter(e=>e.indexOf(" extends ")+1)[0].split(" ").filter(e=>!["public","abstract","final","class"].includes(e))[0];
+	return s[1]==s[1].toLowerCase()?s[0].toLowerCase()+s.slice(1):s;
+}
+function getImports(s){
+	let sp=s.split("\n"),imports=[],blacklist=["ArrayVisualizer","Sort","ReentrantLock","Random","LinkedList","Arrays","ArrayList","IndexedRotations","PriorityQueue","Statistics"];
+	for(let v of sp)
+		if(v.indexOf("import")+1){
+			let raw=v.split(".").slice(-2).map((e,i)=>e.substr(0,e.length-i)),[,filter]=raw;
+			if(blacklist.indexOf(filter)<0)
+				imports.push("//"+raw.join("."));
+		}
+	if(!imports.length)return"";
+	return"\n"+imports.join("\n");
+}
+function checkForBase(s){
+	let rqs,qd;
+	s.split("\n").forEach(e=>{
+		if(e.indexOf("setQuestion")+1)
+			rqs=e.trim();
+	});
+	if(!rqs)return"";
+	let qs=rqs.match(/".*"/g);
+	qd=rqs.replaceAll(" ","").split(",")[1].replace(");","");
+	return`\t\tlet base=askForNum(${qd},${qs});\n`;
+}
+function format(){
+	let raw=input.value,s=raw.trim();
+	if(!s.length)return;
+	s=miscRefactoring(finalize(refactorSyntax(removeSpaces(getMainFunctions(removeBlockComments(removeRedundantLines(s)))))));
+	let sp=s.split("\n"),final="async "+getSortName(raw)+"(len){\n"+checkForBase(raw);
+	if(sp[0].indexOf("function sort(")+1){
+		sp.shift();
+		final+=sp.join("\n").replaceAll("array","arr");
+	}else final+=sp.map(e=>"\t"+e).join("\n")+"\n\t}";
+	output.value=final;
+	if(final.length<1e5)try{navigator.clipboard.writeText(final+"\n//Info:"+getImports(raw)+"\n"+getInfo(final));}catch(e){console.log(e.stack)}
+}
+addOption("remove \"this.\"","rthis",true);
+addOption("remove unnecessary whitespace","rsp",true);
+addOption("change \"currentLen/sortLength\"","cln",true);
+// fix compareIndices(A,0,1) -> compareIndices(A)
+		</script>
+	</body>
+</html>

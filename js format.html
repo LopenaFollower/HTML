@@ -17,9 +17,6 @@
 				width:100%;
 				height:40%;
 			}
-			input.tx{
-				width:60px;
-			}
 		</style>
 	</head>
 	<body>
@@ -31,7 +28,7 @@
 		<textarea id=input></textarea><br>
 		<textarea id=output></textarea><br>
 		<button onclick='s()'>format</button>
-		<span id=info></span>
+		<pre id=info></pre>
 		<table><tbody id=tpar></tbody></table>
 		<script>
 let dtc="SORTNAMEHERE";
@@ -52,6 +49,17 @@ function addOption(n,id,c){
 function isUpper(n){
 	return n.toUpperCase()==n;
 }
+function getQ(s){
+	let t=s.split("\n");
+	let n="";
+	for(let i=0;i<t.length;i++){
+		if(t[i].indexOf("setQuestion")+1){
+			n=t[i];
+			break;
+		}
+	}
+	return n;
+}
 function getSortName(t){
 	let i=t.search(dtc),l=['"',"'"," "],j;
 	if(i+1){
@@ -64,7 +72,7 @@ function getSortName(t){
 	return cammelCase;
 }
 function getImports(s){
-	let blacklist=["ArrayVisualizer","Sort","ReentrantLock","Random","LinkedList","Arrays","ArrayList","IndexedRotations"];
+	let blacklist=["ArrayVisualizer","Sort","ReentrantLock","Random","LinkedList","Arrays","ArrayList","IndexedRotations","PriorityQueue","Statistics"];
 	let sp=s.split("\n");
 	let imports=[];
 	for(let i=0;i<sp.length;i++){
@@ -72,12 +80,11 @@ function getImports(s){
 		if(txt.indexOf("import")+1){
 			let raw=txt.split(".").slice(-2).map((e,i)=>e.substr(0,e.length-i));
 			let filter=raw[1];
-			if(blacklist.indexOf(filter)<0){
+			if(blacklist.indexOf(filter)<0)
 				imports.push("//"+raw.join("."));
-			}
 		}
 	}
-	if(imports.length<1)return"";
+	if(!imports.length)return"";
 	return"\n"+imports.join("\n");
 }
 function rA(t,s,e,o=1){
@@ -85,7 +92,7 @@ function rA(t,s,e,o=1){
 		let i=t.search(s),p=i+1;
 		if(i<0)break;
 		while(t[p]!=e&&p<t.length)p++;
-		t=t.substr(0,i)+t.substr(p+o,t.length)
+		t=t.substr(0,i)+t.substr(p+o,t.length);
 	}
 	return t;
 }
@@ -96,12 +103,12 @@ function rA2(t,s,e){
 	for(let i=0;i<sp.length;i++){
 		let v=sp[i];
 		if(m){
-			if(v.indexOf(s)>=0){
+			if(v.indexOf(s)+1)
 				m=v.indexOf(e)>=0;
-			}else
+			else
 				na.push(v);
 		}else
-			if(v.indexOf(e)>=0)
+			if(v.indexOf(e)+1)
 				m=true;
 	}
 	return na.join("\n");
@@ -113,21 +120,55 @@ function getIdx(t,s,e){
 		if(i<0)break;
 		p=i+1;
 		while(t[p]!=e&&p<t.length)p++;
-		last=t.substr(p+2,t.length)
-		t=t.substr(0,i-1)+last
+		last=t.substr(p+2,t.length);
+		t=t.substr(0,i-1)+last;
 	}
 	return last.substr(0,last.length-1);
+}
+function finalize(s){
+	return s.split("\n").map(e=>{
+		const has=s=>e.indexOf(s)+1;
+		if(has("compareValues")||has("compareIndices")||has("compareIndexValue"))
+			for(let n of["(\\d+).(\\d+)","(\\d+)"])
+				for(let c of[">=","<=",">","<","==","!="])
+					for(let p of[["<=0","<1"],[">=0","+1"],["!=0",""],["==1",">0"],["==-1","<0"]])
+						e=e.replaceAll(new RegExp(","+n+",(\\w+)\\)","g"),")").replaceAll(...p);
+		if(has("function")&&!has("("))
+			e=e.replace("function","let");
+		return e;
+	}).join("\n");
+}
+function count(s,w){
+	return s.length-s.replaceAll(w,"").length;
+}
+function getInfo(str){
+	let obj={};
+	obj.lines=str.split("\n").length;
+	obj.characters=str.length;
+	obj.func_lens={};
+	let c=0,name="";
+	str.split("\n").map(e=>{
+		const has=s=>e.indexOf(s)+1;
+		if(count(e,"\t")==2&&!c&&has("function")){
+			name=e.split(" ")[1].split("(")[0];
+		}else if(count(e,"\t")>2)c++;
+		else if(has("}")&&count(e,"\t")==2){
+			if(name.length)obj.func_lens[name]=c;
+			c=0;
+		}
+	});
+	obj.func_lens=Object.entries(obj.func_lens).sort(([,a],[,b])=>a-b).reduce((r,[k,v])=>({...r,[k]:v}),{});
+	return JSON.stringify(obj,null,2);
 }
 function s(){
 	let chars=["+","-","*","/",",",",\t",";","?","&","%","|",":",")","(","{","}","=","!",">","<","^"];
 	let st=input.value;
 	for(let i=0;i<10;i++)
-		for(let v of chars)
-			st=st.replaceAll("    ","\t").replaceAll("  ","\t").replaceAll("\t ","\t");
+		st=st.replaceAll("    ","\t").replaceAll("  ","\t").replaceAll("\t ","\t");
 	if(rsp.checked)
 		for(let i=0;i<10;i++)
 			for(let v of chars)
-				st=st.replaceAll(" "+v,v).replaceAll(v+" ",v);
+				st=st.replaceAll(" "+v,v).replaceAll(v+" ",v).replaceAll(v+"\t",v);
 	st=st.replaceAll(",int ",",").
 	replaceAll(",double ",",").
 	replaceAll(",boolean ",",").
@@ -149,6 +190,7 @@ function s(){
 	replaceAll("private static double ","function ").
 	replaceAll("private static int ","function ").
 	replaceAll("public static int ","function ").
+	replaceAll("public int[] ","function ").
 	replaceAll("void ","function ").
 	replaceAll("Writes.swap","await swap").
 	replaceAll("Writes.write","await write").
@@ -157,22 +199,26 @@ function s(){
 	replaceAll("Writes.insert","await Wr.insert").
 	replaceAll("Writes.","").replaceAll("Reads.","").
 	replaceAll("(int[] ","(").replaceAll("for(int ","for(let ").replaceAll("(int ","(").replaceAll("(double ","(").
+	replaceAll("private static final int","let").
+	replaceAll("private final int","let").
 	replaceAll("int[] ","let ").
 	replaceAll("int ","let ").
+	replaceAll("boolean[] ","let ").
 	replaceAll("boolean ","let ").
 	replaceAll("double ","let ").
 	replaceAll("Math.min","minVal").replaceAll("Math.max","maxVal").replaceAll("Math.ceil","ceil").replaceAll("Math.sqrt","sqrt").replaceAll("Math.abs","abs").replaceAll("Math.log","log").replaceAll("Math.pow","pow").replaceAll("Math.floor","floor").
-	replaceAll("currentLength","len").replaceAll("sortLength","len").replaceAll("currentLen","len").
 	replaceAll("@Override","").
-	replaceAll(",1,true)==1",")>0").replaceAll(",1,true)>0",")>0").replaceAll(",1,true)==-1",")<0").replaceAll(",1,true)<=0",")<1").replaceAll(",1,true)>=0",")>=0").replaceAll(",0.5,true)==1",")>0").replaceAll(",0.5,true)>0",")>0").replaceAll(",0.5,true)==-1",")<0").replaceAll(",0.5,true)<=0",")<1").replaceAll(",0.5,true)>=0",")>=0").replaceAll(",0,true)==1",")>0").replaceAll(",0,true)>0",")>0").replaceAll(",0,true)==-1",")<0").replaceAll(",0,true)<=0",")<1").replaceAll(",0,true)>=0",")>=0").replaceAll(",1,false)==1",")>0").replaceAll(",1,false)>0",")>0").replaceAll(",1,false)==-1",")<0").replaceAll(",1,false)<=0",")<1").replaceAll(",1,false)>=0",")>=0").replaceAll(",0.5,false)==1",")>0").replaceAll(",0.5,false)>0",")>0").replaceAll(",0.5,false)==-1",")<0").replaceAll(",0.5,false)<=0",")<1").replaceAll(",0.5,false)>=0",")>=0").
-	replaceAll("runSort","main").
+	replaceAll("runSort","sort").
 	replaceAll("createExternalArray","new Array").replaceAll("createArrayList","new Array").
 	replaceAll("changeReversals(1);","").
 	replaceAll("changeAuxWrites(1);","").
 	replaceAll("addComparison();","").replaceAll("stopLap();","").replaceAll("startLap();","").
 	replaceAll("compareOriginalValues","compareValues").
 	replaceAll("compareOriginalIndices","compareIndices").
-	replaceAll("throws Exception","");
+	replaceAll("throws Exception","").
+	replaceAll("Integer.numberOfLeadingZeros","clz32").
+	replaceAll("while(true)","while(1)");
+	if(cln.checked)st=st.replaceAll("currentLength","len").replaceAll("sortLength","len").replaceAll("currentLen","len");
 	if(rthis.checked)st=st.replaceAll("this.","");
 	if(rmr.checked)st=rA(st,"Highlights.",";");
 	st=rA(st,"Delays.sleep",";");
@@ -181,58 +227,60 @@ function s(){
 	st=rA(st,"deleteArrayList",";");
 	st=rA(st,"//","\n",0);
 	for(let j=0;j<5;j++)for(let i=0;i<10;i++)
-		st=st.replaceAll("\n"+new Array(i).fill("\t").join("")+"\n","\n").
-	replaceAll(")\n"+new Array(i).fill("\t").join("")+"{","){").
-	replaceAll("}\n"+new Array(i).fill("\t").join("")+"else","}else");
+		st=st.replaceAll("\n"+"\t".repeat(i)+"\n","\n").
+		replaceAll(")\n"+"\t".repeat(i)+"{","){").
+		replaceAll("}\n"+"\t".repeat(i)+"else","}else");
 	st=st.replaceAll("public final class",dtc);
 	st=st.replaceAll("final public class",dtc);
 	st=st.replaceAll("public abstract class",dtc);
 	st=st.replaceAll("public class",dtc);
 	st=rA2(st,"/*","*/");
+	st=finalize(st).
+	replaceAll("1.0,","1,").
+	replaceAll(",0.",",.");
+	let resq=getQ(st);
+	let q=rA(resq,"\t",",").replaceAll(");","");
+	let qt=rA(rA(resq,"\t","\""),",",";");
+	let qr=_=>q?`\n\tlet base=askForNum(${q},"${qt});`:"";
 	let threshold=1e5;
 	let s2=st;
-	if(s2.indexOf("setBogoSort")>=0){
+	if(s2.indexOf("setBogoSort")+1){
 		let lower=getIdx(s2,"setBogoSort","}");
 		let spl=lower.split("\n");
-		let test=spl[0].indexOf("main")>=0;
+		let test=spl[0].indexOf("sort")+1;
 		let r=test?"\n":"\n\t";
 		if(test){
 			let newLower=[];
 			for(let i=0;i<spl.length-1;i++){
-				if(spl[i].indexOf("function main(")<0){
+				if(spl[i].indexOf("function sort(")<0){
 					newLower.push(spl[i]);
 				}
 			}
-			lower=newLower.join("\n");
+			lower=newLower.join("\n").replaceAll("array","arr");
 		}
-		s2=`async ${getSortName(st)}(len){\n${lower}}`.replaceAll("\n",r);
-		let temp=s2.split("\n");
-		temp[temp.length-1]=temp[temp.length-1].replaceAll("}}","}");
-		s2=temp.join("\n");
-		output.value=s2;
-		if(s2.length<threshold)navigator.clipboard.writeText(s2+getImports(input.value));
-	}else if(s2.indexOf("super")>=0){
+		s2=`async ${getSortName(st)}(len){${qr()}\n${lower}}`.replaceAll("\n",r);
+	}else if(s2.indexOf("super")+1){
 		let lower=getIdx(s2,"super","}");
 		let spl=lower.split("\n");
-		let test=spl[0].indexOf("main")>=0;
+		let test=spl[0].indexOf("sort")+1;
 		let r=test?"\n":"\n\t";
 		if(test){
 			let newLower=[];
 			for(let i=0;i<spl.length-1;i++){
-				if(spl[i].indexOf("function main(")<0){
+				if(spl[i].indexOf("function sort(")<0){
 					newLower.push(spl[i]);
 				}
 			}
-			lower=newLower.join("\n");
+			lower=newLower.join("\n").replaceAll("array","arr");
 		}
-		s2=`async ${getSortName(st).replaceAll("Sorting","Sort")}(len){\n${lower}}`.replaceAll("\n",r);
-		let temp=s2.split("\n");
-		temp[temp.length-1]=temp[temp.length-1].replaceAll("}}","}");
-		s2=temp.join("\n");
-		output.value=s2;
-		if(s2.length<threshold)navigator.clipboard.writeText(s2+getImports(input.value));
+		s2=`async ${getSortName(st).replaceAll("Sorting","Sort")}(len){${qr()}\n${lower}}`.replaceAll("\n",r);
 	}
-	info.innerText=s2.split("\n").length+` lines, ${s2.length} chars`;
+	let temp=s2.split("\n");
+	temp[temp.length-1]=temp[temp.length-1].replaceAll("}}","}");
+	s2=temp.join("\n");
+	output.value=s2;
+	if(s2.length<threshold)navigator.clipboard.writeText(s2+getImports(input.value)+"\n\n"+getInfo(s2).replaceAll("  ","\t"));
+	info.innerText=getInfo(s2);
 }
 txt.onchange=e=>{
 	let fr=new FileReader(),f=e.target.files[0];
@@ -244,9 +292,7 @@ addOption("this.","rthis",true);
 addOption("spaces","rsp",true);
 addOption("use camelCase","ucc",true);
 addOption("remove mark","rmr",true);
-//the way she moves
-//one way ticket  to the moon
-//i dont want to see you anymore 
+addOption("len","cln",true);
 		</script>
 	</body>
 </html>
