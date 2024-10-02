@@ -101,10 +101,8 @@ function refactorSyntax(s){
 function finalize(s){
 	return s.split("\n").map(e=>{
 		if(e.has("compareValues")||e.has("compareIndices")||e.has("compareIndexValue")||e.has("compareValueIndex"))
-			for(let n of["(\\d+).(\\d+)",".(\\d+)","(\\d+)"])
-				for(let c of[">=","<=",">","<","==","!="])
-					for(let p of[["<=0","<1"],[">=0","+1"],["!=0",""],["==1",">0"],["==-1","<0"]])
-						e=e.replace(new RegExp(","+n+",(\\w+)\\)","g"),")").replace(...p);
+			for(let p of[["<=0","<1"],[">=0","+1"],["!=0",""],["==1",">0"],["==-1","<0"]])
+				e=e.replace(/(\([^,]+,[^,]+,[^,]+),[^)]+\)/g,"$1)").replace(...p);
 		if(e.has("function")&&!e.has("("))e=e.replace("function","let");
 		if(e.has("let ")&&!(e.has("=")||!e.has("(")))e=e.replace("let","function");
 		return e;
@@ -216,7 +214,6 @@ function format(){
 addOption("remove \"this.\"","rthis",true);
 addOption("remove unnecessary whitespace","rsp",true);
 addOption("change \"currentLen/sortLength\"","cln",true);
-// fix compareIndices(A,0,1) -> compareIndices(A)
 		</script>
 	</body>
 </html>
