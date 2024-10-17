@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Tester</title>
+		<meta name="viewport"content="width=device-width,initial-scale=1">
+		<style>
+		</style>
+	</head>
+	<body>
+		<select id=m oninput='s()'><option>Aldose</option><option>Ketose</option></select>
+		<center>
+			<h1 id=q></h1>
+			<div>
+				<input id=i maxlength=3 type=number pattern="[0-1]"/>
+				<button onclick='a()'>Sumbit</button>
+			</div>
+		</center>
+		<script>
+const ms={
+	Aldose:{
+		Allose:"111",
+		Altrose:"011",
+		Glucose:"101",
+		Mannose:"001",
+		Gulose:"110",
+		Idose:"010",
+		Galactose:"100",
+		Talose:"000"
+	},
+	Ketose:{
+		Psicose:"11",
+		Fructose:"01",
+		Sorbose:"10",
+		Tagatose:"00"
+	}
+};
+let c="";
+function s(){
+	m.value=Math.random()>.5?"Aldose":"Ketose";
+	let f=Object.keys(ms[m.value]),n=f.sort(()=>Math.random()-.5)[0];
+	if(c!=n)q.innerText=c=n;
+	else s(i.value="");
+}
+function a(){
+	if(i.value==ms[m.value][c])alert("yes");
+	else alert(ms[m.value][c]);
+	i.value="";
+	setTimeout(s,5e2);
+}
+s();
+		</script>
+	</body>
+</html>
